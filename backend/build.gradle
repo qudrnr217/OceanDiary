@@ -125,6 +125,10 @@ dependencies {
 	testImplementation('org.mockito:mockito-inline:3.4.0')
 	testImplementation('org.mockito:mockito-core:3.4.0')
 	testImplementation('org.mockito:mockito-junit-jupiter:3.4.0')
+
+	//embedded-redis 관련 의존성
+	implementation group: 'it.ozimov', name: 'embedded-redis', version: '0.7.1'
+
 	// [끝]
 }
 
