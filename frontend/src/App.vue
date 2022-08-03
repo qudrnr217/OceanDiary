@@ -17,18 +17,58 @@ export default {
 #app {
   font-family: retro;
 }
+/* 기본 컴포넌트*/
 body {
   margin: 0px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-h1 {
+a {
+  text-decoration: none;
+  color: black;
+}
+
+.title {
   color: white;
   font-size: 120px;
   text-align: center;
   text-shadow: 6px 2px 2px gray;
 }
+.background {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  margin: 0;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.banner {
+  height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/*각종 box 관련 */
+.box {
+  background: #ffffff;
+  box-shadow: 0px 10px 0px #a4b0b6;
+  border-radius: 20px;
+}
+.text-box {
+  margin: 0px 100px 0px 100px;
+  height: 200px;
+  padding: 30px 50px;
+}
+.main-box {
+  margin: 0px 100px 0px 100px;
+  width: 80%;
+  height: 500px;
+}
+
+/*각종 button 관련*/
 .button {
   width: 400px;
   height: 100px;
@@ -45,23 +85,6 @@ h1 {
 .button:hover {
   animation: flash; /* referring directly to the animation's @keyframe declaration */
   animation-duration: 1s; /* don't forget to set a duration! */
-}
-.text-box {
-  background: #ffffff;
-  box-shadow: 0px 10px 0px #a4b0b6;
-  border-radius: 20px;
-  margin: 0px 100px 0px 100px;
-  height: 200px;
-  padding: 30px 50px;
-}
-.background {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  margin: 0;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
 }
 .button-name {
   width: 200px;
@@ -92,6 +115,25 @@ h1 {
   color: white;
   border: solid white 2px;
 }
+.button-metro {
+  width: 150px;
+  height: 50px;
+  background: #72ab46;
+  border-radius: 5px;
+  /* button 내부 텍스트*/
+  color: white;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.button-metro:hover {
+  background: #598c32; /*referring directly to the animation's @keyframe declaration*/
+  color: black;
+  border: solid black 2px;
+}
+
+/* 각종 wrap(레이아웃) 관련 */
 .name-wrap {
   height: 25%;
   display: flex;
@@ -109,20 +151,11 @@ h1 {
   align-items: center;
   justify-content: right;
 }
-.button-wrap {
-  height: 25%;
+.main-wrap {
+  width: 100%;
+  height: 100%;
   display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: right;
-}
-
-.ticket {
-  /* height: 114px; */
-  position: relative;
-  left: 85vw;
-  top: 5vh;
-  height: 110px;
-  width: 170px;
-  background-color: blue;
 }
 </style>

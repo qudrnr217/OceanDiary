@@ -1,11 +1,37 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
+import UserView from "../views/UserView.vue";
+import LoginMenu from "../components/user/LoginMenu.vue";
+import LoginSocial from "../components/user/LoginSocial.vue";
+import LoginSingle from "../components/user/LoginSingle.vue";
 
 const routes = [
   {
     path: "/",
     name: "home",
     component: HomeView,
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: UserView,
+    children: [
+      {
+        path: "/login/menu",
+        name: "login-menu",
+        component: LoginMenu,
+      },
+      {
+        path: "/login/social",
+        name: "login-social",
+        component: LoginSocial,
+      },
+      {
+        path: "/login/single",
+        name: "login-single",
+        component: LoginSingle,
+      },
+    ],
   },
   // {
   //   path: "/about",
