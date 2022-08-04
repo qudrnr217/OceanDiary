@@ -102,6 +102,7 @@ h1 {
   display: flex;
   align-items: center;
   font-size: 24px;
+  /* background-color: blue; */
 }
 .button-wrap {
   height: 25%;
