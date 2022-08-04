@@ -1,26 +1,28 @@
 package com.oceandiary.api.config.security;
 
+import com.oceandiary.api.user.security.token.JwtAuthEntryPoint;
+import com.oceandiary.api.user.security.token.JwtAuthenticationFilter;
+import com.oceandiary.api.user.security.token.TokenProvider;
+import com.oceandiary.api.user.security.userdetails.CustomUserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@RequiredArgsConstructor
-@Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     // 목적 : 서버에 보안 설정 적용(리소스 접근 가능 여부 세팅)
-    private final JwtTokenProvider jwtTokenProvider;
+    private final TokenProvider tokenProvider;
+    private final CustomUserDetailService customUserDetailService;
+    private final JwtAuthEntryPoint jwtAuthEntryPoint;
 
     @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public JwtAuthenticationFilter tokenAuthenticationFilter() {
+        return new JwtAuthenticationFilter(tokenProvider, customUserDetailService);
     }
 
     @Override
@@ -34,9 +36,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests() // 사용권한 체크
                 .antMatchers("/docs/**").permitAll() // restdocs 주소는 누구나 접근 가능 (TODO: swagger 적용시 수정 필요)
                 .antMatchers("/*/login").permitAll() // 가입 및 인증 주소는 누구나 접근 가능
-                .anyRequest().hasRole("USER") // 그외 나머지 요청은 모두 인증된 회원만 접근 가능
+                .anyRequest().authenticated() // 그외 나머지 요청은 모두 인증된 회원만 접근 가능
                 .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class); // jwt token 필터를 id/password 인증 필터 전에 추가
-
+                .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // jwt token 필터를 id/password 인증 필터 전에 추가 (TODO: oauth 설정 후 변경 필요)
     }
 }
