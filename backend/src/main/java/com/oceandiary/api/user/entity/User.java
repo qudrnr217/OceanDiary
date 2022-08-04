@@ -1,16 +1,12 @@
 package com.oceandiary.api.user.entity;
 
 import com.oceandiary.api.common.entity.BaseEntity;
-import com.oceandiary.api.diary.entity.Stamp;
 import lombok.*;
 
 import javax.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 
 @Getter
 @Setter
@@ -38,7 +34,7 @@ public class User extends BaseEntity {
     @Column(name = "last_visited")
     private LocalDateTime visitedAt;
 
-    @OneToMany(mappedBy = "stamp")
-    private List<Stamp> stamps = new ArrayList<>();
+    //@OneToMany(mappedBy = "stamp")
+    //private List<Stamp> stamps = new ArrayList<>();
 
 }
