@@ -1,35 +1,45 @@
 <template>
   <div>
     <div class="this_shadow"></div>
+
+    <div>
+      <div class="this_board"></div>
+    </div>
+    <div class="icon_coffee"></div>
+    <div class="study_sangsung">스터디 생성</div>
+    <div class="icon_lock"></div>
+    <div class="rectangle_password"></div>
+    <input type="password" class="input_password input_style" />
+    <div class="this_title">제목 :</div>
+    <input class="input_title input_style" />
+    <div class="rectangle_title"></div>
+    <div class="this_rule">규칙</div>
+    <textarea
+      name=""
+      id=""
+      cols="30"
+      rows="10"
+      class="input_rule input_style"
+    ></textarea>
+    <div class="rectangle_rule"></div>
+    <div class="this_members">인원 :</div>
+    <input
+      type="number"
+      value="3"
+      min="1"
+      max="6"
+      class="input_myung input_style"
+    />
+    <div class="this_myung">명</div>
+    <div class="rectangle_myung"></div>
+    <div class="image_input"></div>
+    <div class="image_text">이미지 :</div>
+    <div class="image_notification">파일 선택</div>
+    <div class="image_thumbnail"></div>
+    <div class="generate_shadow"></div>
+    <div class="generate_button"></div>
+    <div class="generate_text">생성</div>
   </div>
-  <div>
-    <div class="this_board"></div>
-  </div>
-  <div class="icon_coffee"></div>
-  <div class="study_sangsung">스터디 생성</div>
-  <div class="icon_lock"></div>
-  <div class="rectangle_password"></div>
-  <div class="input_password">비밀***</div>
-  <div class="this_title">제목 :</div>
-  <div class="input_title">두시의 카페 스터디</div>
-  <div class="rectangle_title"></div>
-  <div class="this_rule">규칙</div>
-  <div class="input_rule">
-    캠 on, 하루 4시간
-    이상aaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbcccccccccccccc ddddddddddddd
-  </div>
-  <div class="rectangle_rule"></div>
-  <div class="this_members">인원 :</div>
-  <div class="input_myung">6</div>
-  <div class="this_myung">명</div>
-  <div class="rectangle_myung"></div>
-  <div class="image_input"></div>
-  <div class="image_text">이미지 :</div>
-  <div class="image_notification">파일 선택</div>
-  <div class="image_thumbnail"></div>
-  <div class="generate_shadow"></div>
-  <div class="generate_button"></div>
-  <div class="generate_text">생성</div>
 </template>
 
 <script>
@@ -39,6 +49,11 @@ export default {
 </script>
 
 <style scoped>
+.input_style {
+  border: none;
+  background: transparent;
+  z-index: 100;
+}
 .this_shadow {
   position: absolute;
   width: 1190px;
@@ -264,18 +279,16 @@ export default {
 }
 .input_myung {
   position: absolute;
-  width: 18px;
-  height: 36px;
-  left: 336px;
-  top: 497px;
+  width: 70px;
+  height: 77px;
+  left: 330px;
+  top: 478px;
 
   font-family: "NeoDunggeunmo Pro";
   font-style: normal;
   font-weight: 400;
   font-size: 36px;
   line-height: 36px;
-  /* identical to box height */
-
   display: flex;
   align-items: center;
 

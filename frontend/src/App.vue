@@ -10,6 +10,9 @@ export default {
 </script>
 
 <style>
+*:focus {
+  outline: 0;
+}
 @font-face {
   font-family: "retro";
   src: url("~@/assets/fonts/NeoDunggeunmoPro-Regular.ttf") format("truetype");
