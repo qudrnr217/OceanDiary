@@ -21,7 +21,7 @@ plugins {
 	id 'idea'
 	id 'org.springframework.boot' version "${springBootVer}"
 	id 'io.spring.dependency-management' version "${springDependencyMgmtVer}.RELEASE"
-	id "org.asciidoctor.convert" version "1.5.9.2"
+	id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
 group = 'com.oceandiary'
@@ -29,6 +29,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {
+	asciidoctorExt
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
@@ -141,7 +142,7 @@ dependencies {
 	/*************************
 	 * RestDocs
 	 *************************/
-	asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.4.RELEASE'
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.4.RELEASE'
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
 
@@ -159,6 +160,7 @@ tasks.named('test') {
 }
 
 asciidoctor {
+	configurations 'asciidoctorExt'
 	inputs.dir snippetsDir
 	dependsOn test
 }
