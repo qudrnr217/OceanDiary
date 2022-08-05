@@ -2,11 +2,10 @@ package com.oceandiary.api.user.controller;
 
 import com.google.gson.Gson;
 import com.oceandiary.MvcTest;
-import com.oceandiary.api.user.request.NaverLoginJoinRequest;
-import com.oceandiary.api.user.request.NaverLoginRequest;
-import com.oceandiary.api.user.response.NaverLoginJoinResponse;
-import com.oceandiary.api.user.response.NaverLoginResponse;
+import com.oceandiary.api.user.request.NaverRequest;
+import com.oceandiary.api.user.response.NaverResponse;
 import com.oceandiary.api.user.service.NaverLoginService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,7 +31,8 @@ class NaverLoginControllerTest extends MvcTest {
     private NaverLoginService naverLoginService;
 
     @Test
-    public void 상태토큰_생성() throws Exception {
+    @DisplayName("상태토큰_생성")
+    public void generateState() throws Exception {
         mvc.perform(MockMvcRequestBuilders.get("/api/naver/state"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").exists())
@@ -46,19 +46,21 @@ class NaverLoginControllerTest extends MvcTest {
     }
 
     @Test
-    void 네이버로그인_최초사용자_로그인() throws Exception {
-        NaverLoginRequest request = new NaverLoginRequest();
-        NaverLoginResponse response = new NaverLoginResponse();
+    @DisplayName("네이버로그인_최초사용자_로그인")
+    public void firstLoginByNaver() throws Exception {
+        NaverRequest.LoginRequest request = new NaverRequest.LoginRequest();
+        NaverResponse.LoginResponse response = NaverResponse.LoginResponse.builder()
+                .isExist(false)
+                .oauthId("oauthid")
+                .build();
         request.setCode("code");
-        response.setExist(false);
-        response.setOauthId("oauthid");
         MockHttpSession mockHttpSession = new MockHttpSession();
         given(naverLoginService.login(request, mockHttpSession)).
                 willReturn(response);
 
         Gson gson = new Gson();
         String jsonRequest = gson.toJson(request);
-        mvc.perform(post("/api/naver/login").content(jsonRequest).contentType(MediaType.APPLICATION_JSON).with(csrf()).session(mockHttpSession))
+        mvc.perform(post("/api/naver/login").content(jsonRequest).contentType(MediaType.APPLICATION_JSON).session(mockHttpSession))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isExist").value(false))
                 .andExpect(jsonPath("$.oauthId").value("oauthid"))
@@ -80,21 +82,23 @@ class NaverLoginControllerTest extends MvcTest {
     }
 
     @Test
-    void 네이버로그인_회원가입된_사용자_로그인() throws Exception {
-        NaverLoginRequest request = new NaverLoginRequest();
-        NaverLoginResponse response = new NaverLoginResponse();
+    @DisplayName("네이버로그인_회원가입된_사용자_로그인")
+    void loginByNaverWithPresentUser() throws Exception {
+        NaverRequest.LoginRequest request = new NaverRequest.LoginRequest();
+        NaverResponse.LoginResponse response = NaverResponse.LoginResponse.builder()
+                .isExist(true)
+                .accessToken("access-token")
+                .userId(1L)
+                .name("황재완")
+                .build();
         request.setCode("statecode");
-        response.setExist(true);
-        response.setAccessToken("access-token");
-        response.setUserId(1L);
-        response.setName("황재완");
         MockHttpSession mockHttpSession = new MockHttpSession();
         given(naverLoginService.login(request, mockHttpSession)).
                 willReturn(response);
 
         Gson gson = new Gson();
         String jsonRequest = gson.toJson(request);
-        mvc.perform(post("/api/naver/login").content(jsonRequest).contentType(MediaType.APPLICATION_JSON).with(csrf()).session(mockHttpSession))
+        mvc.perform(post("/api/naver/login").content(jsonRequest).contentType(MediaType.APPLICATION_JSON).session(mockHttpSession))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isExist").value(true))
                 .andExpect(jsonPath("$.accessToken").value("access-token"))
@@ -119,16 +123,18 @@ class NaverLoginControllerTest extends MvcTest {
     }
 
     @Test
-    void 네이버로그인_회원가입() throws Exception {
-        NaverLoginJoinRequest request = new NaverLoginJoinRequest();
-        NaverLoginJoinResponse response = new NaverLoginJoinResponse();
+    @DisplayName("네이버로그인_회원가입")
+    void joinByNaver() throws Exception {
+        NaverRequest.JoinRequest request = new NaverRequest.JoinRequest();
+        NaverResponse.JoinResponse response = NaverResponse.JoinResponse.builder()
+                .accessToken("access-token")
+                .userId(1L)
+                .name("황재완")
+                .build();
         request.setEmail("jaeawn9074@gmail.com");
         request.setName("황재완");
         request.setOauthId("oauthid");
         request.setBirth(LocalDate.of(2022, 07, 10));
-        response.setAccessToken("access-token");
-        response.setUserId(1L);
-        response.setName("황재완");
         given(naverLoginService.join(request)).
                 willReturn(response);
 
