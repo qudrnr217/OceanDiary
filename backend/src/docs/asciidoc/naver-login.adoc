@@ -1,0 +1,74 @@
+= 바다마을 다이어리 API 문서 (Social Login: NAVER)
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+:snippets: ../../../build/generated-snippets
+
+== User - Naver Login
+
+== *네이버 로그인을 위한 상태코드 생성*
+
+`GET /api/naver/state`
+
+HTTP Request
+
+include::{snippets}/naver-login-state/http-request.adoc[]
+
+HTTP Response
+
+include::{snippets}/naver-login-state/http-response.adoc[]
+include::{snippets}/naver-login-state/response-fields.adoc[]
+
+== *처음 회원가입하는 유저 로그인*
+
+`POST /api/naver/login`
+
+HTTP Request
+
+include::{snippets}/naver-login-first-user/http-request.adoc[]
+include::{snippets}/naver-login-first-user/request-fields.adoc[]
+
+----
+
+[source]
+{
+    “code”: “FUuGoFt4FcDPb70TZW”,
+}
+----
+
+HTTP Response
+
+include::{snippets}/naver-login-first-user/http-response.adoc[]
+include::{snippets}/naver-login-first-user/response-fields.adoc[]
+
+== *이미 회원인 유저 로그인*
+
+`POST /api/naver/login`
+
+HTTP Request
+
+include::{snippets}/naver-login-duplicate-user/http-request.adoc[]
+include::{snippets}/naver-login-duplicate-user/request-fields.adoc[]
+
+HTTP Response
+
+include::{snippets}/naver-login-duplicate-user/http-response.adoc[]
+include::{snippets}/naver-login-duplicate-user/response-fields.adoc[]
+
+== *회원정보 조회*
+
+`POST /api/naver/singup`
+
+HTTP Request
+
+include::{snippets}/naver-login-signup/http-request.adoc[]
+include::{snippets}/naver-login-signup/request-fields.adoc[]
+
+HTTP Response
+
+include::{snippets}/naver-login-signup/http-response.adoc[]
+
+include::{snippets}/naver-login-signup/response-fields.adoc[]

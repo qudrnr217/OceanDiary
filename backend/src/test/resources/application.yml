@@ -1,3 +1,12 @@
+server:
+  port: 8080
+  address: localhost
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
 spring:
   datasource:
     url: jdbc:h2:mem:testdb;MODE=MYSQL
@@ -17,6 +26,14 @@ spring:
     host: 127.0.0.1
     port: 6379
 
+jwt:
+  access-token-props:
+    secret: adsjkQWFRaeiasjodfiwAWeeifjaSDOFJaiewAEWgIREAjORaerjAOESJOgDASIKFJIAJqiojuerfiAE
+    expiration-time-milli-sec: 3600000
+  refresh-token-props:
+    secret: ZqefBscadfsGjaiADFSGaoGHdsjjsDFksjgDskdjgDjgHJmdSlzLfjbhikjaqWSogvjdsjzUEvlkvvhnDFGVnkfa
+    expiration-time-milli-sec: 864000000
+
 logging.level:
   org.hibernate.SQL: debug
-    # org.hibernate.type: trace
+  # org.hibernate.type: trace

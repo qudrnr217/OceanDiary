@@ -1,11 +1,11 @@
 package com.oceandiary.api.user.service;
 
-import com.oceandiary.api.user.repository.NaverUserRepository;
 import com.oceandiary.api.user.domain.Role;
 import com.oceandiary.api.user.domain.SocialProvider;
 import com.oceandiary.api.user.dto.NaverLoginAccessTokenApiResponse;
 import com.oceandiary.api.user.dto.NaverLoginProfileApiResponse;
 import com.oceandiary.api.user.entity.User;
+import com.oceandiary.api.user.repository.NaverUserRepository;
 import com.oceandiary.api.user.request.NaverLoginJoinRequest;
 import com.oceandiary.api.user.request.NaverLoginRequest;
 import com.oceandiary.api.user.response.NaverLoginJoinResponse;
@@ -13,6 +13,7 @@ import com.oceandiary.api.user.response.NaverLoginResponse;
 import com.oceandiary.api.user.security.token.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -35,8 +36,10 @@ public class NaverLoginService {
     private final TokenProvider tokenProvider;
 
     // TODO: @ConfigurationProperties 혹은 @Value 사용해서 API 키 감추기
-    private final String clientId = "vQpyQoy56bjYmRbrlq5L";
-    private final String clientSecret = "TJhH0VSuX_";
+    @Value("${NAVER_API_CLIENT_ID}")
+    private String clientId;
+    @Value("NAVER_API_CLIENT_SECRET")
+    private String clientSecret;
 
     public NaverLoginResponse login(NaverLoginRequest request, HttpSession session) {
         String accessToken = getAccessToken(request, session);
@@ -44,6 +47,7 @@ public class NaverLoginService {
 
         User foundUser = naverUserRepository.findByProviderAndOauthId(SocialProvider.NAVER, naverUniqueId);
         NaverLoginResponse response = new NaverLoginResponse();
+
         if (foundUser != null) {
             response.setName(foundUser.getName());
             response.setUserId(foundUser.getId());

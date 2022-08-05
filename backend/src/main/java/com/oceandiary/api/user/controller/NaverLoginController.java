@@ -4,6 +4,7 @@ import com.oceandiary.api.user.request.NaverLoginJoinRequest;
 import com.oceandiary.api.user.request.NaverLoginRequest;
 import com.oceandiary.api.user.response.NaverLoginJoinResponse;
 import com.oceandiary.api.user.response.NaverLoginResponse;
+import com.oceandiary.api.user.response.NaverLoginStateResponse;
 import com.oceandiary.api.user.service.NaverLoginService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ public class NaverLoginController {
     private final NaverLoginService naverLoginService;
 
     @GetMapping("/naver/state")
-    public String generateState(HttpSession session) {
+    public NaverLoginStateResponse generateState(HttpSession session) {
         // CSRF 방지를 위한 상태 토큰 생성 코드
         // 상태 토큰은 추후 검증을 위해 세션에 저장되어야 한다.
         // 상태 토큰으로 사용할 랜덤 문자열 생성
@@ -32,7 +33,9 @@ public class NaverLoginController {
         // 세션 또는 별도의 저장 공간에 상태 토큰을 저장
         session.setAttribute("state", state);
         log.info("session={}", session.getAttribute("state"));
-        return state;
+        NaverLoginStateResponse response = new NaverLoginStateResponse();
+        response.setState(state);
+        return response;
     }
 
     @PostMapping("/naver/login")
