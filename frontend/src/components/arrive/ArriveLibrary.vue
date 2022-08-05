@@ -19,7 +19,10 @@
         />
       </div>
       <div class="button-wrap">
-        <div class="button-next">다음</div>
+        <!-- <div class="button-next">다음</div> -->
+        <router-link to="/library_bg/home" class="button-next"
+          >다음</router-link
+        >
       </div>
     </div>
   </div>

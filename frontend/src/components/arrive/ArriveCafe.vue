@@ -19,17 +19,32 @@
         />
       </div>
       <div class="button-wrap">
-        <div class="button-next">다음</div>
+        <!-- <div class="button-next">다음</div> -->
+        <!-- <router-link to="/cafe_bg/home" class="button-next">다음</router-link> -->
+        <button class="button-next" @click="post_title()">다음</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+
 export default {
   name: "HelloWorld",
-  props: {
-    msg: String,
+  setup() {
+    const router = useRouter();
+    const store = useStore();
+    var post_title = () => {
+      store.commit("locationStore/SET_LOCATION_NAME", "카페");
+      console.log(store.state.locationStore.location_name);
+      router.push("/cafe_bg/home");
+    };
+
+    return {
+      post_title,
+    };
   },
 };
 </script>
