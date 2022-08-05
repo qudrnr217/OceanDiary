@@ -41,7 +41,15 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private Role role;
 
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
     //@OneToMany(mappedBy = "stamp")
     //private List<Stamp> stamps = new ArrayList<>();
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
 
 }
