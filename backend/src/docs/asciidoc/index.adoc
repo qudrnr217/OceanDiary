@@ -1,0 +1,3 @@
+= 바닷마을 다이어리 API 문서
+
+- link:/docs/user.html[사용자(User) API]
