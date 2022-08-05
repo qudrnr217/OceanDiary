@@ -38,3 +38,6 @@ out/
 
 ### ssafy-web.log ###
 ssafy-web.log
+
+### application-oauth.properties ###
+application-oauth.properties
