@@ -22,17 +22,29 @@
       </div>
       <div class="button-wrap">
         <!-- <div class="button-next">다음</div> -->
-        <router-link to="/ocean_bg/home" class="button-next">다음</router-link>
+        <!-- <router-link to="/ocean_bg/home" class="button-next">다음</router-link> -->
+        <button class="button-next" @click="next_page()">다음</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 export default {
   name: "HelloWorld",
-  props: {
-    msg: String,
+  setup() {
+    const router = useRouter();
+    const store = useStore();
+    var next_page = () => {
+      store.commit("locationStore/SET_LOCATION_NAME", "바다");
+      router.push("/ocean_bg/home");
+      store.commit("locationStore/SET_CREATE_NAME", "ocean_create");
+    };
+    return {
+      next_page,
+    };
   },
 };
 </script>

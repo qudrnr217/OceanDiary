@@ -80,6 +80,11 @@ const routes = [
         name: "festival_home",
         component: () => import("@/components/room/RoomList.vue"),
       },
+      {
+        path: "create",
+        name: "festival_create",
+        component: () => import("@/components/room/RoomCreate.vue"),
+      },
     ],
   },
   {
@@ -109,6 +114,11 @@ const routes = [
         name: "house_home",
         component: () => import("@/components/room/RoomList.vue"),
       },
+      {
+        path: "create",
+        name: "house_create",
+        component: () => import("@/components/room/RoomCreate.vue"),
+      },
     ],
   },
   {
@@ -121,6 +131,11 @@ const routes = [
         name: "library_home",
         component: () => import("@/components/room/RoomList.vue"),
       },
+      {
+        path: "create",
+        name: "library_create",
+        component: () => import("@/components/room/RoomCreate.vue"),
+      },
     ],
   },
   {
@@ -132,6 +147,11 @@ const routes = [
         path: "home",
         name: "ocean_home",
         component: () => import("@/components/room/RoomList.vue"),
+      },
+      {
+        path: "create",
+        name: "ocean_create",
+        component: () => import("@/components/room/RoomCreate.vue"),
       },
     ],
   },

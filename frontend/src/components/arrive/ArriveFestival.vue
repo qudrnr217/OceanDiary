@@ -22,19 +22,31 @@
       </div>
       <div class="button-wrap">
         <!-- <div class="button-next">다음</div> -->
-        <router-link to="/festival_bg/home" class="button-next"
+        <!-- <router-link to="/festival_bg/home" class="button-next"
           >다음</router-link
-        >
+        > -->
+        <button class="button-next" @click="next_page()">다음</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 export default {
   name: "HelloWorld",
-  props: {
-    msg: String,
+  setup() {
+    const router = useRouter();
+    const store = useStore();
+    var next_page = () => {
+      store.commit("locationStore/SET_LOCATION_NAME", "축제");
+      router.push("/festival_bg/home");
+      store.commit("locationStore/SET_CREATE_NAME", "festival_create");
+    };
+    return {
+      next_page,
+    };
   },
 };
 </script>
