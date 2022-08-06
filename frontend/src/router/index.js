@@ -9,6 +9,34 @@ const routes = [
     component: HomeView,
   },
   {
+    path: "/login",
+    name: "login",
+    component: () => import("@/views/UserView.vue"),
+    children: [
+      {
+        path: "/login/menu",
+        name: "login-menu",
+        component: () => import("@/components/user/LoginMenu.vue"),
+      },
+      {
+        path: "/login/social",
+        name: "login-social",
+        component: () => import("@/components/user/LoginSocial.vue"),
+      },
+      {
+        path: "/login/single",
+        name: "login-single",
+        component: () => import("@/components/user/LoginSingle.vue"),
+      },
+    ],
+  },
+  {
+    path: "/oauth2/redirect",
+    name: "OauthHandler",
+    component: () => import("@/components/user/oauth/NaverHandler.vue"),
+  },
+
+  {
     path: "/station",
     name: "station",
     component: StationView,
