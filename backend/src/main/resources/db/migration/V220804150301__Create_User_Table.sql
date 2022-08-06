@@ -14,5 +14,6 @@ CREATE TABLE `user`
     `deleted_at`   DATETIME     DEFAULT NULL,
     `created_by`   BIGINT       DEFAULT NULL,
     `updated_by`   BIGINT       DEFAULT NULL,
+    `refresh_token` VARCHAR(255) DEFAULT NULL,
     PRIMARY KEY (`user_id`)
 );
