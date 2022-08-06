@@ -14,6 +14,8 @@ export default {
 <style scoped>
 .background {
   background-image: url("~@/assets/[06_방목록]축제.png");
+  width: 100vw;
+  height: 100vh;
 }
 .banner {
   height: 60vh;

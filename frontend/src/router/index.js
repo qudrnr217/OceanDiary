@@ -70,6 +70,71 @@ const routes = [
     name: "station_library",
     component: () => import("@/components/arrive/ArriveLibrary.vue"),
   },
+  {
+    path: "/festival_bg",
+    name: "festival",
+    component: () => import("@/views/FestivalView.vue"),
+    children: [
+      {
+        path: "home",
+        name: "festival_home",
+        component: () => import("@/components/room/RoomList.vue"),
+      },
+    ],
+  },
+  {
+    path: "/cafe_bg",
+    name: "cafe",
+    component: () => import("@/views/CafeView.vue"),
+    children: [
+      {
+        path: "home",
+        name: "cafe_home",
+        component: () => import("@/components/room/RoomList.vue"),
+      },
+      {
+        path: "create",
+        name: "cafe_create",
+        component: () => import("@/components/room/RoomCreate.vue"),
+      },
+    ],
+  },
+  {
+    path: "/house_bg",
+    name: "house",
+    component: () => import("@/views/HouseView.vue"),
+    children: [
+      {
+        path: "home",
+        name: "house_home",
+        component: () => import("@/components/room/RoomList.vue"),
+      },
+    ],
+  },
+  {
+    path: "/library_bg",
+    name: "library",
+    component: () => import("@/views/LibraryView.vue"),
+    children: [
+      {
+        path: "home",
+        name: "library_home",
+        component: () => import("@/components/room/RoomList.vue"),
+      },
+    ],
+  },
+  {
+    path: "/ocean_bg",
+    name: "ocean",
+    component: () => import("@/views/OceanView.vue"),
+    children: [
+      {
+        path: "home",
+        name: "ocean_home",
+        component: () => import("@/components/room/RoomList.vue"),
+      },
+    ],
+  },
 ];
 
 const router = createRouter({
