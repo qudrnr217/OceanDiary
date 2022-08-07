@@ -26,7 +26,8 @@
       </div>
     </div>
     <div class="button-wrap">
-      <div class="button-metro">출 발</div>
+      <!-- <div class="button-metro">출 발</div> -->
+      <router-link to="/station/home" class="button-metro">출 발</router-link>
     </div>
   </div>
 </template>

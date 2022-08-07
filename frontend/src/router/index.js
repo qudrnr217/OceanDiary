@@ -28,6 +28,11 @@ const routes = [
         name: "login-single",
         component: () => import("@/components/user/LoginSingle.vue"),
       },
+      {
+        path: "/login/signup",
+        name: "login-signup",
+        component: () => import("@/components/user/LoginSignup.vue"),
+      },
     ],
   },
   {

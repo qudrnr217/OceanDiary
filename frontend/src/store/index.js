@@ -23,8 +23,14 @@
 import { createStore } from "vuex";
 // import createPersistedState from "vuex-persistedstate";
 import locationStore from "./modules/locationStore";
+import userStore from "./modules/userStore";
+import createPersistedState from "vuex-persistedstate";
 
 export default createStore({
-  modules: { locationStore },
-  plugins: [],
+  modules: { locationStore, userStore },
+  plugins: [
+    createPersistedState({
+      paths: ["userStore"],
+    }),
+  ],
 });
