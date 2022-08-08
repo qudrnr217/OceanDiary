@@ -169,6 +169,11 @@ const routes = [
         name: "library_create",
         component: () => import("@/components/room/RoomCreate.vue"),
       },
+      {
+        path: "room",
+        name: "library_study",
+        component: () => import("@/components/room/StudyRoom.vue"),
+      },
     ],
   },
   {
