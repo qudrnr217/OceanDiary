@@ -1,6 +1,6 @@
 package com.oceandiary.api.room.request;
 
-import com.oceandiary.api.room.domain.Category;
+import com.oceandiary.api.common.category.Category;
 import lombok.Data;
 
 public class RoomRequest {
@@ -15,6 +15,7 @@ public class RoomRequest {
         private String pw;
     }
 
+    @Data
     public static class EnterRoom {
         private String pw;
     }

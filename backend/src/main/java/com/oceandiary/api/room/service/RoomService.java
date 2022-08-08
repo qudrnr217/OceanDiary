@@ -6,6 +6,7 @@ import com.oceandiary.api.room.entity.Participant;
 import com.oceandiary.api.room.entity.ParticipantOnRedis;
 import com.oceandiary.api.room.entity.Room;
 import com.oceandiary.api.room.entity.RoomOnRedis;
+import com.oceandiary.api.room.exception.PasswordNotValidException;
 import com.oceandiary.api.room.repository.ParticipantOnRedisRepository;
 import com.oceandiary.api.room.repository.ParticipantRepository;
 import com.oceandiary.api.room.repository.RoomOnRedisRepository;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Transactional
@@ -38,6 +40,9 @@ public class RoomService {
     private final RoomOnRedisRepository roomOnRedisRepository;
     private final ParticipantRepository participantRepository;
     private final ParticipantOnRedisRepository participantOnRedisRepository;
+
+    @Value("${openvidu.secret}")
+    private String OPENVIDU_SECRET;
 
     public RoomService(@Value("${openvidu.secret}") String secret, @Value("${openvidu.url}") String openviduUrl, RoomRepository roomRepository, RoomOnRedisRepository roomOnRedisRepository, ParticipantRepository participantRepository, ParticipantOnRedisRepository participantOnRedisRepository) {
         this.SECRET = secret;
@@ -56,6 +61,8 @@ public class RoomService {
         ConnectionProperties connectionProperties =
                 new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).role(OpenViduRole.MODERATOR).build();
 
+        log.info("openvidu 접속 테스트 완료");
+
         if (roomOnRedisRepository.findByCreatedBy(user.getId()).isPresent()) {
             throw new BusinessException("이미 방을 생성한 유저가 다시 생성함");
         }
@@ -71,14 +78,16 @@ public class RoomService {
                     .pw(request.getPw())
                     .build();
             Room newRoom = roomRepository.save(room);
+            log.info("생성된 방: {}", newRoom);
 
             // Create a new OpenVidu Session
             Session session = this.openVidu.createSession();
             // Generate a new Connection with the recently created connectionProperties
             String token = session.createConnection(connectionProperties).getToken();
 
-            roomOnRedisRepository.save(RoomOnRedis.builder().id(newRoom.getId()).createdBy(user.getId()).session(session).build());
-            ParticipantOnRedis participantOnRedis = ParticipantOnRedis.builder().id(newRoom.getId()).build();
+            RoomOnRedis newRoomOnRedis = RoomOnRedis.builder().id(newRoom.getId()).sessionId(session.getSessionId()).createdBy(user.getId()).build();
+            roomOnRedisRepository.save(newRoomOnRedis);
+            ParticipantOnRedis participantOnRedis = ParticipantOnRedis.builder().id(newRoom.getId()).participants(new ConcurrentHashMap<>()).build();
             ParticipantOnRedis newParticipantOnRedis = participantOnRedisRepository.save(participantOnRedis);
 
             Participant newParticipant = Participant.builder()
@@ -93,15 +102,14 @@ public class RoomService {
             newParticipantOnRedis.addParticipant(newParticipant.getId(), token);
             participantOnRedisRepository.save(newParticipantOnRedis);
 
-            RoomResponse.CreateRoom response = RoomResponse.CreateRoom.builder()
+            return RoomResponse.CreateRoom.builder()
                     .roomId(newRoom.getId())
                     .participantId(newParticipant.getId())
                     .token(token)
                     .build();
 
-            return response;
-
         } catch (Exception e) {
+            log.error("에러 메시지: {}", e.getStackTrace());
             throw new BusinessException("세션 생성중 예외 발생");
         }
     }
@@ -116,10 +124,17 @@ public class RoomService {
 
         try {
             // Generate a new Connection with the recently created connectionProperties
-            Session session = roomOnRedisRepository.findById(roomId).orElseThrow().getSession();
-            String token = session.createConnection(connectionProperties).getToken();
+            String sessionId = roomOnRedisRepository.findById(roomId).orElseThrow().getSessionId();
+            Session session = getSession(sessionId);
 
+            String token = session.createConnection(connectionProperties).getToken();
             Room room = roomRepository.findById(roomId).orElseThrow();
+
+            // 비밀번호 설정된 방인데 비밀번호가 틀린경우
+            if (!room.getIsOpen() && !room.getPw().equals(request.getPw())){
+                throw new PasswordNotValidException();
+            }
+
             Participant newParticipant = Participant.builder()
                     .room(room)
                     .user(user)
@@ -133,12 +148,10 @@ public class RoomService {
             participantOnRedis.addParticipant(newParticipant.getId(), token);
             participantOnRedisRepository.save(participantOnRedis);
 
-            RoomResponse.EnterRoom response = RoomResponse.EnterRoom.builder()
+            return RoomResponse.EnterRoom.builder()
                     .participantId(newParticipant.getId())
                     .token(token)
                     .build();
-
-            return response;
 
         } catch (OpenViduJavaClientException e) {
             // If internal error generate an error message and return it to client
@@ -153,6 +166,8 @@ public class RoomService {
                 room.setDeletedAt(LocalDateTime.now());
             }
             throw new BusinessException(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -162,9 +177,18 @@ public class RoomService {
             RoomOnRedis roomOnRedis = roomOnRedisRepository.findById(roomId).orElseThrow();
             ParticipantOnRedis participantOnRedis = participantOnRedisRepository.findById(roomId).orElseThrow();
 
+            Session session = getSession(roomOnRedis.getSessionId());
+
             if (user.getId() == roomOnRedis.getCreatedBy()) {  // 방장이 나갈경우
-                Session session = roomOnRedis.getSession(); // 세션을 끊어 버림
                 session.close();
+                for (Long pid  : participantOnRedis.getParticipants().keySet()) {
+                    Participant participant = participantRepository.findById(pid).orElseThrow();
+                    participant.addExitDate();
+                }
+                participantOnRedis.getParticipants().clear();
+            } else {
+                Participant participant = participantRepository.findById(participantId).orElseThrow();
+                participant.addExitDate();
             }
 
             participantOnRedis.removeParticipant(participantId);
@@ -174,6 +198,7 @@ public class RoomService {
                 roomOnRedisRepository.deleteById(roomId);
                 Room room = roomRepository.findById(roomId).orElseThrow();
                 room.setDeletedAt(LocalDateTime.now());
+                log.info("방 세션 종료");
             } else {  // 방에 아직 참가자가 있을경우
                 participantOnRedisRepository.save(participantOnRedis);
             }
@@ -191,6 +216,8 @@ public class RoomService {
                 room.setDeletedAt(LocalDateTime.now());
             }
             throw new BusinessException(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -202,6 +229,11 @@ public class RoomService {
             searchedRoom.setCurNum(searchedRoomId);
         }
         return page;
+    }
+
+    public Session getSession(String sessionId) {
+        List<Session> activeSessions = this.openVidu.getActiveSessions();
+        return activeSessions.stream().filter(s -> s.getSessionId().equals(sessionId)).findFirst().orElseThrow();
     }
 }
 

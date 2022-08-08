@@ -1,7 +1,7 @@
 package com.oceandiary.api.room.entity;
 
 import com.oceandiary.api.common.entity.BaseEntity;
-import com.oceandiary.api.room.domain.Category;
+import com.oceandiary.api.common.category.Category;
 import com.oceandiary.api.user.entity.User;
 import lombok.*;
 
@@ -17,6 +17,7 @@ import javax.persistence.*;
 public class Room extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "room_id")
     private Long id;
 
     @Enumerated(EnumType.STRING)

@@ -33,4 +33,8 @@ public class Participant {
 
     @Column(name = "exit_date")
     private LocalDateTime exitDate;
+
+    public void addExitDate() {
+        this.exitDate = LocalDateTime.now();
+    }
 }

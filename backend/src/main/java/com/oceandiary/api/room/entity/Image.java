@@ -14,6 +14,7 @@ public class Image {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "image_id")
     private Long id;
 
     @OneToOne(mappedBy = "image", fetch = FetchType.LAZY)
