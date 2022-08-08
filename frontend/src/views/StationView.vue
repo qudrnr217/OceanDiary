@@ -13,7 +13,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .background {
-  background-image: url("~@/assets/[06_방목록]축제.png");
+  background-image: url("~@/assets/[03_티켓확인]타는곳(기존이미지).png");
 }
 .banner {
   height: 60vh;

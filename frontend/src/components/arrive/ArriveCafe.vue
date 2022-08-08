@@ -21,7 +21,7 @@
       <div class="button-wrap">
         <!-- <div class="button-next">다음</div> -->
         <!-- <router-link to="/cafe_bg/home" class="button-next">다음</router-link> -->
-        <button class="button-next" @click="post_title()">다음</button>
+        <button class="button-next" @click="next_page()">다음</button>
       </div>
     </div>
   </div>
@@ -36,14 +36,15 @@ export default {
   setup() {
     const router = useRouter();
     const store = useStore();
-    var post_title = () => {
+    var next_page = () => {
       store.commit("locationStore/SET_LOCATION_NAME", "카페");
       console.log(store.state.locationStore.location_name);
       router.push("/cafe_bg/home");
+      store.commit("locationStore/SET_CREATE_NAME", "cafe_create");
     };
 
     return {
-      post_title,
+      next_page,
     };
   },
 };

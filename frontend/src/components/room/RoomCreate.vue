@@ -24,7 +24,7 @@
       </div>
       <div class="text-middle">
         <div class="title-wrap">
-          <div class="title">제목 :</div>
+          <div class="title-name">제목 :</div>
           <input type="text" class="title_text" />
         </div>
         <div class="rule-wrap">
@@ -161,7 +161,7 @@ export default {
   align-items: center;
 }
 
-.title {
+.title-name {
   position: relative;
   left: 10%;
 }

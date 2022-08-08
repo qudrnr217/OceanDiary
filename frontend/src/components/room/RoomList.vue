@@ -29,7 +29,8 @@ export default {
     var title = store.state.locationStore.location_name;
     const router = useRouter();
     var create_room = () => {
-      router.push("/cafe_bg/create");
+      console.log(store.state.locationStore.create_name);
+      router.push({ name: store.state.locationStore.create_name });
     };
     return {
       title,

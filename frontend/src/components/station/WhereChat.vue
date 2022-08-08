@@ -17,7 +17,16 @@
 </template>
 
 <script>
-export default {};
+import { useStore } from "vuex";
+export default {
+  setup() {
+    const store = useStore();
+    console.log("where 시작!");
+    console.log(store.state.userStore.name);
+    console.log(store.state.userStore.token);
+    console.log(store.state.userStore.userId);
+  },
+};
 </script>
 
 <style scoped>

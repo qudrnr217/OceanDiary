@@ -5,6 +5,7 @@ const locationStore = {
   state: () => ({
     location_url: "",
     location_name: "",
+    create_name: "",
   }),
   mutations: {
     SET_LOCATION_URL(state, location_url) {
@@ -12,6 +13,9 @@ const locationStore = {
     },
     SET_LOCATION_NAME(state, location_name) {
       state.location_name = location_name;
+    },
+    SET_CREATE_NAME(state, create_name) {
+      state.create_name = create_name;
     },
   },
 };

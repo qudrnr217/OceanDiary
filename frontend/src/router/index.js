@@ -9,6 +9,39 @@ const routes = [
     component: HomeView,
   },
   {
+    path: "/login",
+    name: "login",
+    component: () => import("@/views/UserView.vue"),
+    children: [
+      {
+        path: "/login/menu",
+        name: "login-menu",
+        component: () => import("@/components/user/LoginMenu.vue"),
+      },
+      {
+        path: "/login/social",
+        name: "login-social",
+        component: () => import("@/components/user/LoginSocial.vue"),
+      },
+      {
+        path: "/login/single",
+        name: "login-single",
+        component: () => import("@/components/user/LoginSingle.vue"),
+      },
+      {
+        path: "/login/signup",
+        name: "login-signup",
+        component: () => import("@/components/user/LoginSignup.vue"),
+      },
+    ],
+  },
+  {
+    path: "/oauth2/redirect",
+    name: "OauthHandler",
+    component: () => import("@/components/user/oauth/NaverHandler.vue"),
+  },
+
+  {
     path: "/station",
     name: "station",
     component: StationView,
@@ -80,6 +113,11 @@ const routes = [
         name: "festival_home",
         component: () => import("@/components/room/RoomList.vue"),
       },
+      {
+        path: "create",
+        name: "festival_create",
+        component: () => import("@/components/room/RoomCreate.vue"),
+      },
     ],
   },
   {
@@ -109,6 +147,11 @@ const routes = [
         name: "house_home",
         component: () => import("@/components/room/RoomList.vue"),
       },
+      {
+        path: "create",
+        name: "house_create",
+        component: () => import("@/components/room/RoomCreate.vue"),
+      },
     ],
   },
   {
@@ -121,6 +164,11 @@ const routes = [
         name: "library_home",
         component: () => import("@/components/room/RoomList.vue"),
       },
+      {
+        path: "create",
+        name: "library_create",
+        component: () => import("@/components/room/RoomCreate.vue"),
+      },
     ],
   },
   {
@@ -132,6 +180,11 @@ const routes = [
         path: "home",
         name: "ocean_home",
         component: () => import("@/components/room/RoomList.vue"),
+      },
+      {
+        path: "create",
+        name: "ocean_create",
+        component: () => import("@/components/room/RoomCreate.vue"),
       },
     ],
   },
