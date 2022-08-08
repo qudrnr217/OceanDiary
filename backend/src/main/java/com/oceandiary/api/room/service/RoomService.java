@@ -109,7 +109,6 @@ public class RoomService {
                     .build();
 
         } catch (Exception e) {
-            log.error("에러 메시지: {}", e.getStackTrace());
             throw new BusinessException("세션 생성중 예외 발생");
         }
     }
@@ -223,8 +222,7 @@ public class RoomService {
 
     public Page<RoomResponse.SearchRooms> search(RoomSearchCondition condition, Pageable pageable) {
         Page<RoomResponse.SearchRooms> page = roomRepository.search(condition, pageable);
-        List<RoomResponse.SearchRooms> searchedRooms = page.getContent();
-        for (RoomResponse.SearchRooms searchedRoom : searchedRooms) {
+        for (RoomResponse.SearchRooms searchedRoom : page.getContent()) {
             Integer searchedRoomId = participantOnRedisRepository.findById(searchedRoom.getRoomId()).orElseThrow().getParticipants().size();
             searchedRoom.setCurNum(searchedRoomId);
         }

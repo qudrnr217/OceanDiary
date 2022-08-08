@@ -4,14 +4,13 @@ import com.oceandiary.api.room.dto.RoomSearchCondition;
 import com.oceandiary.api.room.request.RoomRequest;
 import com.oceandiary.api.room.response.RoomResponse;
 import com.oceandiary.api.room.service.RoomService;
-import com.oceandiary.api.user.entity.User;
 import com.oceandiary.api.user.security.userdetails.CurrentUser;
-import com.oceandiary.api.user.security.userdetails.CustomUserDetailService;
 import com.oceandiary.api.user.security.userdetails.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,9 +39,10 @@ public class RoomController {
     }
 
     @GetMapping("")
-    public Page<RoomResponse.SearchRooms> search(RoomSearchCondition condition, Pageable pageable) {
+    public Page<RoomResponse.SearchRooms> search(RoomSearchCondition condition, @PageableDefault(size = 5) Pageable pageable) {
         log.info("{}", condition);
         return roomService.search(condition, pageable);
     }
+
 
 }

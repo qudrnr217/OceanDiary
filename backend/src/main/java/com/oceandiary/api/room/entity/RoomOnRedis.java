@@ -1,9 +1,10 @@
 package com.oceandiary.api.room.entity;
 
-import io.openvidu.java.client.Session;
-import lombok.*;
-import org.springframework.data.annotation.Id;
+import lombok.Builder;
+import lombok.Getter;
 import org.springframework.data.redis.core.RedisHash;
+
+import javax.persistence.Id;
 
 @Getter
 @Builder

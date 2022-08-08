@@ -1,10 +1,6 @@
 package com.oceandiary.api.room.response;
 
-import com.querydsl.core.annotations.QueryProjection;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 public class RoomResponse {
 
@@ -25,6 +21,8 @@ public class RoomResponse {
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class SearchRooms {
         private Long roomId;
         private Long createdBy;
@@ -33,6 +31,5 @@ public class RoomResponse {
         private Integer maxNum;
         private Integer curNum;
         private Boolean isOpen;
-
     }
 }

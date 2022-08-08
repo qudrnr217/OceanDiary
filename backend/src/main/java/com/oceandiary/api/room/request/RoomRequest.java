@@ -7,7 +7,6 @@ public class RoomRequest {
     @Data
     public static class CreateRoom {
         private Category categoryId;
-        private Long userId;
         private String title;
         private String rule;
         private Integer maxNum;
