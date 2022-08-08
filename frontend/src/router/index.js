@@ -36,11 +36,15 @@ const routes = [
     ],
   },
   {
-    path: "/oauth2/redirect",
-    name: "OauthHandler",
+    path: "/oauth2/naver",
+    name: "NaverHandler",
     component: () => import("@/components/user/oauth/NaverHandler.vue"),
   },
-
+  {
+    path: "/oauth2/kakao",
+    name: "KakaoHandler",
+    component: () => import("@/components/user/oauth/KakaoHandler.vue"),
+  },
   {
     path: "/station",
     name: "station",

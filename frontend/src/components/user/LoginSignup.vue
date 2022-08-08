@@ -9,12 +9,12 @@
     </div>
     <div class="name-wrap">
       <div class="name-box">이름</div>
-      <input type="text" v-model="name" class="name-input" />
+      <input type="text" v-model="state.userinfo.name" class="name-input" />
       <div class="ticket-title">정기권</div>
     </div>
     <div class="email-wrap">
       <div class="name-box">이메일</div>
-      <input type="email" v-model="email" class="name-input" />
+      <input type="email" v-model="state.userinfo.email" class="name-input" />
       <img
         src="@/assets/아이콘/[아이콘]정기권_상단.png"
         alt="아이콘"
@@ -23,74 +23,77 @@
     </div>
     <div class="birth-wrap">
       <div class="name-box">생년월일</div>
-      <input class="year-box" v-model="year" />
+      <input class="year-box" v-model="state.date.year" />
       <div class="year-name">년</div>
-      <input class="month-box" v-model="month" />
+      <input class="month-box" v-model="state.date.month" />
       <div class="year-name">월</div>
-      <input class="day-box" v-model="day" />
+      <input class="day-box" v-model="state.date.day" />
       <div class="year-name">일</div>
     </div>
     <div class="submit-wrap">
-      <button class="button-next" @click="submit_info()">발 급</button>
+      <button class="button-next" @click="submit()">발 급</button>
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from "@vue/reactivity";
-import axios from "axios";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-// import { useCookies } from "vue3-cookies";
+import { signup } from "@/api/login.js";
+import { reactive } from "vue";
+
 export default {
   setup() {
-    // const cookies = useCookies();
     const router = useRouter();
     const store = useStore();
-    let name = ref("");
-    let email = ref("");
-    let year = ref("");
-    let month = ref("");
-    let day = ref("");
+    const state = reactive({
+      userinfo: {
+        email: "",
+        name: "",
+        birth: new Date(),
+        oauthId: "",
+      },
+      date: {
+        year: "",
+        month: "",
+        day: "",
+      },
+    });
 
-    var submit_info = () => {
-      axios({
-        method: "post",
-        url: "https://i7a406.p.ssafy.io/api/naver/signup",
-        data: {
-          email: email.value,
-          name: name.value,
-          birth: year.value + "-" + month.value + "-" + day.value,
-          oauthId: store.state.userStore.oauth,
+    const urlParams = new URL(location.href).searchParams;
+    const social = urlParams.get("social");
+    const oauthId = urlParams.get("oauthId");
+
+    var submit = () => {
+      state.userinfo.birth.setFullYear(state.date.year);
+      state.userinfo.birth.setMonth(state.date.month);
+      state.userinfo.birth.setDate(state.date.day);
+      state.userinfo.oauthId = oauthId;
+
+      signup(
+        social,
+        state.userinfo,
+        (response) => {
+          console.log("회원가입 요청 : 성공!");
+          // vuex에 회원 정보 업데이트
+          store.commit("userStore/SET_NAME", response.data.name);
+          store.commit("userStore/SET_TOKEN", response.data.accessToken);
+          store.commit("userStore/SET_USERID", response.data.userId);
+          router.push({ name: "station_where" });
         },
-      }).then((response) => {
-        console.log(response);
-        store.commit("userStore/SET_NAME", response.data.name);
-        store.commit(
-          "userStore/SET_TOKEN",
-          "Bearer " + response.data.accessToken
-        );
-        store.commit("userStore/SET_USERID", response.data.userId);
-        // cookies.set("userName", response.data.name);
-        // cookies.set("userToken", "Bearer " + response.data.accessToken);
-        // cookies.set("userId", response.data.userId);
-
-        console.log(store.state.userStore.name);
-        console.log(store.state.userStore.token);
-        console.log(store.state.userStore.userId);
-
-        router.push({ name: "station_where" });
-      });
+        (error) => {
+          console.log(error);
+        }
+      );
     };
+    /* (TODO) 로그인 사항에 대한 예외처리를 구현합니다.
+    const checkInput = () => {
 
+    }
+    */
     return {
-      name,
-      email,
-      year,
-      month,
-      day,
-      submit_info,
-      //   cookies,
+      state,
+      submit,
     };
   },
 };

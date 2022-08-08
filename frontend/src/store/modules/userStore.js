@@ -26,7 +26,7 @@ const userStore = {
       state.social = social;
     },
     SET_TOKEN: (state, token) => {
-      state.token = token;
+      state.token = "Bearer " + token;
     },
     SET_OAUTH: (state, oauth) => {
       state.oauth = oauth;
