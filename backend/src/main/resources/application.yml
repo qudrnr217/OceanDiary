@@ -1,0 +1,83 @@
+server:
+  address: localhost
+  servlet:
+    encoding:
+      force: 'true'
+      charset: UTF-8
+      enabled: 'true'
+    contextPath: /
+  port: '8080'
+build:
+  date: '@build.date@'
+
+#database
+spring:
+  jpa:
+    hibernate:
+      naming:
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+      ddl-auto: update
+      dialect: org.hibernate.dialect.MySQL57Dialect
+      format_sql: true
+      default_batch_fetch_size: 100
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
+  redis:
+    host: 127.0.0.1
+    port: '6379'
+  flyway:
+    baseline-on-migrate: 'true'
+    schemas: ssafy_web_db
+    locations: filesystem:src/main/resources/db/migration
+    encoding: UTF-8
+    baseline-version: '0'
+    url: jdbc:mysql://localhost:3306/
+    validate-on-migrate: 'true'
+    user: oceandiary
+    password: oceandiary
+  profiles:
+    include: aws
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      password: oceandiary
+      username: oceandiary
+    url: jdbc:mysql://localhost:3306/ssafy_web_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true
+  devtools:
+    livereload:
+      enabled: 'true'
+
+logging:
+  level:
+    org:
+      sringframework:
+        boot: DEBUG
+        security: DEBUG
+      apache:
+        tiles: INFO
+      springframework:
+        web: DEBUG
+    root: INFO
+    com:
+      samsung:
+        security: DEBUG
+  file:
+    name: ./ssafy-web.log
+jwt:
+  access-token-props:
+    secret: adsjkQWFRaeiasjodfiwAWeeifjaSDOFJaiewAEWgIREAjORaerjAOESJOgDASIKFJIAJqiojuerfiAE
+    expiration-time-milli-sec: '3600000'
+  refresh-token-props:
+    expiration-time-milli-sec: '864000000'
+    secret: ZqefBscadfsGjaiADFSGaoGHdsjjsDFksjgDskdjgDjgHJmdSlzLfjbhikjaqWSogvjdsjzUEvlkvvhnDFGVnkfa==
+tmp:
+  file:
+    prefix:
+
+NAVER_API_CLIENT_SECRET:
+KAKAO_API_CLIENT_SECRET:
+NAVER_API_CLIENT_ID:
+KAKAO_API_CLIENT_ID:
