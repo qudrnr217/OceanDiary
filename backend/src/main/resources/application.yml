@@ -53,13 +53,12 @@ spring:
 logging:
   level:
     org:
-      sringframework:
+      springframework:
         boot: DEBUG
         security: DEBUG
+        web: DEBUG
       apache:
         tiles: INFO
-      springframework:
-        web: DEBUG
     root: INFO
     com:
       samsung:

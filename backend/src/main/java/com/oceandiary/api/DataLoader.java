@@ -1,31 +1,27 @@
 package com.oceandiary.api;
 
-import com.oceandiary.api.category.entity.Category;
-import com.oceandiary.api.category.repository.CategoryRepository;
+import com.oceandiary.api.user.domain.Role;
+import com.oceandiary.api.user.domain.SocialProvider;
+import com.oceandiary.api.user.entity.User;
+import com.oceandiary.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
-    private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
 
     @Override
     public void run(String... args) throws Exception {
-        if (categoryRepository.findAll().isEmpty()) {
-            List<Category> categoryList = new ArrayList<Category>();
-            String[] categoryIds = new String[] {"OCEAN", "LIBRARY", "CAFE", "FESTIVAL", "HOME"};
-            String[] categoryNames = new String[] {"바다", "도서관", "카페", "축제", "집"};
-            for (int i = 0; i < 5; i++) {
-                Category category = Category.builder().id(categoryIds[i]).name(categoryNames[i]).build();
-                categoryList.add(category);
-            }
-            categoryRepository.saveAll(categoryList);
+        if (userRepository.findAll().isEmpty()) {
+            User user = User.builder().email("oceandiary@oceandiary.com").provider(SocialProvider.NAVER).name("테스터").birth(LocalDate.of(2022, 8,9)).role(Role.USER).oauthId("test").visitedAt(LocalDateTime.now()).build();
+            userRepository.save(user);
         }
     }
 }
