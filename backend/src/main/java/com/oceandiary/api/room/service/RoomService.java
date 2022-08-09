@@ -76,16 +76,20 @@ public class RoomService {
         }
 
         try {
+
+            Image newImage = null;
             // AWS S3 image upload
-            Long imageId = imageService.save(file).getId();
-            Image newImage = imageRepository.findById(imageId).orElseThrow();
+            if (!file.isEmpty()) {
+                Long imageId = imageService.save(file).getId();
+                newImage = imageRepository.findById(imageId).orElseThrow();
+            }
 
             Room room = Room.builder()
                     .category(request.getCategoryId())
                     .user(user)
                     .title(request.getTitle())
                     .rule(request.getRule())
-                    .image(newImage)
+                    .image(newImage != null ? newImage : null)
                     .maxNum(request.getMaxNum())
                     .isOpen(request.getIsOpen())
                     .pw(request.getPw())
