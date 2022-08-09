@@ -29,7 +29,7 @@ public class LoginController {
         // 상태 토큰은 추후 검증을 위해 세션에 저장되어야 한다.
         // 상태 토큰으로 사용할 랜덤 문자열 생성
         String state = new BigInteger(130, new SecureRandom()).toString(32);
-
+        ;
         // 세션 또는 별도의 저장 공간에 상태 토큰을 저장
         session.setAttribute("state", state);
         log.info("session={}", session.getAttribute("state"));

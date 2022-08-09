@@ -60,24 +60,20 @@ public class LoginService {
 
     @Transactional
     public JoinResponse join(JoinRequest request, String provider){
-        log.info("provider: {}", provider);
-        SocialProvider socialProvider = SocialProvider.valueOf(provider.toUpperCase());
-        log.info("socialProvider: {}", socialProvider);
         User newUser = User.builder()
                 .email(request.getEmail())
                 .name(request.getName())
                 .birth(request.getBirth())
-                .provider(socialProvider)
+                .provider(SocialProvider.valueOf(provider.toUpperCase()))
                 .role(Role.USER)
                 .oauthId(request.getOauthId())
                 .build();
 
-        System.out.println("newUser: " + newUser.getOauthId());
         socialLoginUserRepository.save(newUser);
         // Issue refresh token
         String refreshToken = tokenProvider.generateRefreshToken(newUser).getToken();
         newUser.updateRefreshToken(refreshToken);
-        log.info("refreshToken: {}", refreshToken);
+
         JoinResponse response = JoinResponse.builder()
                 .accessToken(tokenProvider.generateAccessToken(newUser).getToken())
                 .name(newUser.getName())
