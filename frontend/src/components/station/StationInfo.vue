@@ -23,8 +23,6 @@
 </template>
 
 <script scoped>
-import { watch } from "vue";
-
 export default {
   props: ["name", "explanation", "componentKey", "img"],
 
@@ -33,11 +31,6 @@ export default {
     console.log(props.explanation);
     console.log(props.copmponentKey);
     console.log(props.img);
-
-    watch(props.explanation, (newEx, oldEx) => {
-      console.log(newEx);
-      console.log(oldEx);
-    });
   },
 };
 </script>

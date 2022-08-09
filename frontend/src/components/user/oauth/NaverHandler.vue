@@ -20,11 +20,15 @@ export default {
     console.log(code);
     if (code) {
       console.log("axios 시작!");
-      axios({
-        method: "post",
-        url: "https://i7a406.p.ssafy.io/api/naver/login",
-        data: { code: code },
-      }).then((data) => {
+      axios(
+        {
+          method: "post",
+          // url: "https://i7a406.p.ssafy.io/api/naver/login",
+          url: "/api/naver/login",
+          data: { code: code },
+        },
+        { withCredentials: true }
+      ).then((data) => {
         console.log(data.data.oauthId);
         store.commit("userStore/SET_OAUTH", data.data.oauthId);
         //아이디가 있을 경우

@@ -9,31 +9,42 @@
             src="@/assets/아이콘/icon_lock.png"
             class="lock"
             alt="방생성"
-            @click="show = !show"
-            v-if="show"
+            @click="isOpen = !isOpen"
+            v-if="!isOpen"
           />
-          <input type="password" class="password" v-show="show" />
+          <input
+            type="password"
+            class="password"
+            v-show="!isOpen"
+            v-model="pw"
+          />
           <img
             src="@/assets/아이콘/[아이콘]방_공개.png"
             class="lock"
             alt="방생성"
-            @click="show = !show"
-            v-if="!show"
+            @click="isOpen = !isOpen"
+            v-if="isOpen"
           />
         </div>
       </div>
       <div class="text-middle">
         <div class="title-wrap">
           <div class="title-name">제목 :</div>
-          <input type="text" class="title_text" />
+          <input type="text" class="title_text" v-model="title" />
         </div>
         <div class="rule-wrap">
           <div class="rule">규칙 :</div>
-          <input type="text" class="rule-text" />
+          <input type="text" class="rule-text" v-model="rule" />
         </div>
         <div class="count-wrap">
           <div class="count">인원 :</div>
-          <input type="number" class="count-text" />
+          <input
+            type="number"
+            class="count-text"
+            v-model="maxNum"
+            max="6"
+            min="1"
+          />
           <div class="count-last">명</div>
         </div>
         <div class="img-wrap">
@@ -43,7 +54,7 @@
         </div>
       </div>
       <div class="text-footer">
-        <button class="button-next">생성</button>
+        <button class="button-next" @click="create_room()">생성</button>
       </div>
     </div>
   </div>
@@ -52,16 +63,69 @@
 <script>
 import { ref } from "@vue/reactivity";
 import { useStore } from "vuex";
-
+import axios from "axios";
 export default {
   setup() {
     const store = useStore();
-    var title = store.state.locationStore.location_name;
+    var location_name = store.state.locationStore.location_name;
     var show = ref(false);
+    var title = ref("");
+    var rule = ref("");
+    var maxNum = ref(1);
+    var isOpen = ref(true);
+    var pw = ref(null);
+    var img = ref(null);
+
+    var create_room = () => {
+      const data = new FormData();
+      const form = {
+        categoryId: store.state.locationStore.location_name,
+        title: title,
+        rule: rule,
+        maxNum: maxNum,
+        isOpen: isOpen,
+        pw: pw,
+      };
+      // frm.append("categoryId", store.state.locationStore.location_name);
+      // frm.append("title", title);
+      // frm.append("rule", rule);
+      // frm.append("maxNum", maxNum);
+      // frm.append("isOpen", isOpen);
+      // frm.append("pw", pw);
+      data.append("form", new Blob([JSON.stringify(form)]), {
+        type: "application/json",
+      });
+      data.append("file", img);
+      console.log(store.state.userStore.token);
+      console.log("hi");
+      axios(
+        {
+          method: "post",
+          // url: "https://i7a406.p.ssafy.io/api/room",
+          url: "/api/room",
+          data: data,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            // Authorization: store.state.userStore.token,
+          },
+        },
+        { withCredentials: true }
+      ).then((data) => {
+        console.log(data);
+      });
+    };
 
     return {
+      location_name,
       title,
       show,
+      rule,
+      maxNum,
+      isOpen,
+      pw,
+      img,
+
+      create_room,
     };
   },
 };

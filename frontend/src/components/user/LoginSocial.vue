@@ -50,10 +50,14 @@ export default {
     // const code = urlParams.get("code");
     // if (code != null) login(code);
 
-    axios({
-      methods: "get",
-      url: "https://i7a406.p.ssafy.io/api/naver/state",
-    }).then((response) => {
+    axios(
+      {
+        methods: "get",
+        // url: "https://i7a406.p.ssafy.io/api/naver/state",
+        url: "/api/naver/state",
+      },
+      { withCredentials: true }
+    ).then((response) => {
       console.log(response);
       this.state = response.data.state;
       console.log(this.state);
@@ -81,7 +85,8 @@ export default {
 
     sendNaverUrl() {
       // console.log(this.state);
-      location.href = `https://nid.naver.com/oauth2.0/authorize?client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=https://i7a406.p.ssafy.io/oauth2/redirect&state=${this.state}`;
+      // location.href = `https://nid.naver.com/oauth2.0/authorize?client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=https://i7a406.p.ssafy.io/oauth2/redirect&state=${this.state}`;
+      location.href = `https://nid.naver.com/oauth2.0/authorize?client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=http://localhost:8080/oauth2/redirect&state=${this.state}`;
     },
   },
 };
