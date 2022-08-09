@@ -55,8 +55,12 @@ public class RoomController {
 
     @PatchMapping("/{roomId}/info")
     public void updateRoomInfo(@PathVariable(name = "roomId") Long roomId, @RequestPart(value = "form") RoomRequest.CreateRoom request, @RequestPart(value = "file") MultipartFile file, @CurrentUser CustomUserDetails user) {
-        roomService.updateRoomInfo(roomId, request, file, user);
+        roomService.updateRoomInfo(roomId, request, file, user.getUser());
     }
 
+    @PostMapping("/{roomId}/participants/{participantId}")
+    public void dropoutParticipant(@PathVariable(name = "roomId") Long roomId, @PathVariable("participantId") Long participantId, @CurrentUser CustomUserDetails user) {
+        roomService.dropoutParticipant(roomId, participantId, user.getUser());
+    }
 
 }

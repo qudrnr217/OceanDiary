@@ -8,6 +8,8 @@ import com.oceandiary.api.user.entity.User;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -33,6 +35,9 @@ public class Room extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id")
     private Image image;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    private List<Dropout> dropouts = new ArrayList<>();
 
     private String title;
 

@@ -13,13 +13,17 @@ import java.util.Map;
 public class ParticipantOnRedis {
     @Id
     private Long id;
-    private Map<Long, String> participants;
+    private Map<Long, String> participantTokenMap;
 
-    public void addParticipant(Long participantId, String token) {
-        this.participants.put(participantId, token);
+    private Map<Long, String> participantConnectionMap;
+
+    public void addParticipant(Long participantId, String token, String connectionId) {
+        this.participantTokenMap.put(participantId, token);
+        this.participantConnectionMap.put(participantId, connectionId);
     }
 
     public void removeParticipant(Long participantId) {
-        this.participants.remove(participantId);
+        this.participantTokenMap.remove(participantId);
+        this.participantConnectionMap.remove(participantId);
     }
 }

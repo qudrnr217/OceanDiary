@@ -1,6 +1,7 @@
 package com.oceandiary.api.user.entity;
 
 import com.oceandiary.api.common.entity.BaseEntity;
+import com.oceandiary.api.room.entity.Dropout;
 import com.oceandiary.api.room.entity.Room;
 import com.oceandiary.api.user.domain.Role;
 import com.oceandiary.api.user.domain.SocialProvider;
@@ -48,6 +49,9 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private final List<Room> rooms = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Dropout> dropouts = new ArrayList<>();
 
     //@OneToMany(mappedBy = "stamp")
     //private List<Stamp> stamps = new ArrayList<>();
