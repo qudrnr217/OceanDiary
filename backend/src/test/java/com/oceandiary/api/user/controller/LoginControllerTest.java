@@ -23,6 +23,8 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -127,8 +129,8 @@ class LoginControllerTest extends MvcTest {
     }
 
     @Test
-    @DisplayName("소셜로그인_회원가입")
-    void join() throws Exception {
+    @DisplayName("네이버로그인_회원가입")
+    void joinByNaver() throws Exception {
         JoinRequest request = new JoinRequest();
         JoinResponse response = JoinResponse.builder()
                 .accessToken("access-token")
@@ -153,7 +155,7 @@ class LoginControllerTest extends MvcTest {
                 .andExpect(jsonPath("$.accessToken").value("access-token"))
                 .andExpect(jsonPath("$.userId").value(1L))
                 .andExpect(jsonPath("$.name").value("황재완"))
-                .andDo(document("social-login-signup",
+                .andDo(document("naver-login-signup",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
@@ -163,9 +165,9 @@ class LoginControllerTest extends MvcTest {
                                 fieldWithPath("oauthId").description("고유 아이디")
                         ),
                         responseFields(
-                                fieldWithPath("accessToken").description("access-token"),
+                                fieldWithPath("accessToken").description("네이버 access-token"),
                                 fieldWithPath("userId").description("유저 식별 아이디"),
-                                fieldWithPath("name").description("유저 이름")
+                                fieldWithPath("name").description("네이버 유저 이름")
                         )
                 ));
 
@@ -185,13 +187,16 @@ class LoginControllerTest extends MvcTest {
         request.setCode("code");
         given(loginService.kakaoLogin(request)).willReturn(response);
 
-        mvc.perform(post("/api/kakao/login").param("code", request.getCode()).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
+        mvc.perform(post("/api/kakao/login").contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).param("code", request.getCode()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isExist").value(false))
                 .andExpect(jsonPath("$.oauthId").value("oauthid"))
                 .andDo(document("kakao-login-first-user",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
+                        requestParameters(
+                            parameterWithName("code").description("code")
+                        ),
                         responseFields(
                                 fieldWithPath("accessToken").description("카카오 access-token").ignored(),
                                 fieldWithPath("userId").description("유저 식별 아이디").ignored(),
@@ -204,8 +209,8 @@ class LoginControllerTest extends MvcTest {
     }
 
     @Test
-    @DisplayName("카카오록인_회원가입된_사용자_로그인")
-    void loginByKakaoWithPresentUser() throws Exception{
+    @DisplayName("카카오로그인_회원가입된_사용자_로그인")
+    void loginByKakaoWithPresentUser() throws Exception {
         LoginRequest request = new LoginRequest();
         LoginResponse response = LoginResponse.builder()
                 .isExist(true)
@@ -224,6 +229,9 @@ class LoginControllerTest extends MvcTest {
                 .andExpect(jsonPath("$.name").value("김싸피"))
                 .andDo(document("kakao-login-duplicate-user",
                         preprocessResponse(prettyPrint()),
+                        requestParameters(
+                                parameterWithName("code").description("code")
+                        ),
                         responseFields(
                                 fieldWithPath("accessToken").description("카카오 access-token"),
                                 fieldWithPath("userId").description("유저 식별 아이디"),
@@ -234,6 +242,53 @@ class LoginControllerTest extends MvcTest {
                 ));
 
         verify(loginService).kakaoLogin(request);
+    }
+
+    @Test
+    @DisplayName("카카오로그인_회원가입")
+    void joinByKakao() throws Exception {
+        JoinRequest request = new JoinRequest();
+        JoinResponse response = JoinResponse.builder()
+                .accessToken("access-token")
+                .userId(1L)
+                .name("김싸피")
+                .build();
+        request.setEmail("ssafy@gmail.com");
+        request.setName("김싸피");
+        request.setOauthId("oauthid");
+        request.setBirth(LocalDate.of(2022, 07, 10));
+
+        given(loginService.join(request, "kakao")).
+                willReturn(response);
+
+        Gson gson = new Gson();
+        String jsonRequest = gson.toJson(request);
+
+        jsonRequest = jsonRequest.replace("{\"year\":2022,\"month\":7,\"day\":10}", "\"2022-07-10\"");
+
+        mvc.perform(post("/api/kakao/signup").content(jsonRequest).contentType(MediaType.APPLICATION_JSON).with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("access-token"))
+                .andExpect(jsonPath("$.userId").value(1L))
+                .andExpect(jsonPath("$.name").value("김싸피"))
+                .andDo(document("kakao-login-signup",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("email").description("유저 이메일"),
+                                fieldWithPath("name").description("유저 이름"),
+                                fieldWithPath("birth").description("유저 생년월일"),
+                                fieldWithPath("oauthId").description("고유 아이디")
+                        ),
+                        responseFields(
+                                fieldWithPath("accessToken").description("카카오 access-token"),
+                                fieldWithPath("userId").description("유저 식별 아이디"),
+                                fieldWithPath("name").description("카카오 유저 이름")
+                        )
+                ));
+
+        verify(loginService).join(request, "kakao");
+
     }
 
 }
