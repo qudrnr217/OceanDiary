@@ -1,8 +1,7 @@
 <template>
   <div class="background">
     <div class="banner">
-      <div class="title">바닷마을 다이어리</div>
-      <!-- <h1>바닷마을 다이어리</h1> -->
+      <div class="title">나뭇잎마을 다이어리</div>
     </div>
     <div class="button">
       <router-link :to="{ name: 'login-menu' }" class="start-btn"
