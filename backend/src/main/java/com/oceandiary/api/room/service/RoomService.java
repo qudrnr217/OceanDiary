@@ -1,6 +1,11 @@
 package com.oceandiary.api.room.service;
 
 import com.oceandiary.api.common.exception.BusinessException;
+import com.oceandiary.api.file.dto.ImageResponse;
+import com.oceandiary.api.file.entity.Image;
+import com.oceandiary.api.file.exception.FileNotFoundException;
+import com.oceandiary.api.file.repository.ImageRepository;
+import com.oceandiary.api.file.service.S3Service;
 import com.oceandiary.api.room.dto.RoomSearchCondition;
 import com.oceandiary.api.room.entity.Participant;
 import com.oceandiary.api.room.entity.ParticipantOnRedis;
@@ -21,9 +26,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -41,38 +48,55 @@ public class RoomService {
     private final ParticipantRepository participantRepository;
     private final ParticipantOnRedisRepository participantOnRedisRepository;
 
+    private final ImageRepository imageRepository;
+    private final S3Service s3Service;
+
     @Value("${openvidu.secret}")
     private String OPENVIDU_SECRET;
 
-    public RoomService(@Value("${openvidu.secret}") String secret, @Value("${openvidu.url}") String openviduUrl, RoomRepository roomRepository, RoomOnRedisRepository roomOnRedisRepository, ParticipantRepository participantRepository, ParticipantOnRedisRepository participantOnRedisRepository) {
+    public RoomService(@Value("${openvidu.secret}") String secret, @Value("${openvidu.url}") String openviduUrl, RoomRepository roomRepository, RoomOnRedisRepository roomOnRedisRepository, ParticipantRepository participantRepository, ParticipantOnRedisRepository participantOnRedisRepository, ImageRepository imageRepository, S3Service s3Service) {
         this.SECRET = secret;
         this.OPENVIDU_URL = openviduUrl;
         this.roomRepository = roomRepository;
         this.roomOnRedisRepository = roomOnRedisRepository;
         this.participantRepository = participantRepository;
         this.participantOnRedisRepository = participantOnRedisRepository;
+        this.imageRepository = imageRepository;
+        this.s3Service = s3Service;
         this.openVidu = new OpenVidu(OPENVIDU_URL, SECRET);
     }
 
-    public RoomResponse.CreateRoom createRoom(RoomRequest.CreateRoom request, User user) {
+    public ImageResponse.OnlyId save(MultipartFile file) {
+        return ImageResponse.OnlyId.build(imageRepository.save(Image.create(s3Service.upload(file))));
+    }
+
+    public ImageResponse.GetImage getImage(Long imageId) {
+        return ImageResponse.GetImage.build(imageRepository.findById(imageId).orElseThrow(FileNotFoundException::new));
+    }
+
+    public RoomResponse.CreateRoom createRoom(RoomRequest.CreateRoom request, MultipartFile file, User user) {
 
         String serverData = "{\"userId\": \"" + user.getId() + "\"," +
                 "\"name\": \"" + user.getName() + "\"}";
         ConnectionProperties connectionProperties =
                 new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).role(OpenViduRole.MODERATOR).build();
 
-        log.info("openvidu 접속 테스트 완료");
+        log.info("openvidu connection successful");
 
         if (roomOnRedisRepository.findByCreatedBy(user.getId()).isPresent()) {
             throw new BusinessException("이미 방을 생성한 유저가 다시 생성함");
         }
 
         try {
+            Long imageId = save(file).getId();
+            Image newImage = imageRepository.findById(imageId).orElseThrow();
+
             Room room = Room.builder()
                     .category(request.getCategoryId())
                     .user(user)
                     .title(request.getTitle())
                     .rule(request.getRule())
+                    .image(newImage)
                     .maxNum(request.getMaxNum())
                     .isOpen(request.getIsOpen())
                     .pw(request.getPw())
@@ -220,6 +244,7 @@ public class RoomService {
         }
     }
 
+    @Transactional(readOnly = true)
     public Page<RoomResponse.SearchRooms> search(RoomSearchCondition condition, Pageable pageable) {
         Page<RoomResponse.SearchRooms> page = roomRepository.search(condition, pageable);
         for (RoomResponse.SearchRooms searchedRoom : page.getContent()) {
@@ -229,9 +254,46 @@ public class RoomService {
         return page;
     }
 
+    @Transactional(readOnly = true)
     public Session getSession(String sessionId) {
         List<Session> activeSessions = this.openVidu.getActiveSessions();
         return activeSessions.stream().filter(s -> s.getSessionId().equals(sessionId)).findFirst().orElseThrow();
+    }
+
+    @Transactional(readOnly = true)
+    public RoomResponse.RoomInfo getRoomInfo(Long roomId) {
+        RoomOnRedis roomOnRedis = roomOnRedisRepository.findById(roomId).orElseThrow();
+        ParticipantOnRedis participantOnRedis = participantOnRedisRepository.findById(roomId).orElseThrow();
+        Room room = roomRepository.findById(roomId).orElseThrow();
+        return RoomResponse.RoomInfo.builder()
+                .roomId(roomId)
+                .sessionId(roomOnRedis.getSessionId())
+                .categoryId(room.getCategory())
+                .createdBy(room.getCreatedBy().getId())
+                .title(room.getTitle())
+                .rule(room.getRule())
+                .imageId(room.getImage().getId())
+                .maxNum(room.getMaxNum())
+                .curNum(participantOnRedis.getParticipants().size())
+                .isOpen(room.getIsOpen())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public RoomResponse.RoomDetail getRoomDetail(Long roomId) {
+        return RoomResponse.RoomDetail.builder()
+                .roomInfo(getRoomInfo(roomId))
+                .participantList(getParticipants(roomId))
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<RoomResponse.RoomDetail.ParticipantInfo> getParticipants(Long roomId) {
+        ParticipantOnRedis participantOnRedis = participantOnRedisRepository.findById(roomId).orElseThrow();
+        Map<Long, String> participants = participantOnRedis.getParticipants();
+        List<RoomResponse.RoomDetail.ParticipantInfo> participantInfos = participantRepository.findActiveParticipants(participants.keySet());
+        participantInfos.forEach(participantInfo -> participantInfo.setToken(participants.get(participantInfo.getParticipantId())));
+        return participantInfos;
     }
 }
 

@@ -25,7 +25,7 @@ public class RoomController {
     public RoomResponse.CreateRoom createRoom(@RequestPart(value = "form") RoomRequest.CreateRoom request, @RequestPart(value = "file") MultipartFile file, @CurrentUser CustomUserDetails user) {
         // TODO: image 업로드 구현
         log.info("방 생성 request: {}, {}, {}", request, file, user.getUser());
-        return roomService.createRoom(request, user.getUser());
+        return roomService.createRoom(request, file, user.getUser());
     }
 
     @PostMapping("/{roomId}")
@@ -42,6 +42,16 @@ public class RoomController {
     public Page<RoomResponse.SearchRooms> search(RoomSearchCondition condition, @PageableDefault(size = 5) Pageable pageable) {
         log.info("{}", condition);
         return roomService.search(condition, pageable);
+    }
+
+    @GetMapping("/{roomId}/info")
+    public RoomResponse.RoomInfo roomInfo(@PathVariable(name = "roomId") Long roomId) {
+        return roomService.getRoomInfo(roomId);
+    }
+
+    @GetMapping("/{roomId}/detail")
+    public RoomResponse.RoomDetail roomDetail(@PathVariable(name = "roomId") Long roomId) {
+        return roomService.getRoomDetail(roomId);
     }
 
 

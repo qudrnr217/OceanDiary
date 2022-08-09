@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static com.oceandiary.api.room.entity.QImage.image;
+import static com.oceandiary.api.file.entity.QImage.image;
 import static com.oceandiary.api.room.entity.QRoom.room;
 
 
@@ -33,7 +33,7 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
                         RoomResponse.SearchRooms.class,
                         room.id.as("roomId"),
                         room.createdBy.id.as("createdBy"),
-                        room.image.name.as("image"),
+                        room.image.id.as("imageId"),
                         room.title,
                         room.maxNum,
                         room.isOpen

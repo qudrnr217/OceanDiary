@@ -2,6 +2,7 @@ package com.oceandiary.api.file.entity;
 
 import com.oceandiary.api.common.entity.BaseEntity;
 import com.oceandiary.api.file.dto.SavedFile;
+import com.oceandiary.api.room.entity.Room;
 import lombok.*;
 
 import javax.persistence.*;
@@ -34,10 +35,10 @@ public class Image extends BaseEntity {
 
     private Integer height;
 
-//    @OneToOne(mappedBy = "image")
-//    private Room room;
+    @OneToOne(mappedBy = "image", fetch = FetchType.LAZY)
+    private Room room;
 
-    public static Image create(SavedFile request){
+    public static Image create(SavedFile request) {
         return Image.builder()
                 .name(request.getName())
                 .originName(request.getOriginName())

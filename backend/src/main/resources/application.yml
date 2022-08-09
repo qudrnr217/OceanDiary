@@ -39,7 +39,7 @@ spring:
     user: oceandiary
     password: oceandiary
   profiles:
-    include: aws
+    include: aws, oauth
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
@@ -81,3 +81,8 @@ NAVER_API_CLIENT_SECRET:
 KAKAO_API_CLIENT_SECRET:
 NAVER_API_CLIENT_ID:
 KAKAO_API_CLIENT_ID:
+
+# openvidu
+openvidu:
+  url: https://i7a406.p.ssafy.io:5443
+  secret: A406

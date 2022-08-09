@@ -1,7 +1,8 @@
 package com.oceandiary.api.room.entity;
 
-import com.oceandiary.api.common.entity.BaseEntity;
 import com.oceandiary.api.common.category.Category;
+import com.oceandiary.api.common.entity.BaseEntity;
+import com.oceandiary.api.file.entity.Image;
 import com.oceandiary.api.user.entity.User;
 import lombok.*;
 
