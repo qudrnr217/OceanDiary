@@ -1,0 +1,13 @@
+POST {{apiUrl}}/diary/stamp
+Authorization: {{authorizationToken}}
+Content-Type: application/json;charset=UTF-8
+
+{
+  "enterTime": "2022-08-09 10:31:43",
+  "exitTime": "2022-08-09 22:03:02",
+  "category": "CAFE"
+}
+
+###
+GET {{apiUrl}}/diary/user/1
+Authorization: {{authorizationToken}}
