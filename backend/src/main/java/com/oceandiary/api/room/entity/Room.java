@@ -3,10 +3,13 @@ package com.oceandiary.api.room.entity;
 import com.oceandiary.api.common.category.Category;
 import com.oceandiary.api.common.entity.BaseEntity;
 import com.oceandiary.api.file.entity.Image;
+import com.oceandiary.api.room.request.RoomRequest;
 import com.oceandiary.api.user.entity.User;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -33,6 +36,9 @@ public class Room extends BaseEntity {
     @JoinColumn(name = "image_id")
     private Image image;
 
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    private List<Dropout> dropouts = new ArrayList<>();
+
     private String title;
 
     private String rule;
@@ -44,4 +50,25 @@ public class Room extends BaseEntity {
     private Boolean isOpen;
 
     private String pw;
+
+    public void updateInfo(RoomRequest.CreateRoom request, Image newImage) {
+        if (request.getTitle() != null) {
+            this.title = request.getTitle();
+        }
+        if (request.getRule() != null) {
+            this.rule = request.getRule();
+        }
+        if (request.getMaxNum() != null) {
+            this.maxNum = request.getMaxNum();
+        }
+        if (request.getIsOpen() != null) {
+            this.isOpen = request.getIsOpen();
+        }
+        if (request.getPw() != null) {
+            this.pw = request.getPw();
+        }
+        if (newImage != null) {
+            this.image = newImage;
+        }
+    }
 }

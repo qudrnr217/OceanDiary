@@ -14,6 +14,7 @@ public class RoomResponse {
         private Long roomId;
         private Long participantId;
         private String token;
+        private String connectionId;
     }
 
     @Getter
@@ -21,6 +22,7 @@ public class RoomResponse {
     public static class EnterRoom {
         private Long participantId;
         private String token;
+        private String connectionId;
     }
 
     @Data
@@ -50,6 +52,7 @@ public class RoomResponse {
             private String name;
             private LocalDateTime enterTime;
             private String token;
+            private String connectionId;
         }
 
     }
