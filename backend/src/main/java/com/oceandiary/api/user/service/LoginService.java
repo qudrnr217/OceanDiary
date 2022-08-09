@@ -58,8 +58,11 @@ public class LoginService {
         return checkUser(foundUser, kakaoUniqueId);
     }
 
+    @Transactional
     public JoinResponse join(JoinRequest request, String provider){
-        SocialProvider socialProvider = (provider.equals(SocialProvider.NAVER)) ? SocialProvider.NAVER:SocialProvider.KAKAO;
+        log.info("provider: {}", provider);
+        SocialProvider socialProvider = SocialProvider.valueOf(provider.toUpperCase());
+        log.info("socialProvider: {}", socialProvider);
         User newUser = User.builder()
                 .email(request.getEmail())
                 .name(request.getName())
@@ -69,11 +72,12 @@ public class LoginService {
                 .oauthId(request.getOauthId())
                 .build();
 
+        System.out.println("newUser: " + newUser.getOauthId());
         socialLoginUserRepository.save(newUser);
         // Issue refresh token
         String refreshToken = tokenProvider.generateRefreshToken(newUser).getToken();
         newUser.updateRefreshToken(refreshToken);
-
+        log.info("refreshToken: {}", refreshToken);
         JoinResponse response = JoinResponse.builder()
                 .accessToken(tokenProvider.generateAccessToken(newUser).getToken())
                 .name(newUser.getName())
