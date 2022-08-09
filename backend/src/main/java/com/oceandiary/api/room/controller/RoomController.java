@@ -1,6 +1,5 @@
 package com.oceandiary.api.room.controller;
 
-import com.oceandiary.api.room.dto.RoomSearchCondition;
 import com.oceandiary.api.room.request.RoomRequest;
 import com.oceandiary.api.room.response.RoomResponse;
 import com.oceandiary.api.room.service.RoomService;
@@ -39,7 +38,7 @@ public class RoomController {
     }
 
     @GetMapping("")
-    public Page<RoomResponse.SearchRooms> search(RoomSearchCondition condition, @PageableDefault(size = 5) Pageable pageable) {
+    public Page<RoomResponse.SearchRooms> search(RoomRequest.RoomSearchCondition condition, @PageableDefault(size = 5) Pageable pageable) {
         log.info("{}", condition);
         return roomService.search(condition, pageable);
     }

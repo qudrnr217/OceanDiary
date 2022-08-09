@@ -1,6 +1,6 @@
 package com.oceandiary.api.room.repository;
 
-import com.oceandiary.api.room.dto.RoomSearchCondition;
+import com.oceandiary.api.room.request.RoomRequest;
 import com.oceandiary.api.room.response.RoomResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -26,7 +26,7 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
     }
 
     @Override
-    public Page<RoomResponse.SearchRooms> search(RoomSearchCondition condition, Pageable pageable) {
+    public Page<RoomResponse.SearchRooms> search(RoomRequest.RoomSearchCondition condition, Pageable pageable) {
 
         List<RoomResponse.SearchRooms> content = queryFactory
                 .select(Projections.fields(

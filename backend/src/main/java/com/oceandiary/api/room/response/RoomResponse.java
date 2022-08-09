@@ -36,13 +36,11 @@ public class RoomResponse {
         private Integer curNum;
         private Boolean isOpen;
     }
-
     @Getter
     @Builder
     public static class RoomDetail {
         RoomInfo roomInfo;
         List<ParticipantInfo> participantList;
-
         @Data
         @Builder
         @NoArgsConstructor
@@ -55,7 +53,6 @@ public class RoomResponse {
         }
 
     }
-
     @Data
     @Getter
     @Builder

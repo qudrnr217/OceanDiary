@@ -18,4 +18,11 @@ public class RoomRequest {
     public static class EnterRoom {
         private String pw;
     }
+
+    @Data
+    public static class RoomSearchCondition {
+        private Category category;
+        private String title;
+        private Long lastRoomId;
+    }
 }
