@@ -17,6 +17,7 @@ import com.oceandiary.api.room.repository.RoomRepository;
 import com.oceandiary.api.room.request.RoomRequest;
 import com.oceandiary.api.room.response.RoomResponse;
 import com.oceandiary.api.user.entity.User;
+import com.oceandiary.api.user.security.userdetails.CustomUserDetails;
 import io.openvidu.java.client.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -149,7 +150,7 @@ public class RoomService {
             Room room = roomRepository.findById(roomId).orElseThrow();
 
             // 비밀번호 설정된 방인데 비밀번호가 틀린경우
-            if (!room.getIsOpen() && !room.getPw().equals(request.getPw())){
+            if (!room.getIsOpen() && !room.getPw().equals(request.getPw())) {
                 throw new PasswordNotValidException();
             }
 
@@ -199,7 +200,7 @@ public class RoomService {
 
             if (user.getId() == roomOnRedis.getCreatedBy()) {  // 방장이 나갈경우
                 session.close();
-                for (Long pid  : participantOnRedis.getParticipants().keySet()) {
+                for (Long pid : participantOnRedis.getParticipants().keySet()) {
                     Participant participant = participantRepository.findById(pid).orElseThrow();
                     participant.addExitDate();
                 }
@@ -254,6 +255,7 @@ public class RoomService {
         List<Session> activeSessions = this.openVidu.getActiveSessions();
         return activeSessions.stream().filter(s -> s.getSessionId().equals(sessionId)).findFirst().orElseThrow();
     }
+
     @Transactional(readOnly = true)
     public RoomResponse.RoomInfo getRoomInfo(Long roomId) {
         RoomOnRedis roomOnRedis = roomOnRedisRepository.findById(roomId).orElseThrow();
@@ -280,6 +282,7 @@ public class RoomService {
                 .participantList(getParticipants(roomId))
                 .build();
     }
+
     @Transactional(readOnly = true)
     public List<RoomResponse.RoomDetail.ParticipantInfo> getParticipants(Long roomId) {
         ParticipantOnRedis participantOnRedis = participantOnRedisRepository.findById(roomId).orElseThrow();
@@ -288,7 +291,30 @@ public class RoomService {
         participantInfos.forEach(participantInfo -> participantInfo.setToken(participants.get(participantInfo.getParticipantId())));
         return participantInfos;
     }
+
+    public void updateRoomInfo(Long roomId, RoomRequest.CreateRoom request, MultipartFile file, CustomUserDetails user) {
+        /**
+         * 1. 수정하는 사람이 방장인지 확인한다.
+         * 2. 이미지 파일 수정인지 확인한다.
+         * 3. maxNum이 curNum보다 큰지 확인한다. 크거나 같은 경우만 수정 가능하게 한다.
+         * */
+
+        if (roomRepository.findById(roomId).orElseThrow().getUser().getId() != user.getUser().getId()) {
+            throw new BusinessException("방 수정 권한이 없습니다.");
+        }
+
+        Image newImage = null;
+        if (!file.isEmpty()) {
+            Long newImageId = imageService.save(file).getId();
+            newImage = imageRepository.findById(newImageId).orElseThrow();
+        }
+
+        if (participantOnRedisRepository.findById(roomId).orElseThrow().getParticipants().size() > request.getMaxNum()) {
+            throw new BusinessException("현재 참가 인원보다 적게 설정할 수 없습니다.");
+        }
+
+        Room foundRoom = roomRepository.findById(roomId).orElseThrow();
+
+        foundRoom.updateInfo(request, newImage);
+    }
 }
-
-
-

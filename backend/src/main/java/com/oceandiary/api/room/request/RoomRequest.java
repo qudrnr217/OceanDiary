@@ -25,4 +25,13 @@ public class RoomRequest {
         private String title;
         private Long lastRoomId;
     }
+
+    @Data
+    public static class UpdateRoomInfo {
+        private String title;
+        private String rule;
+        private Integer maxNum;
+        private Boolean isOpen;
+        private String pw;
+    }
 }
