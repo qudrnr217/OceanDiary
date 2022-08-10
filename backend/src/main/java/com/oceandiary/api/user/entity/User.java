@@ -1,14 +1,18 @@
 package com.oceandiary.api.user.entity;
 
 import com.oceandiary.api.common.entity.BaseEntity;
+import com.oceandiary.api.diary.entity.Stamp;
+import com.oceandiary.api.room.entity.Dropout;
+import com.oceandiary.api.room.entity.Room;
 import com.oceandiary.api.user.domain.Role;
 import com.oceandiary.api.user.domain.SocialProvider;
 import lombok.*;
 
 import javax.persistence.*;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Builder
@@ -44,8 +48,15 @@ public class User extends BaseEntity {
     @Column(name = "refresh_token")
     private String refreshToken;
 
-    //@OneToMany(mappedBy = "stamp")
-    //private List<Stamp> stamps = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private final List<Room> rooms = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Dropout> dropouts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Stamp> stamps = new ArrayList<>();
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;

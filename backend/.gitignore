@@ -41,5 +41,5 @@ out/
 ### ssafy-web.log ###
 ssafy-web.log
 
-### application-oauth.properties ###
-application-oauth.properties
+### application.properties ###
+application-aws.yml

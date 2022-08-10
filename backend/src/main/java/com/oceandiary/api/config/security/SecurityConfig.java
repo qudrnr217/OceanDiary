@@ -33,8 +33,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .exceptionHandling().authenticationEntryPoint(jwtAuthEntryPoint)
+                .and()
                 .authorizeRequests() // 사용권한 체크
-                .antMatchers("/docs/**").permitAll() // restdocs 주소는 누구나 접근 가능 (TODO: swagger 적용시 수정 필요)
+                .antMatchers("/docs/**").permitAll() // restdocs 주소는 누구나 접근 가능
                 .antMatchers("/*/login").permitAll() // 가입 및 인증 주소는 누구나 접근 가능
                 .antMatchers("/api/naver/**").permitAll()// 네이버 로그인 접근 가능
                 .antMatchers("/api/kakao/**").permitAll()// 카카오 로그인 접근 가능
