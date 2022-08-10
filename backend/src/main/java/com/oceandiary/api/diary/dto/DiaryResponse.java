@@ -44,8 +44,8 @@ public class DiaryResponse {
 
     @Getter
     @Builder
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor (access = AccessLevel.PRIVATE)
+    @AllArgsConstructor (access = AccessLevel.PRIVATE)
     public static class GetStamps {
         private List<DiaryResponse.GetStamp> stamps;
         public static DiaryResponse.GetStamps build(List<Stamp> stampList){
