@@ -6,10 +6,8 @@ import com.oceandiary.api.user.dto.KakaoApiResponse;
 import com.oceandiary.api.user.dto.NaverApiResponse;
 import com.oceandiary.api.user.entity.User;
 import com.oceandiary.api.user.repository.SocialLoginUserRepository;
-import com.oceandiary.api.user.request.JoinRequest;
-import com.oceandiary.api.user.request.LoginRequest;
-import com.oceandiary.api.user.response.JoinResponse;
-import com.oceandiary.api.user.response.LoginResponse;
+import com.oceandiary.api.user.request.ProviderRequest;
+import com.oceandiary.api.user.response.ProviderResponse;
 import com.oceandiary.api.user.security.token.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +41,7 @@ public class LoginService {
     @Value("${KAKAO_API_CLIENT_ID}")
     private String kakaoClientId;
 
-    public LoginResponse naverLogin(LoginRequest request, HttpSession session){
+    public ProviderResponse.LoginResponse naverLogin(ProviderRequest.LoginRequest request, HttpSession session){
         String accessToken = getNaverAccessToken(request, session);
         String naverUniqueId = getNaverUniqueId(accessToken);
 
@@ -51,7 +49,7 @@ public class LoginService {
         return checkUser(foundUser, naverUniqueId);
     }
 
-    public LoginResponse kakaoLogin(LoginRequest request){
+    public ProviderResponse.LoginResponse kakaoLogin(ProviderRequest.LoginRequest request){
         String accessToken = getKakaoAccessToken(request);
         String kakaoUniqueId = getKakaoUniqueId(accessToken);
         User foundUser = socialLoginUserRepository.findByProviderAndOauthId(SocialProvider.KAKAO, kakaoUniqueId);
@@ -59,7 +57,7 @@ public class LoginService {
     }
 
     @Transactional
-    public JoinResponse join(JoinRequest request, String provider){
+    public ProviderResponse.JoinResponse join(ProviderRequest.JoinRequest request, String provider){
         User newUser = User.builder()
                 .email(request.getEmail())
                 .name(request.getName())
@@ -74,7 +72,7 @@ public class LoginService {
         String refreshToken = tokenProvider.generateRefreshToken(newUser).getToken();
         newUser.updateRefreshToken(refreshToken);
 
-        JoinResponse response = JoinResponse.builder()
+        ProviderResponse.JoinResponse response = ProviderResponse.JoinResponse.builder()
                 .accessToken(tokenProvider.generateAccessToken(newUser).getToken())
                 .name(newUser.getName())
                 .userId(newUser.getId())
@@ -83,17 +81,17 @@ public class LoginService {
         return response;
     }
 
-    public LoginResponse checkUser(User foundUser, String uniqueId){
-        LoginResponse response;
+    public ProviderResponse.LoginResponse checkUser(User foundUser, String uniqueId){
+        ProviderResponse.LoginResponse response;
         if(foundUser != null){
-            response = LoginResponse.builder()
+            response = ProviderResponse.LoginResponse.builder()
                     .name(foundUser.getName())
                     .userId(foundUser.getId())
                     .isExist(true)
                     .accessToken(tokenProvider.generateAccessToken(foundUser).getToken())
                     .build();
         }else{
-            response = LoginResponse.builder()
+            response = ProviderResponse.LoginResponse.builder()
                     .isExist(false)
                     .oauthId(uniqueId)
                     .build();
@@ -101,7 +99,7 @@ public class LoginService {
         return response;
     }
 
-    public String getNaverAccessToken(LoginRequest request, HttpSession session){
+    public String getNaverAccessToken(ProviderRequest.LoginRequest request, HttpSession session){
         URI uri = UriComponentsBuilder
                 .fromUriString("https://nid.naver.com")
                 .path("/oauth2.0/token")
@@ -121,7 +119,7 @@ public class LoginService {
         return responseEntity.getBody().getAccessToken();
     }
 
-    public String getKakaoAccessToken(LoginRequest request) {
+    public String getKakaoAccessToken(ProviderRequest.LoginRequest request) {
         URI uri = UriComponentsBuilder
                 .fromUriString("https://kauth.kakao.com")
                 .path("/oauth/token")
