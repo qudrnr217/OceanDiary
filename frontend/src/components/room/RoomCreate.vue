@@ -50,6 +50,10 @@
         <div class="img-wrap">
           <div class="image">이미지 :</div>
           <div class="select-file">파일 선택</div>
+          <form action="">
+            <input type="file" @change="fileSlc" id="file" name="file" />
+          </form>
+
           <!-- <img src="" alt=""> -->
         </div>
       </div>
@@ -64,8 +68,10 @@
 import { ref } from "@vue/reactivity";
 import { useStore } from "vuex";
 import axios from "axios";
+import { useRouter } from "vue-router";
 export default {
   setup() {
+    const router = useRouter();
     const store = useStore();
     var location_name = store.state.locationStore.location_name;
     var show = ref(false);
@@ -73,45 +79,76 @@ export default {
     var rule = ref("");
     var maxNum = ref(1);
     var isOpen = ref(true);
-    var pw = ref(null);
-    var img = ref(null);
+    var pw = ref("");
+    var img = ref("");
+    var slc2 = ref("");
+
+    var fileSlc = (event) => {
+      console.log(event);
+      console.log(event.target.files[0]);
+      slc2.value = event.target.files[0];
+    };
 
     var create_room = () => {
+      // const data = new FormData();
       const data = new FormData();
+      console.log(slc2.value);
       const form = {
-        categoryId: store.state.locationStore.location_name,
-        title: title,
-        rule: rule,
-        maxNum: maxNum,
-        isOpen: isOpen,
-        pw: pw,
+        categoryId: "LIBRARY",
+        title: title.value,
+        rule: rule.value,
+        maxNum: maxNum.value,
+        isOpen: isOpen.value,
+        pw: pw.value,
       };
-      // frm.append("categoryId", store.state.locationStore.location_name);
-      // frm.append("title", title);
-      // frm.append("rule", rule);
-      // frm.append("maxNum", maxNum);
-      // frm.append("isOpen", isOpen);
-      // frm.append("pw", pw);
-      data.append("form", new Blob([JSON.stringify(form)]), {
-        type: "application/json",
-      });
-      data.append("file", img);
+
+      data.append(
+        "form",
+        new Blob([JSON.stringify(form)], { type: "application/json" })
+      );
+      data.append("file", slc2.value);
+
       console.log(store.state.userStore.token);
-      console.log("hi");
+      // console.log("hi");
+      // console.log(data);
       axios(
         {
           method: "post",
           // url: "https://i7a406.p.ssafy.io/api/room",
-          url: "/api/room",
+          // url: "/api/rooms",
+          url: "http://localhost:8080/api/rooms",
           data: data,
           headers: {
             "Content-Type": "multipart/form-data",
-            // Authorization: store.state.userStore.token,
+            Authorization: store.state.userStore.token,
           },
         },
         { withCredentials: true }
       ).then((data) => {
         console.log(data);
+        const array = data.data.token.split('"');
+        const tmp = array[0].split("=");
+        const tmp2 = tmp[1].split("&");
+        // console.log(tmp[0]);
+        // console.log(tmp[1]);
+        // console.log(tmp[2]);
+        // console.log(tmp2[0]);
+        // console.log(tmp2[1]);
+
+        // var openvidu_token = tmp[2];
+        var session_id = tmp2[0];
+        store.commit("roomStore/SET_ROOM_ID", data.data.roomId);
+        store.commit("roomStore/SET_PARTICIPANT_ID", data.data.participantId);
+        store.commit("roomStore/SET_OPENVIDU_TOKEN", data.data.token);
+        store.commit("roomStore/SET_CONNECTION_ID", data.data.connectionId);
+        store.commit("roomStore/SET_SESSION_ID", session_id);
+        console.log(store.state.roomStore.roomId);
+        console.log(store.state.roomStore.participantId);
+        console.log(store.state.roomStore.openvidu_token);
+        console.log(store.state.roomStore.connectionId);
+        console.log(store.state.roomStore.sessionId);
+
+        router.push({ name: "library_study" });
       });
     };
 
@@ -124,7 +161,8 @@ export default {
       isOpen,
       pw,
       img,
-
+      slc2,
+      fileSlc,
       create_room,
     };
   },
