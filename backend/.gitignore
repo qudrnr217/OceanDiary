@@ -43,3 +43,4 @@ ssafy-web.log
 
 ### application.properties ###
 application-aws.yml
+application-oauth.yml
