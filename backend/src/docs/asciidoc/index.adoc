@@ -2,3 +2,4 @@
 
 - link:/docs/user.html[사용자(User) API]
 - link:/docs/naver-login.html[네이버 로그인 API]
+- link:/docs/kakao-login.html[카카오 로그인 API]

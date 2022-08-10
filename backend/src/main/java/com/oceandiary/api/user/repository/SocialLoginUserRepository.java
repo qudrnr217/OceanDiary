@@ -11,11 +11,11 @@ import static com.oceandiary.api.user.entity.QUser.user;
 
 
 @Repository
-public class NaverUserRepository {
+public class SocialLoginUserRepository {
     private final EntityManager em;
     private final JPAQueryFactory queryFactory;
 
-    public NaverUserRepository(EntityManager em) {
+    public SocialLoginUserRepository(EntityManager em) {
         this.em = em;
         this.queryFactory = new JPAQueryFactory(em);
     }

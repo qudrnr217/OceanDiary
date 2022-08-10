@@ -39,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/docs/**").permitAll() // restdocs 주소는 누구나 접근 가능
                 .antMatchers("/*/login").permitAll() // 가입 및 인증 주소는 누구나 접근 가능
                 .antMatchers("/api/naver/**").permitAll()// 네이버 로그인 접근 가능
-                .antMatchers("/api/user/login/**").permitAll() // 테스트는 누구나 접근 가능 (TODO: 삭제 필요)
+                .antMatchers("/api/kakao/**").permitAll()// 카카오 로그인 접근 가능
                 .anyRequest().authenticated() // 그외 나머지 요청은 모두 인증된 회원만 접근 가능
                 .and()
                 .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // jwt token 필터를 id/password 인증 필터 전에 추가 (TODO: oauth 설정 후 변경 필요)
