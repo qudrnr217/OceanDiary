@@ -2,7 +2,7 @@
   <div v-if="streamManager">
     <ov-video :stream-manager="streamManager" />
     <div>
-      <p>{{ clientData }}</p>
+      <!-- <p>{{ clientData }}</p> -->
     </div>
   </div>
 </template>
@@ -19,7 +19,7 @@ export default {
 
   props: {
     streamManager: Object,
-    isTalking: Boolean,
+    camera: Boolean,
   },
 
   computed: {
@@ -29,11 +29,11 @@ export default {
     },
   },
 
-  watch: {
-    isTalking(newIsTalking) {
-      console.log(newIsTalking);
-    },
-  },
+  // watch: {
+  //   isTalking(newIsTalking) {
+  //     console.log(newIsTalking);
+  //   },
+  // },
 
   methods: {
     getConnectionData() {
