@@ -54,7 +54,8 @@ export default {
       {
         methods: "get",
         // url: "https://i7a406.p.ssafy.io/api/naver/state",
-        url: "/api/naver/state",
+        // url: "/api/naver/state",
+        url: "http://localhost:8080/api/naver/state",
       },
       { withCredentials: true }
     ).then((response) => {
@@ -86,7 +87,7 @@ export default {
     sendNaverUrl() {
       // console.log(this.state);
       // location.href = `https://nid.naver.com/oauth2.0/authorize?client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=https://i7a406.p.ssafy.io/oauth2/redirect&state=${this.state}`;
-      location.href = `https://nid.naver.com/oauth2.0/authorize?client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=http://localhost:8080/oauth2/redirect&state=${this.state}`;
+      location.href = `https://nid.naver.com/oauth2.0/authorize?client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=http://localhost:8081/oauth2/redirect&state=${this.state}`;
     },
   },
 };

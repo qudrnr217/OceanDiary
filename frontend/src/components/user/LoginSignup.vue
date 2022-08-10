@@ -57,7 +57,8 @@ export default {
       axios({
         method: "post",
         // url: "https://i7a406.p.ssafy.io/api/naver/signup",
-        url: "/api/naver/signup",
+        // url: "/api/naver/signup",
+        url: "http://localhost:8080/api/naver/signup",
         data: {
           email: email.value,
           name: name.value,

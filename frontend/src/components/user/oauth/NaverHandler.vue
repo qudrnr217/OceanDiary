@@ -24,7 +24,8 @@ export default {
         {
           method: "post",
           // url: "https://i7a406.p.ssafy.io/api/naver/login",
-          url: "/api/naver/login",
+          url: "http://localhost:8080/api/naver/login",
+          // url: "/api/naver/login",
           data: { code: code },
         },
         { withCredentials: true }
@@ -33,6 +34,10 @@ export default {
         store.commit("userStore/SET_OAUTH", data.data.oauthId);
         //아이디가 있을 경우
         if (data.data.isExist) {
+          store.commit(
+            "userStore/SET_TOKEN",
+            "Bearer " + data.data.accessToken
+          );
           router.push({ name: "station_where" });
         } else {
           //아이디가 없을 경우
