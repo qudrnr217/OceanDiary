@@ -31,13 +31,6 @@ HTTP Request
 include::{snippets}/naver-login-first-user/http-request.adoc[]
 include::{snippets}/naver-login-first-user/request-fields.adoc[]
 
-----
-
-[source]
-{
-    “code”: “FUuGoFt4FcDPb70TZW”,
-}
-----
 
 HTTP Response
 

@@ -56,9 +56,11 @@ public class RoomResponse {
         }
 
     }
+
     @Data
-    @Getter
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class RoomInfo {
         private Long roomId;
         private String sessionId;
@@ -71,4 +73,5 @@ public class RoomResponse {
         private Integer curNum;
         private Boolean isOpen;
     }
+
 }

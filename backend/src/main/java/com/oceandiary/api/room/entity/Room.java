@@ -37,7 +37,7 @@ public class Room extends BaseEntity {
     private Image image;
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
-    private List<Dropout> dropouts = new ArrayList<>();
+    private final List<Dropout> dropouts = new ArrayList<>();
 
     private String title;
 
@@ -51,7 +51,7 @@ public class Room extends BaseEntity {
 
     private String pw;
 
-    public void updateInfo(RoomRequest.CreateRoom request, Image newImage) {
+    public void updateInfo(RoomRequest.UpdateRoom request, Image newImage) {
         if (request.getTitle() != null) {
             this.title = request.getTitle();
         }
