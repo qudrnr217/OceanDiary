@@ -52,7 +52,7 @@ public class User extends BaseEntity {
     private final List<Room> rooms = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<Dropout> dropouts = new ArrayList<>();
+    private final List<Dropout> dropouts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @Builder.Default
@@ -62,5 +62,8 @@ public class User extends BaseEntity {
         this.refreshToken = refreshToken;
     }
 
+    public void updateVisitedAt() {
+        this.visitedAt = LocalDateTime.now();
+    }
 
 }

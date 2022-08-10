@@ -43,3 +43,6 @@ ssafy-web.log
 
 ### application.properties ###
 application-aws.yml
+
+### .http private env ###
+src/rest/http-client.private.env.json

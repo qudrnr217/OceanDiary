@@ -22,7 +22,6 @@ public class RoomController {
 
     @PostMapping("")
     public RoomResponse.CreateRoom createRoom(@RequestPart(value = "form") RoomRequest.CreateRoom request, @RequestPart(value = "file") MultipartFile file, @CurrentUser CustomUserDetails user) {
-        // TODO: image 업로드 구현
         log.info("방 생성 request: {}, {}, {}", request, file, user.getUser());
         return roomService.createRoom(request, file, user.getUser());
     }
@@ -54,7 +53,7 @@ public class RoomController {
     }
 
     @PatchMapping("/{roomId}/info")
-    public void updateRoomInfo(@PathVariable(name = "roomId") Long roomId, @RequestPart(value = "form") RoomRequest.CreateRoom request, @RequestPart(value = "file") MultipartFile file, @CurrentUser CustomUserDetails user) {
+    public void updateRoomInfo(@PathVariable(name = "roomId") Long roomId, @RequestPart(value = "form") RoomRequest.UpdateRoom request, @RequestPart(value = "file") MultipartFile file, @CurrentUser CustomUserDetails user) {
         roomService.updateRoomInfo(roomId, request, file, user.getUser());
     }
 

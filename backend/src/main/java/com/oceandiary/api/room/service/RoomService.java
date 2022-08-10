@@ -1,6 +1,9 @@
 package com.oceandiary.api.room.service;
 
 import com.oceandiary.api.common.exception.BusinessException;
+import com.oceandiary.api.diary.dto.DiaryRequest;
+import com.oceandiary.api.diary.entity.Stamp;
+import com.oceandiary.api.diary.repository.StampRepository;
 import com.oceandiary.api.file.entity.Image;
 import com.oceandiary.api.file.repository.ImageRepository;
 import com.oceandiary.api.file.service.ImageService;
@@ -35,20 +38,30 @@ public class RoomService {
     private final String OPENVIDU_URL;
     // Secret shared with our OpenVidu server
     private final String SECRET;
+    private final S3Service s3Service;
+    private final ImageService imageService;
     private final RoomRepository roomRepository;
     private final RoomOnRedisRepository roomOnRedisRepository;
     private final ParticipantRepository participantRepository;
     private final ParticipantOnRedisRepository participantOnRedisRepository;
-
     private final DropoutRepository dropoutRepository;
     private final ImageRepository imageRepository;
-    private final S3Service s3Service;
-    private final ImageService imageService;
+    private final StampRepository stampRepository;
 
     @Value("${openvidu.secret}")
     private String OPENVIDU_SECRET;
 
-    public RoomService(@Value("${openvidu.secret}") String secret, @Value("${openvidu.url}") String openviduUrl, RoomRepository roomRepository, RoomOnRedisRepository roomOnRedisRepository, ParticipantRepository participantRepository, ParticipantOnRedisRepository participantOnRedisRepository, DropoutRepository dropoutRepository, ImageRepository imageRepository, S3Service s3Service, ImageService imageService) {
+    public RoomService(@Value("${openvidu.secret}") String secret,
+                       @Value("${openvidu.url}") String openviduUrl,
+                       RoomRepository roomRepository,
+                       RoomOnRedisRepository roomOnRedisRepository,
+                       ParticipantRepository participantRepository,
+                       ParticipantOnRedisRepository participantOnRedisRepository,
+                       DropoutRepository dropoutRepository,
+                       ImageRepository imageRepository,
+                       S3Service s3Service,
+                       ImageService imageService,
+                       StampRepository stampRepository) {
         this.SECRET = secret;
         this.OPENVIDU_URL = openviduUrl;
         this.roomRepository = roomRepository;
@@ -59,6 +72,7 @@ public class RoomService {
         this.imageRepository = imageRepository;
         this.s3Service = s3Service;
         this.imageService = imageService;
+        this.stampRepository = stampRepository;
         this.openVidu = new OpenVidu(OPENVIDU_URL, SECRET);
     }
 
@@ -89,7 +103,7 @@ public class RoomService {
                     .user(user)
                     .title(request.getTitle())
                     .rule(request.getRule())
-                    .image(newImage != null ? newImage : null)
+                    .image(newImage)
                     .maxNum(request.getMaxNum())
                     .isOpen(request.getIsOpen())
                     .pw(request.getPw())
@@ -153,7 +167,6 @@ public class RoomService {
         }
 
         try {
-            // Generate a new Connection with the recently created connectionProperties
             String sessionId = roomOnRedisRepository.findById(roomId).orElseThrow().getSessionId();
             Session session = getSession(sessionId);
 
@@ -191,14 +204,7 @@ public class RoomService {
             // If internal error generate an error message and return it to client
             throw new BusinessException(e.getMessage());
         } catch (OpenViduHttpException e) {
-            if (404 == e.getStatus()) {
-                // Invalid sessionId (user left unexpectedly). Session object is not valid
-                // anymore. Clean collections and continue as new session
-                roomOnRedisRepository.deleteById(roomId);
-                roomOnRedisRepository.deleteById(roomId);
-                Room room = roomRepository.findById(roomId).orElseThrow();
-                room.setDeletedAt(LocalDateTime.now());
-            }
+            handleUnexpectedlyInvalidSessionException(roomId, e);
             throw new BusinessException(e.getMessage());
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -213,16 +219,17 @@ public class RoomService {
 
             Session session = getSession(roomOnRedis.getSessionId());
 
+            Room room = roomRepository.findById(roomId).orElseThrow();
+
             if (user.getId() == roomOnRedis.getCreatedBy()) {  // 방장이 나갈경우
                 session.close();
                 for (Long pid : participantOnRedis.getParticipantTokenMap().keySet()) {
-                    Participant participant = participantRepository.findById(pid).orElseThrow();
-                    participant.addExitDate();
+                    addStampAndUpdateVisitedAtBeforeExit(room, pid);
                 }
                 participantOnRedis.getParticipantTokenMap().clear();
+                participantOnRedis.getParticipantConnectionMap().clear();
             } else {
-                Participant participant = participantRepository.findById(participantId).orElseThrow();
-                participant.addExitDate();
+                addStampAndUpdateVisitedAtBeforeExit(room, participantId);
             }
 
             participantOnRedis.removeParticipant(participantId);
@@ -230,7 +237,7 @@ public class RoomService {
             if (participantOnRedis.getParticipantTokenMap().isEmpty()) {  // 방에 더이상 참가자가 없을경우
                 participantOnRedisRepository.deleteById(roomId);
                 roomOnRedisRepository.deleteById(roomId);
-                Room room = roomRepository.findById(roomId).orElseThrow();
+                room = roomRepository.findById(roomId).orElseThrow();
                 room.setDeletedAt(LocalDateTime.now());
                 log.info("방 세션 종료");
             } else {  // 방에 아직 참가자가 있을경우
@@ -241,15 +248,7 @@ public class RoomService {
             // If internal error generate an error message and return it to client
             throw new BusinessException(e.getMessage());
         } catch (OpenViduHttpException e) {
-            if (404 == e.getStatus()) {
-                // Invalid sessionId (user left unexpectedly). Session object is not valid
-                // anymore. Clean collections and continue as new session
-                roomOnRedisRepository.deleteById(roomId);
-                roomOnRedisRepository.deleteById(roomId);
-                Room room = roomRepository.findById(roomId).orElseThrow();
-                room.setDeletedAt(LocalDateTime.now());
-            }
-            throw new BusinessException(e.getMessage());
+            handleUnexpectedlyInvalidSessionException(roomId, e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -266,12 +265,6 @@ public class RoomService {
     }
 
     @Transactional(readOnly = true)
-    public Session getSession(String sessionId) {
-        List<Session> activeSessions = this.openVidu.getActiveSessions();
-        return activeSessions.stream().filter(s -> s.getSessionId().equals(sessionId)).findFirst().orElseThrow();
-    }
-
-    @Transactional(readOnly = true)
     public RoomResponse.RoomInfo getRoomInfo(Long roomId) {
         RoomOnRedis roomOnRedis = roomOnRedisRepository.findById(roomId).orElseThrow();
         ParticipantOnRedis participantOnRedis = participantOnRedisRepository.findById(roomId).orElseThrow();
@@ -283,7 +276,7 @@ public class RoomService {
                 .createdBy(room.getCreatedBy().getId())
                 .title(room.getTitle())
                 .rule(room.getRule())
-                .imageId(room.getImage().getId())
+                .imageId(room.getImage() != null ? room.getImage().getId() : null)
                 .maxNum(room.getMaxNum())
                 .curNum(participantOnRedis.getParticipantTokenMap().size())
                 .isOpen(room.getIsOpen())
@@ -311,7 +304,7 @@ public class RoomService {
         return participantInfos;
     }
 
-    public void updateRoomInfo(Long roomId, RoomRequest.CreateRoom request, MultipartFile file, User user) {
+    public void updateRoomInfo(Long roomId, RoomRequest.UpdateRoom request, MultipartFile file, User user) {
         /**
          * 1. 수정하는 사람이 방장인지 확인한다.
          * 2. 이미지 파일 수정인지 확인한다.
@@ -339,7 +332,8 @@ public class RoomService {
     /**
      * 1. 같퇴하는 주체가 방장인지 확인한다.
      * 2. 강퇴자가 아직 세션에 남아있는지 확인한다.
-     * 3. participant의 exit_date 기록한다.
+     * 3. participant의 exit_date를 기록한다.
+     * 4. 강퇴자는 스탬프를 얻을 수 없다.
      */
     public void dropoutParticipant(Long roomId, Long participantId, User user) {
 
@@ -368,10 +362,42 @@ public class RoomService {
                     .name(participant.getName())
                     .build();
             dropoutRepository.save(dropout);
-        } catch (OpenViduJavaClientException e) {
-            throw new RuntimeException(e);
-        } catch (OpenViduHttpException e) {
+        } catch (OpenViduJavaClientException | OpenViduHttpException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void createStamp(DiaryRequest.StampCreate request, User user) {
+        Stamp stamp = Stamp.create(user, request.getCategory(), request.getEnterTime(), request.getExitTime());
+        stampRepository.save(stamp);
+    }
+
+    private Session getSession(String sessionId) {
+        List<Session> activeSessions = this.openVidu.getActiveSessions();
+        return activeSessions.stream().filter(s -> s.getSessionId().equals(sessionId)).findFirst().orElseThrow();
+    }
+
+    private void handleUnexpectedlyInvalidSessionException(Long roomId, OpenViduHttpException e) {
+        if (404 == e.getStatus()) {
+            // Invalid sessionId (user left unexpectedly). Session object is not valid
+            // anymore. Clean collections and continue as new session
+            roomOnRedisRepository.deleteById(roomId);
+            participantOnRedisRepository.deleteById(roomId);
+            Room room = roomRepository.findById(roomId).orElseThrow();
+            room.setDeletedAt(LocalDateTime.now());
+        }
+    }
+
+    private void addStampAndUpdateVisitedAtBeforeExit(Room room, Long participantId) {
+        Participant participant = participantRepository.findById(participantId).orElseThrow();
+        participant.addExitDate();
+        // 스탬프 저장
+        createStamp(DiaryRequest.StampCreate.builder()
+                .category(room.getCategory())
+                .enterTime(participant.getEnterDate())
+                .exitTime(participant.getExitDate())
+                .build(), participant.getUser());
+        // 최근 방문시각 저장
+        participant.getUser().updateVisitedAt();
     }
 }

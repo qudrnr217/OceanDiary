@@ -1,0 +1,92 @@
+### 방 생성
+POST {{apiUrl}}/rooms
+Authorization: {{authorizationToken}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="form"
+Content-Type: application/json
+
+ {
+      "categoryId": "LIBRARY",
+      "title": "테스트 방입니다",
+      "rule": "규칙 입니다.",
+      "maxNum": 4,
+      "isOpen": false,
+      "pw": "1234"
+ }
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="image.png"
+Content-Type: image/png
+
+< ./image.png
+
+> {%
+     client.global.set("roomId", response.body.roomId);
+     client.global.set("participantId", response.body.participantId);
+   %}
+
+
+### 방 입장
+POST {{apiUrl}}/rooms/{{roomId}}
+Authorization: {{authorizationToken}}
+Content-Type: application/json
+
+{
+  "pw": "1234"
+}
+
+
+### 방 퇴장
+DELETE {{apiUrl}}/rooms/{{roomId}}/participants/{{participantId}}
+Authorization: {{authorizationToken}}
+Content-Type: application/json
+
+
+### 방 검색 (무한 스크롤 페이징)
+GET {{apiUrl}}/rooms?size={{size}}&category={{categoryId}}&lastRoomId={{roomId}}
+Authorization: {{authorizationToken}}
+Accept: application/json
+
+
+### 방 상세정보
+GET {{apiUrl}}/rooms/{{roomId}}/info
+Authorization: {{authorizationToken}}
+Accept: application/json
+
+
+### 방 상세정보 + 참가자 리스트 조회
+GET {{apiUrl}}/rooms/{{roomId}}/detail
+Authorization: {{authorizationToken}}
+Accept: application/json
+
+
+### 방 정보 수정
+PATCH {{apiUrl}}/rooms/{{roomId}}/info
+Authorization: {{authorizationToken}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+
+--WebAppBoundary
+Content-Disposition: form-data; name="form"
+Content-Type: application/json
+
+{
+"title": "테스트 방 수정입니다.",
+"rule": "수정된 규칙입니다.",
+"maxNum": 3,
+"isOpen": true,
+"pw": null
+}
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="image.png"
+Content-Type: image/png
+
+< ./image.png
+
+
+### 방 참가자 강퇴
+POST {{apiUrl}}/rooms/{{roomId}}/participants/{{participantId}}
+Authorization: {{authorizationToken}}
