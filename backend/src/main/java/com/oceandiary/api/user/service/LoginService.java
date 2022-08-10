@@ -33,7 +33,6 @@ public class LoginService {
     private final SocialLoginUserRepository socialLoginUserRepository;
     private final TokenProvider tokenProvider;
 
-    // TODO: @ConfigurationProperties 혹은 @Value 사용해서 API 키 감추기
     @Value("${NAVER_API_CLIENT_ID}")
     private String naverClientId;
     @Value("${NAVER_API_CLIENT_SECRET}")
