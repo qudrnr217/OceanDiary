@@ -171,7 +171,6 @@ class LoginControllerTest extends MvcTest {
                 ));
 
         verify(loginService).join(request, "naver");
-
     }
 
     @Test
