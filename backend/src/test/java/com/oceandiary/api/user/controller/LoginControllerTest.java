@@ -130,8 +130,9 @@ class LoginControllerTest extends MvcTest {
     @DisplayName("네이버로그인_회원가입")
     void joinByNaver() throws Exception {
         ProviderRequest.JoinRequest request = new ProviderRequest.JoinRequest();
-        LoginResponse.Join response = LoginResponse.Join.builder()
+        LoginResponse.JoinWithToken response = LoginResponse.JoinWithToken.builder()
                 .accessToken("access-token")
+                .refreshToken("refresh-token")
                 .userId(1L)
                 .name("황재완")
                 .build();
@@ -170,7 +171,6 @@ class LoginControllerTest extends MvcTest {
                 ));
 
         verify(loginService).join(request, "naver");
-
     }
 
     @Test
@@ -246,8 +246,9 @@ class LoginControllerTest extends MvcTest {
     @DisplayName("카카오로그인_회원가입")
     void joinByKakao() throws Exception {
         ProviderRequest.JoinRequest request = new ProviderRequest.JoinRequest();
-        LoginResponse.Join response = LoginResponse.Join.builder()
+        LoginResponse.JoinWithToken response = LoginResponse.JoinWithToken.builder()
                 .accessToken("access-token")
+                .refreshToken("refresh-token")
                 .userId(1L)
                 .name("김싸피")
                 .build();

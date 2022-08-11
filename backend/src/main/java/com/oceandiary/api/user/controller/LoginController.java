@@ -51,9 +51,13 @@ public class LoginController {
 
     @PostMapping("/{provider}/signup")
     public ResponseEntity<LoginResponse.Join> join(@RequestBody @Valid ProviderRequest.JoinRequest request, @PathVariable String provider, HttpServletResponse response) {
-        LoginResponse.Join tokenResponse = loginService.join(request, provider);
+        LoginResponse.JoinWithToken tokenResponse = loginService.join(request, provider);
+        LoginResponse.Join finalResponse = LoginResponse.Join.builder()
+                .userId(tokenResponse.getUserId())
+                .accessToken(tokenResponse.getAccessToken())
+                .name(tokenResponse.getName()).build();
         CookieUtils.addCookie(response, REFRESH_TOKEN, tokenResponse.getRefreshToken(), MAX_COOKIE_TIME_S);
-        return ResponseEntity.ok().body(tokenResponse);
+        return ResponseEntity.ok().body(finalResponse);
     }
 
     @PostMapping("/user/refresh")
