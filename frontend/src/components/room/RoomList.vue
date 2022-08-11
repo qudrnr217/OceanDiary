@@ -14,14 +14,19 @@
           @click="create_room()"
         />
       </div>
-      <div class="text-middle"></div>
+      <div class="text-middle">
+        <!-- <div class="room" v-for=""></div> -->
+        <button @click="insideroom()">입장</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { onMounted } from "@vue/runtime-core";
 
 export default {
   setup() {
@@ -32,9 +37,38 @@ export default {
       console.log(store.state.locationStore.create_name);
       router.push({ name: store.state.locationStore.create_name });
     };
+
+    var insideroom = () => {
+      axios({
+        method: "post",
+        url: `/api/rooms/2`,
+        // url: `http://localhost:8080/api/rooms/${store.state.roomStore.roomId}`,
+        pw: "123",
+        headers: {
+          Authorization:
+            "Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIyIiwiYXVkIjoi6rCV67OR6rWtIiwiZXhwIjoxNjYwMTk2NTA3fQ.wu_3QT_TehiHa64eV40EP4aBZE4E8zqNvJP_oE8KkN3XVjvGUH7XUIW4jjh1Nnws",
+        },
+      }).then((data) => {
+        console.log(data);
+      });
+    };
+
+    onMounted(() => {
+      axios({
+        method: "get",
+        url: `/api/rooms?category=LIBRARY&lastRoomId=0`,
+        headers: {
+          Authorization: store.state.userStore.token,
+        },
+      }).then((response) => {
+        console.log(response);
+      });
+    });
+
     return {
       title,
       create_room,
+      insideroom,
     };
   },
 };
