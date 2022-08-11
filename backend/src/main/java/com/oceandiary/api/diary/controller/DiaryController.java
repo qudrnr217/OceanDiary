@@ -23,7 +23,7 @@ public class DiaryController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<DiaryResponse.GetDiaryContents> getList(@PathVariable("userId") Long userId) {
+    public ResponseEntity<DiaryResponse.GetDiaryContents> getDiary(@PathVariable("userId") Long userId) {
         DiaryResponse.GetDiaryContents response = diaryService.getDiaryInfo(userId);
         return ResponseEntity.ok().body(response);
     }

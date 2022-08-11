@@ -67,7 +67,7 @@ public class DiaryResponse {
         private Long id;
         private String name;
         private String email;
-        private LocalDate brith;
+        private LocalDate birth;
         private LocalDateTime visitedAt;
         private List<DiaryResponse.GetStamp> stamps = new ArrayList<>();
 
@@ -76,7 +76,7 @@ public class DiaryResponse {
                     .id(user.getId())
                     .name(user.getName())
                     .email(user.getEmail())
-                    .brith(user.getBirth())
+                    .birth(user.getBirth())
                     .visitedAt(user.getVisitedAt())
                     .stamps(DiaryResponse.GetStamps.build(user.getStamps()).getStamps())
                     .build();
