@@ -30,20 +30,19 @@ public class ImageResponse {
         private String name;
         private String extension;
         private Long size;
-        private String publicUrl;
         private int width;
         private int height;
-
-        public static ImageResponse.GetImage build(Image image) {
-            return ImageResponse.GetImage.builder()
+        private String base64Str;
+        public static ImageResponse.GetImage build(Image image, String base64Str) {
+            return GetImage.builder()
                     .id(image.getId())
                     .name(image.getName())
                     .extension(image.getExtension())
                     .originName(image.getOriginName())
                     .size(image.getSize())
-                    .publicUrl(image.getUrl())
                     .width(image.getWidth())
                     .height(image.getHeight())
+                    .base64Str(base64Str)
                     .build();
         }
 
