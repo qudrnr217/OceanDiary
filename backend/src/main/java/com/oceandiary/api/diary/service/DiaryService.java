@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class StampService {
+public class DiaryService {
     // TODO: 방 퇴장과 연결 후 삭제 예정
     private final UserRepository userRepository;
     private final StampRepository stampRepository;
@@ -34,6 +34,11 @@ public class StampService {
         User findUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         List<Stamp> stamps = stampRepository.findAllByUserOrderByIdDesc(findUser);
         return stamps.stream().map(stamp -> DiaryResponse.GetStamp.build(stamp)).collect(Collectors.toList());
+    }
+
+    public DiaryResponse.GetDiaryContents getDiaryInfo(Long userId){
+        User findUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        return DiaryResponse.GetDiaryContents.build(findUser);
     }
 
 }

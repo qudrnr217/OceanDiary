@@ -3,8 +3,12 @@ package com.oceandiary.api.diary.dto;
 
 import com.oceandiary.api.common.category.Category;
 import com.oceandiary.api.diary.entity.Stamp;
+import com.oceandiary.api.user.entity.User;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,8 +48,8 @@ public class DiaryResponse {
 
     @Getter
     @Builder
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor (access = AccessLevel.PRIVATE)
+    @AllArgsConstructor (access = AccessLevel.PRIVATE)
     public static class GetStamps {
         private List<DiaryResponse.GetStamp> stamps;
         public static DiaryResponse.GetStamps build(List<Stamp> stampList){
@@ -53,5 +57,30 @@ public class DiaryResponse {
                     .stamps(stampList.stream().map(DiaryResponse.GetStamp::build).collect(Collectors.toList()))
                     .build();
         }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class GetDiaryContents{
+        private Long id;
+        private String name;
+        private String email;
+        private LocalDate brith;
+        private LocalDateTime visitedAt;
+        private List<DiaryResponse.GetStamp> stamps = new ArrayList<>();
+
+        public static DiaryResponse.GetDiaryContents build(User user){
+            return GetDiaryContents.builder()
+                    .id(user.getId())
+                    .name(user.getName())
+                    .email(user.getEmail())
+                    .brith(user.getBirth())
+                    .visitedAt(user.getVisitedAt())
+                    .stamps(DiaryResponse.GetStamps.build(user.getStamps()).getStamps())
+                    .build();
+        }
+
     }
 }
