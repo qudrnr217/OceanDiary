@@ -172,6 +172,7 @@ public class LoginService {
                 .encode()
                 .build()
                 .toUri();
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
         HttpEntity request = new HttpEntity(headers);

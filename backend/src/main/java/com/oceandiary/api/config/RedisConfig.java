@@ -28,7 +28,7 @@ public class RedisConfig {
         try {
             redisServer.start();
         } catch (Exception e) {
-            log.error("Redis 서버가 이미 실행 중: {}", e);
+            log.info("Redis 서버가 이미 실행 중: 기존 레디스 서버를 사용합니다.");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.oceandiary.api.room.repository;
 
+import com.oceandiary.api.room.entity.Room;
 import com.oceandiary.api.room.request.RoomRequest;
 import com.oceandiary.api.room.response.RoomResponse;
 import com.querydsl.core.types.Projections;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import static com.oceandiary.api.file.entity.QImage.image;
 import static com.oceandiary.api.room.entity.QRoom.room;
+import static com.querydsl.jpa.JPAExpressions.select;
 
 
 @Slf4j
@@ -43,7 +45,7 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
                 .where(
                         room.category.eq(condition.getCategory()),
                         room.deletedAt.isNull(),
-                        room.id.lt(condition.getLastRoomId()),
+                        condition.getLastRoomId() != 0 ? room.id.lt(condition.getLastRoomId()) : room.id.loe(select(room.id.max()).from(room)),
                         condition.getTitle() == null ? null : room.title.like(condition.getTitle())
                 )
                 .offset(0)
@@ -59,14 +61,30 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
                 .where(
                         room.category.eq(condition.getCategory()),
                         room.deletedAt.isNull(),
-                        room.id.lt(condition.getLastRoomId()),
                         condition.getTitle() == null ? null : room.title.like(condition.getTitle())
                 )
-                .offset(0)
-                .orderBy(room.id.desc())
-                .limit(pageable.getPageSize())
                 .fetchCount();
 
         return new PageImpl<>(content, pageable, total);
     }
+
+    @Override
+    public List<Room> searchUndeletedRooms() {
+        return queryFactory
+                .selectFrom(room)
+                .where(
+                        room.deletedAt.isNull()
+                )
+                .fetch();
+    }
+
+//    @Override
+//    public void updateUndeletedRoomToDeletedRoom(Long roomId) {
+//        queryFactory
+//                .update(room)
+//                .set(room.deletedAt, LocalDateTime.now())
+//                .where(room.id.eq(roomId))
+//                .execute();
+//    }
+
 }
