@@ -1,15 +1,19 @@
 package com.oceandiary.api.config;
 
+import com.oceandiary.api.user.security.token.JwtRefreshTokenInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
+    private final JwtRefreshTokenInterceptor tokenInterceptor;
+
     /****************************************************************************************
      * CORS 설정
      * 모두 허용함
@@ -34,5 +38,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
         characterEncodingFilter.setEncoding("UTF-8");
         characterEncodingFilter.setForceEncoding(true);
         return characterEncodingFilter;
+    }
+    /****************************************************************************************
+     * 리프레시 토큰 인터셉터
+     * 발급 시도 시 사용되도록
+     ****************************************************************************************/
+    public void addInterceptors(InterceptorRegistry interceptorRegistry) {
+        interceptorRegistry.addInterceptor(tokenInterceptor).addPathPatterns("/api/user/refresh");
     }
 }
