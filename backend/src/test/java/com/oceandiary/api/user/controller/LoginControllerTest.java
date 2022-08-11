@@ -3,7 +3,7 @@ package com.oceandiary.api.user.controller;
 import com.google.gson.Gson;
 import com.oceandiary.MvcTest;
 import com.oceandiary.api.user.request.ProviderRequest;
-import com.oceandiary.api.user.response.ProviderResponse;
+import com.oceandiary.api.user.response.LoginResponse;
 import com.oceandiary.api.user.service.LoginService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,7 +53,7 @@ class LoginControllerTest extends MvcTest {
     @DisplayName("네이버로그인_최초사용자_로그인")
     public void firstLoginByNaver() throws Exception {
         ProviderRequest.LoginRequest request = new ProviderRequest.LoginRequest();
-        ProviderResponse.LoginResponse response = ProviderResponse.LoginResponse.builder()
+        LoginResponse.Login response = LoginResponse.Login.builder()
                 .isExist(false)
                 .oauthId("oauthid")
                 .build();
@@ -89,7 +89,7 @@ class LoginControllerTest extends MvcTest {
     @DisplayName("네이버로그인_회원가입된_사용자_로그인")
     void loginByNaverWithPresentUser() throws Exception {
         ProviderRequest.LoginRequest request = new ProviderRequest.LoginRequest();
-        ProviderResponse.LoginResponse response = ProviderResponse.LoginResponse.builder()
+        LoginResponse.Login response = LoginResponse.Login.builder()
                 .isExist(true)
                 .accessToken("access-token")
                 .userId(1L)
@@ -130,7 +130,7 @@ class LoginControllerTest extends MvcTest {
     @DisplayName("네이버로그인_회원가입")
     void joinByNaver() throws Exception {
         ProviderRequest.JoinRequest request = new ProviderRequest.JoinRequest();
-        ProviderResponse.JoinResponse response = ProviderResponse.JoinResponse.builder()
+        LoginResponse.Join response = LoginResponse.Join.builder()
                 .accessToken("access-token")
                 .userId(1L)
                 .name("황재완")
@@ -177,7 +177,7 @@ class LoginControllerTest extends MvcTest {
     @DisplayName("카카오로그인_최초사용자_로그인")
     public void firstLoginByKakao() throws Exception {
         ProviderRequest.LoginRequest request = new ProviderRequest.LoginRequest();
-        ProviderResponse.LoginResponse response = ProviderResponse.LoginResponse.builder()
+        LoginResponse.Login response = LoginResponse.Login.builder()
                 .isExist(false)
                 .oauthId("oauthid")
                 .build();
@@ -210,7 +210,7 @@ class LoginControllerTest extends MvcTest {
     @DisplayName("카카오로그인_회원가입된_사용자_로그인")
     void loginByKakaoWithPresentUser() throws Exception {
         ProviderRequest.LoginRequest request = new ProviderRequest.LoginRequest();
-        ProviderResponse.LoginResponse response = ProviderResponse.LoginResponse.builder()
+        LoginResponse.Login response = LoginResponse.Login.builder()
                 .isExist(true)
                 .accessToken("access-token")
                 .userId(1L)
@@ -246,7 +246,7 @@ class LoginControllerTest extends MvcTest {
     @DisplayName("카카오로그인_회원가입")
     void joinByKakao() throws Exception {
         ProviderRequest.JoinRequest request = new ProviderRequest.JoinRequest();
-        ProviderResponse.JoinResponse response = ProviderResponse.JoinResponse.builder()
+        LoginResponse.Join response = LoginResponse.Join.builder()
                 .accessToken("access-token")
                 .userId(1L)
                 .name("김싸피")

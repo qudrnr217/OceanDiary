@@ -5,9 +5,12 @@ import com.oceandiary.api.user.domain.SocialProvider;
 import com.oceandiary.api.user.dto.KakaoApiResponse;
 import com.oceandiary.api.user.dto.NaverApiResponse;
 import com.oceandiary.api.user.entity.User;
+import com.oceandiary.api.user.exception.UserNotFoundException;
 import com.oceandiary.api.user.repository.SocialLoginUserRepository;
+import com.oceandiary.api.user.repository.UserRepository;
 import com.oceandiary.api.user.request.ProviderRequest;
-import com.oceandiary.api.user.response.ProviderResponse;
+import com.oceandiary.api.user.response.LoginResponse;
+import com.oceandiary.api.user.security.token.Token;
 import com.oceandiary.api.user.security.token.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +32,7 @@ import java.net.URI;
 @RequiredArgsConstructor
 @Slf4j
 public class LoginService {
-
+    private final UserRepository userRepository;
     private final SocialLoginUserRepository socialLoginUserRepository;
     private final TokenProvider tokenProvider;
 
@@ -40,7 +43,7 @@ public class LoginService {
     @Value("${KAKAO_API_CLIENT_ID}")
     private String kakaoClientId;
 
-    public ProviderResponse.LoginResponse naverLogin(ProviderRequest.LoginRequest request, HttpSession session){
+    public LoginResponse.Login naverLogin(ProviderRequest.LoginRequest request, HttpSession session){
         String accessToken = getNaverAccessToken(request, session);
         String naverUniqueId = getNaverUniqueId(accessToken);
 
@@ -48,7 +51,7 @@ public class LoginService {
         return checkUser(foundUser, naverUniqueId);
     }
 
-    public ProviderResponse.LoginResponse kakaoLogin(ProviderRequest.LoginRequest request){
+    public LoginResponse.Login kakaoLogin(ProviderRequest.LoginRequest request){
         String accessToken = getKakaoAccessToken(request);
         String kakaoUniqueId = getKakaoUniqueId(accessToken);
         User foundUser = socialLoginUserRepository.findByProviderAndOauthId(SocialProvider.KAKAO, kakaoUniqueId);
@@ -56,7 +59,7 @@ public class LoginService {
     }
 
     @Transactional
-    public ProviderResponse.JoinResponse join(ProviderRequest.JoinRequest request, String provider){
+    public LoginResponse.Join join(ProviderRequest.JoinRequest request, String provider){
         User newUser = User.builder()
                 .email(request.getEmail())
                 .name(request.getName())
@@ -71,7 +74,7 @@ public class LoginService {
         String refreshToken = tokenProvider.generateRefreshToken(newUser).getToken();
         newUser.updateRefreshToken(refreshToken);
 
-        ProviderResponse.JoinResponse response = ProviderResponse.JoinResponse.builder()
+        LoginResponse.Join response = LoginResponse.Join.builder()
                 .accessToken(tokenProvider.generateAccessToken(newUser).getToken())
                 .name(newUser.getName())
                 .userId(newUser.getId())
@@ -80,17 +83,17 @@ public class LoginService {
         return response;
     }
 
-    public ProviderResponse.LoginResponse checkUser(User foundUser, String uniqueId){
-        ProviderResponse.LoginResponse response;
+    public LoginResponse.Login checkUser(User foundUser, String uniqueId){
+        LoginResponse.Login response;
         if(foundUser != null){
-            response = ProviderResponse.LoginResponse.builder()
+            response = LoginResponse.Login.builder()
                     .name(foundUser.getName())
                     .userId(foundUser.getId())
                     .isExist(true)
                     .accessToken(tokenProvider.generateAccessToken(foundUser).getToken())
                     .build();
         }else{
-            response = ProviderResponse.LoginResponse.builder()
+            response = LoginResponse.Login.builder()
                     .isExist(false)
                     .oauthId(uniqueId)
                     .build();
@@ -184,6 +187,10 @@ public class LoginService {
         log.info("KAKAO Unique ID = {}", responseEntity.getBody().getId());
         return responseEntity.getBody().getId().toString();
     }
-
-
+    public LoginResponse.Auth createAccessTokenAndRefreshToken(String refreshToken) {
+        Long userId = tokenProvider.getUserIdFromRefreshToken(refreshToken);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        Token createdRefreshToken = tokenProvider.generateRefreshToken(user);
+        return LoginResponse.Auth.build(user, tokenProvider.generateAccessToken(user), createdRefreshToken);
+    }
 }

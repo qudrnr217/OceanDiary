@@ -10,4 +10,3 @@ Content-Type: application/json;charset=UTF-8
 
 ###
 GET {{apiUrl}}/diary/user/1
-Authorization: {{authorizationToken}}
