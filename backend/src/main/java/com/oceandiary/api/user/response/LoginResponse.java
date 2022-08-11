@@ -15,6 +15,15 @@ public class LoginResponse {
         private Long userId;
         private String name;
         private String accessToken;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    public static class JoinWithToken {
+        private Long userId;
+        private String name;
+        private String accessToken;
         private String refreshToken;
     }
 

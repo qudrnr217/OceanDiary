@@ -59,7 +59,7 @@ public class LoginService {
     }
 
     @Transactional
-    public LoginResponse.Join join(ProviderRequest.JoinRequest request, String provider){
+    public LoginResponse.JoinWithToken join(ProviderRequest.JoinRequest request, String provider){
         User newUser = User.builder()
                 .email(request.getEmail())
                 .name(request.getName())
@@ -70,14 +70,12 @@ public class LoginService {
                 .build();
 
         socialLoginUserRepository.save(newUser);
-        // Issue refresh token
-        String refreshToken = tokenProvider.generateRefreshToken(newUser).getToken();
-        newUser.updateRefreshToken(refreshToken);
 
-        LoginResponse.Join response = LoginResponse.Join.builder()
+        LoginResponse.JoinWithToken response = LoginResponse.JoinWithToken.builder()
                 .accessToken(tokenProvider.generateAccessToken(newUser).getToken())
                 .name(newUser.getName())
                 .userId(newUser.getId())
+                .refreshToken(tokenProvider.generateRefreshToken(newUser).getToken())
                 .build();
 
         return response;
@@ -132,8 +130,6 @@ public class LoginService {
                 .encode()
                 .build()
                 .toUri();
-
-        //System.out.print("uri: " + uri);
         log.info("uri : " + uri );
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<NaverApiResponse.AccessTokenApiResponse> responseEntity
