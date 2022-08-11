@@ -24,8 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -254,12 +256,34 @@ public class RoomService {
         }
     }
 
-    @Transactional(readOnly = true)
     public Page<RoomResponse.SearchRooms> search(RoomRequest.RoomSearchCondition condition, Pageable pageable) {
         Page<RoomResponse.SearchRooms> page = roomRepository.search(condition, pageable);
-        for (RoomResponse.SearchRooms searchedRoom : page.getContent()) {
-            Integer searchedRoomId = participantOnRedisRepository.findById(searchedRoom.getRoomId()).orElseThrow().getParticipantTokenMap().size();
-            searchedRoom.setCurNum(searchedRoomId);
+        Iterator<RoomResponse.SearchRooms> searchedRoomsIterator = page.getContent().iterator();
+        boolean isInConsistent = false;
+        while (searchedRoomsIterator.hasNext()) {
+            RoomResponse.SearchRooms searchedRoom = searchedRoomsIterator.next();
+            Optional<ParticipantOnRedis> participantOrNull = participantOnRedisRepository.findById(searchedRoom.getRoomId());
+            // redis와 mysql의 데이터 정합성 수행
+            if (participantOrNull.isEmpty()) {
+                // 1. 데이터 부정합성 발생
+                isInConsistent = true;
+                // 2. 부정합성 해결 -> Room 엔티티의 deletedAt에 현재시각을 추가
+                resolveInconsistency();
+                break;
+            }
+            // 현재 참가자 넣기
+            Integer curNum = participantOrNull.orElseThrow().getParticipantTokenMap().size();
+            searchedRoom.setCurNum(curNum);
+        }
+        // 만약 부정합성이 발견되었다면 다시 가져온다.
+        if (isInConsistent) {
+            page = roomRepository.search(condition, pageable);
+            for (RoomResponse.SearchRooms searchedRoom : page.getContent()) {
+                Integer curNum = participantOnRedisRepository.findById(searchedRoom.getRoomId())
+                        .map(participantOnRedis -> participantOnRedis.getParticipantTokenMap().size())
+                        .orElse(0);
+                searchedRoom.setCurNum(curNum);
+            }
         }
         return page;
     }
@@ -399,5 +423,15 @@ public class RoomService {
                 .build(), participant.getUser());
         // 최근 방문시각 저장
         participant.getUser().updateVisitedAt();
+    }
+
+    private void resolveInconsistency() {
+        List<Room> searchedUndeletedRooms = roomRepository.searchUndeletedRooms();
+        for (Room searchedUndeletedRoom : searchedUndeletedRooms) {
+            if (roomOnRedisRepository.findById(searchedUndeletedRoom.getId()).isEmpty()) {
+                Room room = roomRepository.findById(searchedUndeletedRoom.getId()).orElseThrow();
+                room.setDeletedAt(LocalDateTime.now());
+            }
+        }
     }
 }
