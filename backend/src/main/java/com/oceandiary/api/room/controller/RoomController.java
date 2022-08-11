@@ -1,5 +1,6 @@
 package com.oceandiary.api.room.controller;
 
+import com.oceandiary.api.common.utils.CookieUtils;
 import com.oceandiary.api.room.request.RoomRequest;
 import com.oceandiary.api.room.response.RoomResponse;
 import com.oceandiary.api.room.service.RoomService;
@@ -13,6 +14,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Optional;
+
 @RestController
 @Slf4j
 @RequestMapping("/api/rooms")
@@ -22,23 +26,26 @@ public class RoomController {
 
     @PostMapping("")
     public RoomResponse.CreateRoom createRoom(@RequestPart(value = "form") RoomRequest.CreateRoom request, @RequestPart(value = "file") MultipartFile file, @CurrentUser CustomUserDetails user) {
-        log.info("방 생성 request: {}, {}, {}", request, file, user.getUser());
         return roomService.createRoom(request, file, user.getUser());
     }
 
     @PostMapping("/{roomId}")
-    public RoomResponse.EnterRoom enterRoom(@PathVariable("roomId") Long roomId, @RequestBody RoomRequest.EnterRoom request, @CurrentUser CustomUserDetails user) {
-        return roomService.enterRoom(request, roomId, user.getUser());
+    public RoomResponse.EnterRoom enterRoom(@PathVariable("roomId") Long roomId,
+                                            @RequestBody RoomRequest.EnterRoom request,
+                                            @CurrentUser CustomUserDetails user,
+                                            @CookieValue(name = "name", defaultValue = "") String name) throws UnsupportedEncodingException {
+        return roomService.enterRoom(request, roomId, Optional.ofNullable(user).map(CustomUserDetails::getUser).orElse(null), CookieUtils.getCookie(name));
     }
 
     @DeleteMapping("/{roomId}/participants/{participantId}")
-    public void exitRoom(@PathVariable("roomId") Long roomId, @PathVariable Long participantId, @CurrentUser CustomUserDetails user) {
-        roomService.exitRoom(roomId, participantId, user.getUser());
+    public void exitRoom(@PathVariable("roomId") Long roomId,
+                         @PathVariable Long participantId,
+                         @CurrentUser CustomUserDetails user) {
+        roomService.exitRoom(roomId, participantId, Optional.ofNullable(user).map(CustomUserDetails::getUser).orElse(null));
     }
 
     @GetMapping("")
     public Page<RoomResponse.SearchRooms> search(RoomRequest.RoomSearchCondition condition, @PageableDefault(size = 5) Pageable pageable) {
-        log.info("{}", condition);
         return roomService.search(condition, pageable);
     }
 
