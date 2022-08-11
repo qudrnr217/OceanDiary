@@ -3,12 +3,15 @@ package com.oceandiary.api.file.service;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
 import com.oceandiary.api.file.dto.S3Component;
 import com.oceandiary.api.file.dto.SavedFile;
+import com.oceandiary.api.file.entity.Image;
 import com.oceandiary.api.file.exception.FileExtensionException;
 import com.oceandiary.api.file.exception.S3Exception;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -96,5 +100,28 @@ public class S3Service {
         } catch (StringIndexOutOfBoundsException e) {
             throw new FileExtensionException();
         }
+    }
+
+    private byte[] convertFileContentToBlob (Image image) {
+        try {
+            String bucket = component.getBucket();
+            String fileName = image.getName();
+            S3Object s3Object = s3Client.getObject(bucket, fileName);
+            return IOUtils.toByteArray(s3Object.getObjectContent());
+        } catch (IOException e) {
+            log.error("file convert Error");
+            return null;
+        }
+    }
+    private String convertBlobToBase64 (byte[] blob) {
+        return Base64.getEncoder().encodeToString(blob);
+    }
+    public String getBase64Str (Image image) {
+        byte[] fileByte = convertFileContentToBlob(image);
+        String imgStr = convertBlobToBase64(fileByte);
+        StringBuilder sb = new StringBuilder();
+        sb.append("data:image/").append(image.getExtension()).append(";base64, ").append(imgStr);
+        imgStr = sb.toString();
+        return imgStr;
     }
 }

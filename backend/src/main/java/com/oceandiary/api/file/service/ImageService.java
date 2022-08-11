@@ -20,6 +20,8 @@ public class ImageService {
     }
 
     public ImageResponse.GetImage getImage(Long imageId) {
-        return ImageResponse.GetImage.build(imageRepository.findById(imageId).orElseThrow(FileNotFoundException::new));
+        Image image = imageRepository.findById(imageId).orElseThrow(FileNotFoundException::new);
+        String base64Str = s3Service.getBase64Str(image);
+        return ImageResponse.GetImage.build(image, base64Str);
     }
 }
