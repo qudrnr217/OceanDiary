@@ -40,6 +40,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { onMounted, ref } from "vue";
@@ -112,6 +113,7 @@ export default {
       capacity,
       button,
       create_room,
+      insideroom,
     };
   },
 };

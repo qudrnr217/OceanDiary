@@ -90,6 +90,11 @@ const routes = [
         name: "train-arrive",
         component: () => import("@/components/train/TrainArrive.vue"),
       },
+      {
+        path: "room",
+        name: "library_study",
+        component: () => import("@/components/room/StudyRoom.vue"),
+      },
     ],
   },
   // 방 생성 관련,
