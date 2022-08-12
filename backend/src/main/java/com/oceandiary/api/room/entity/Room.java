@@ -3,7 +3,7 @@ package com.oceandiary.api.room.entity;
 import com.oceandiary.api.common.category.Category;
 import com.oceandiary.api.common.entity.BaseEntity;
 import com.oceandiary.api.file.entity.Image;
-import com.oceandiary.api.room.request.RoomRequest;
+import com.oceandiary.api.room.dto.RoomRequest;
 import com.oceandiary.api.user.entity.User;
 import lombok.*;
 
@@ -51,7 +51,7 @@ public class Room extends BaseEntity {
 
     private String pw;
 
-    public void updateInfo(RoomRequest.UpdateRoom request, Image newImage) {
+    public void updateInfo(RoomRequest.UpdateRoom request) {
         if (request.getTitle() != null) {
             this.title = request.getTitle();
         }
@@ -67,8 +67,10 @@ public class Room extends BaseEntity {
         if (request.getPw() != null) {
             this.pw = request.getPw();
         }
-        if (newImage != null) {
-            this.image = newImage;
+    }
+    public void updateImage(Image image) {
+        if (image != null) {
+            this.image = image;
         }
     }
 }

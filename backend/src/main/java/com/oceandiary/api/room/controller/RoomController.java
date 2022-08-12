@@ -1,8 +1,8 @@
 package com.oceandiary.api.room.controller;
 
 import com.oceandiary.api.common.utils.CookieUtils;
-import com.oceandiary.api.room.request.RoomRequest;
-import com.oceandiary.api.room.response.RoomResponse;
+import com.oceandiary.api.room.dto.RoomRequest;
+import com.oceandiary.api.room.dto.RoomResponse;
 import com.oceandiary.api.room.service.RoomService;
 import com.oceandiary.api.user.security.userdetails.CurrentUser;
 import com.oceandiary.api.user.security.userdetails.CustomUserDetails;
@@ -38,10 +38,10 @@ public class RoomController {
     }
 
     @DeleteMapping("/{roomId}/participants/{participantId}")
-    public void exitRoom(@PathVariable("roomId") Long roomId,
+    public RoomResponse.OnlyId exitRoom(@PathVariable("roomId") Long roomId,
                          @PathVariable Long participantId,
                          @CurrentUser CustomUserDetails user) {
-        roomService.exitRoom(roomId, participantId, Optional.ofNullable(user).map(CustomUserDetails::getUser).orElse(null));
+        return roomService.exitRoom(roomId, participantId, Optional.ofNullable(user).map(CustomUserDetails::getUser).orElse(null));
     }
 
     @GetMapping("")
@@ -60,13 +60,18 @@ public class RoomController {
     }
 
     @PatchMapping("/{roomId}/info")
-    public void updateRoomInfo(@PathVariable(name = "roomId") Long roomId, @RequestPart(value = "form") RoomRequest.UpdateRoom request, @RequestPart(value = "file") MultipartFile file, @CurrentUser CustomUserDetails user) {
-        roomService.updateRoomInfo(roomId, request, file, user.getUser());
+    public RoomResponse.OnlyId updateRoomInfo(@PathVariable(name = "roomId") Long roomId, @RequestBody RoomRequest.UpdateRoom request, @CurrentUser CustomUserDetails user) {
+        return roomService.updateRoomInfo(roomId, request, user.getUser());
+    }
+
+    @PostMapping("/{roomId}/image")
+    public RoomResponse.OnlyId updateRoomImage(@PathVariable(name = "roomId") Long roomId, @RequestPart(value = "file") MultipartFile file, @CurrentUser CustomUserDetails user) {
+        return roomService.updateRoomImage(roomId, file, user.getUser());
     }
 
     @PostMapping("/{roomId}/participants/{participantId}")
-    public void dropoutParticipant(@PathVariable(name = "roomId") Long roomId, @PathVariable("participantId") Long participantId, @CurrentUser CustomUserDetails user) {
-        roomService.dropoutParticipant(roomId, participantId, user.getUser());
+    public RoomResponse.OnlyId dropoutParticipant(@PathVariable(name = "roomId") Long roomId, @PathVariable("participantId") Long participantId, @CurrentUser CustomUserDetails user) {
+        return roomService.dropoutParticipant(roomId, participantId, user.getUser());
     }
 
 }

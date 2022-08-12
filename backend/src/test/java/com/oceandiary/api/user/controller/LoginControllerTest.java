@@ -30,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(LoginController.class)
 @WebAppConfiguration
+@DisplayName("Login API 문서화")
 class LoginControllerTest extends MvcTest {
     @MockBean
     private LoginService loginService;

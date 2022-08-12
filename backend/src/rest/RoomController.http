@@ -20,7 +20,7 @@ Content-Type: application/json
 Content-Disposition: form-data; name="file"; filename="image.png"
 Content-Type: image/png
 
-< ./image.png
+< ./../main/resources/dummy/image/image.png
 
 > {%
      client.global.set("roomId", response.body.roomId);

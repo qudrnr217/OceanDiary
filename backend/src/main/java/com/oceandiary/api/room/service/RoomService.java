@@ -11,8 +11,8 @@ import com.oceandiary.api.file.service.S3Service;
 import com.oceandiary.api.room.entity.*;
 import com.oceandiary.api.room.exception.PasswordNotValidException;
 import com.oceandiary.api.room.repository.*;
-import com.oceandiary.api.room.request.RoomRequest;
-import com.oceandiary.api.room.response.RoomResponse;
+import com.oceandiary.api.room.dto.RoomRequest;
+import com.oceandiary.api.room.dto.RoomResponse;
 import com.oceandiary.api.user.entity.User;
 import io.openvidu.java.client.*;
 import lombok.extern.slf4j.Slf4j;
@@ -213,7 +213,7 @@ public class RoomService {
     /**
      * 1. 방장이 나갈 경우 세션을 종료한다.
      */
-    public void exitRoom(Long roomId, Long participantId, User user) {
+    public RoomResponse.OnlyId exitRoom(Long roomId, Long participantId, User user) {
 
         try {
             RoomOnRedis roomOnRedis = roomOnRedisRepository.findById(roomId).orElseThrow();
@@ -255,6 +255,7 @@ public class RoomService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return RoomResponse.OnlyId.builder().roomId(roomId).build();
     }
 
     /**
@@ -339,9 +340,23 @@ public class RoomService {
      * 2. 이미지 파일 수정인지 확인한다.
      * 3. maxNum이 curNum보다 큰지 확인한다. 크거나 같은 경우만 수정 가능하게 한다.
      */
-    public void updateRoomInfo(Long roomId, RoomRequest.UpdateRoom request, MultipartFile file, User user) {
+    public RoomResponse.OnlyId updateRoomInfo(Long roomId, RoomRequest.UpdateRoom request, User user) {
 
-        if (roomRepository.findById(roomId).orElseThrow().getUser().getId() != user.getId()) {
+        if (isValidated(roomId, user)) {
+            throw new BusinessException("방 수정 권한이 없습니다.");
+        }
+
+        if (participantOnRedisRepository.findById(roomId).orElseThrow().getParticipantTokenMap().size() > request.getMaxNum()) {
+            throw new BusinessException("현재 참가 인원보다 적게 설정할 수 없습니다.");
+        }
+
+        Room foundRoom = roomRepository.findById(roomId).orElseThrow();
+        foundRoom.updateInfo(request);
+        return RoomResponse.OnlyId.builder().roomId(roomId).build();
+    }
+    public RoomResponse.OnlyId updateRoomImage(Long roomId, MultipartFile file, User user) {
+
+        if (isValidated(roomId, user)) {
             throw new BusinessException("방 수정 권한이 없습니다.");
         }
 
@@ -351,21 +366,23 @@ public class RoomService {
             newImage = imageRepository.findById(newImageId).orElseThrow();
         }
 
-        if (participantOnRedisRepository.findById(roomId).orElseThrow().getParticipantTokenMap().size() > request.getMaxNum()) {
-            throw new BusinessException("현재 참가 인원보다 적게 설정할 수 없습니다.");
-        }
-
         Room foundRoom = roomRepository.findById(roomId).orElseThrow();
-        foundRoom.updateInfo(request, newImage);
+        foundRoom.updateImage(newImage);
+        return RoomResponse.OnlyId.builder().roomId(roomId).build();
     }
 
+    private boolean isValidated(Long roomId, User user) {
+        if(roomRepository.findById(roomId).orElseThrow().getUser().getId() != user.getId())
+            return false;
+        return true;
+    }
     /**
      * 1. 같퇴하는 주체가 방장인지 확인한다.
      * 2. 강퇴자가 아직 세션에 남아있는지 확인한다.
      * 3. participant의 exit_date를 기록한다.
      * 4. 강퇴자는 스탬프를 얻을 수 없다.
      */
-    public void dropoutParticipant(Long roomId, Long participantId, User user) {
+    public RoomResponse.OnlyId dropoutParticipant(Long roomId, Long participantId, User user) {
 
         if (roomOnRedisRepository.findById(roomId).orElseThrow().getCreatedBy() != user.getId()) {
             throw new BusinessException("방장만이 강퇴하기 기능을 사용할 수 있습니다.");
@@ -404,6 +421,7 @@ public class RoomService {
         } catch (OpenViduJavaClientException | OpenViduHttpException e) {
             throw new RuntimeException(e);
         }
+        return RoomResponse.OnlyId.builder().roomId(roomId).build();
     }
 
     private void createStamp(DiaryRequest.StampCreate request, User user) {
