@@ -11,4 +11,15 @@ function apiInstance() {
   });
   return instance;
 }
-export { apiInstance };
+
+function authorizedApiInstance(token) {
+  const instance = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+      "Content-type": "application/json",
+      Authorization: token,
+    },
+  });
+  return instance;
+}
+export { apiInstance, authorizedApiInstance };

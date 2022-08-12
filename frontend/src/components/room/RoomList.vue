@@ -29,7 +29,7 @@
                 ● {{ item.curNum }} / {{ item.maxNum }}
               </div>
               <div ref="button" class="room-card-button">
-                <div class="button-next">입장</div>
+                <div class="button-next" @click="enterRoom()">입장</div>
               </div>
             </div>
           </div>
@@ -40,25 +40,23 @@
 </template>
 
 <script>
-import axios from "axios";
 import { useRouter } from "vue-router";
-import { useStore } from "vuex";
 import { onMounted, ref } from "vue";
-import { names, icons, indexes, themeColors } from "@/const/const.js";
+import { names, icons, indexes } from "@/const/const.js";
+import axios from "axios";
+import { useStore } from "vuex";
 // import { getRoomList } from "@/api/webrtc.js";
 
 export default {
   setup() {
-    const store = useStore();
     const router = useRouter();
+    const store = useStore();
 
     const urlParams = new URL(location.href).searchParams;
     const dest = urlParams.get("dest");
     const index = indexes[dest];
     const title = names[index];
     const iconPath = require(`@/assets/아이콘/${icons[index]}`);
-    const darkColor = themeColors[index][0];
-    const brightColor = themeColors[index][1];
     // const items = getRoomList(dest, 0);
     const items = [
       {
@@ -86,9 +84,32 @@ export default {
         isOpen: true,
       },
     ];
-
+    const enterRoom = () => {
+      axios({
+        method: "post",
+        url: `https://i7a406.p.ssafy.io/api/rooms/57`,
+        headers: {
+          Authorization: store.state.userStore.token,
+        },
+        data: {
+          pw: "1234",
+        },
+      }).then((response) => {
+        alert("방을 생성했습니다!");
+        store.commit(
+          "roomStore/SET_PARTICIPANT_ID",
+          response.data.participantId
+        );
+        store.commit("roomStore/SET_OPENVIDU_TOKEN", response.data.token);
+        store.commit("roomStore/SET_CONNECTION_ID", response.data.connectionId);
+        router.push({
+          name: "festival-room",
+          query: { dest: dest },
+        });
+      });
+    };
     const create_room = () => {
-      console.log(store.state.locationStore.create_name);
+      console.log("Let's go!");
       router.push({
         name: "room-create",
         query: { dest: dest },
@@ -96,14 +117,18 @@ export default {
     };
     /*
     (TODO) 색상 변경이 theme color로 바뀌지 않는 버그
+    const darkColor = themeColors[index][0];
+    const brightColor = themeColors[index][1];
+    onMounted(() => {
+      capacity.value.style = `color: ${darkColor};`;
+      button.value.style = `background: ${brightColor};`;
+    });
     */
     const icon = ref(null);
     const capacity = ref(null);
     const button = ref(null);
     onMounted(() => {
       icon.value.src = iconPath;
-      capacity.value.style = `color: ${darkColor};`;
-      button.value.style = `background: ${brightColor};`;
     });
     return {
       title,
@@ -113,7 +138,7 @@ export default {
       capacity,
       button,
       create_room,
-      insideroom,
+      enterRoom,
     };
   },
 };

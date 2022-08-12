@@ -115,11 +115,18 @@ const routes = [
       },
     ],
   },
-  // {
-  //   path: "/festival",
-  //   name: "festival",
-  //   component: () => import("@/views/FestivalView.vue"),
-  // },
+  {
+    path: "/festival",
+    name: "festival",
+    component: () => import("@/views/FestivalView.vue"),
+    children: [
+      {
+        path: "study",
+        name: "festival-room",
+        component: () => import("@/components/room/StudyRoom.vue"),
+      },
+    ],
+  },
   // {
   //   path: "/cafe",
   //   name: "cafe",

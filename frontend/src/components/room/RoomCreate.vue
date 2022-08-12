@@ -53,7 +53,7 @@
           <tr>
             <th>이미지 :</th>
             <td>
-              <div class="button-next" style="width: 30%">첨부파일</div>
+              <input type="file" style="width: 100%" @change="fileInput" />
             </td>
           </tr>
         </table>
@@ -66,6 +66,7 @@
 </template>
 
 <script>
+import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { onMounted, reactive, ref } from "vue";
 import { icons, indexes, types } from "@/const/const.js";
@@ -73,7 +74,8 @@ import { createRoom } from "@/api/webrtc.js";
 export default {
   setup() {
     const router = useRouter();
-
+    const store = useStore();
+    console.log("현재 저장된 토큰 : " + store.state.userStore.token);
     const urlParams = new URL(location.href).searchParams;
     const dest = urlParams.get("dest");
     const index = indexes[dest];
@@ -92,15 +94,35 @@ export default {
     const imageFile = ref("");
     var show = ref(false);
     var icon = ref(null);
-
+    const fileInput = (event) => {
+      imageFile.value = event.target.files[0];
+    };
     const create = () => {
+      console.log("방 생성 절차를 시작합니다.");
+      const data = new FormData();
+      data.append(
+        "form",
+        new Blob([JSON.stringify(roomInfo)], { type: "application/json" })
+      );
+      data.append("file", imageFile.value);
+
       createRoom(
-        roomInfo,
-        imageFile,
-        () => {
+        store.state.userStore.token,
+        data,
+        (response) => {
           alert("방을 생성했습니다!");
+          store.commit("roomStore/SET_ROOM_ID", response.data.roomId);
+          store.commit(
+            "roomStore/SET_PARTICIPANT_ID",
+            response.data.participantId
+          );
+          store.commit("roomStore/SET_OPENVIDU_TOKEN", response.data.token);
+          store.commit(
+            "roomStore/SET_CONNECTION_ID",
+            response.data.connectionId
+          );
           router.push({
-            name: "lobby",
+            name: "festival-room",
             query: { dest: dest },
           });
         },
@@ -119,6 +141,7 @@ export default {
       icon,
       type,
       create,
+      fileInput,
     };
   },
 };

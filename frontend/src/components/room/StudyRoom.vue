@@ -98,7 +98,7 @@ export default {
       camera: true,
       openvidu_token: store.state.roomStore.openvidu_token,
 
-      mySessionId: store.state.roomStore.sessionId,
+      mySessionId: 123,
       myUserName: "Participant" + Math.floor(Math.random() * 100),
     });
     var toggle = true;
