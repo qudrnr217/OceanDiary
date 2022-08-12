@@ -1,5 +1,6 @@
 package com.oceandiary.api.diary.service;
 
+import com.oceandiary.api.common.exception.PermissionException;
 import com.oceandiary.api.diary.dto.DiaryRequest;
 import com.oceandiary.api.diary.dto.DiaryResponse;
 import com.oceandiary.api.diary.entity.Stamp;
@@ -44,17 +45,22 @@ public class DiaryService {
     }
 
     @Transactional
-    public DiaryResponse.UserInfo updateUserInfo(Long userId, DiaryRequest.UserInfo request){
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        user.updateUserInfo(request);
-        user.setUpdatedAt(LocalDateTime.now());
+    public DiaryResponse.UserInfo updateUserInfo(Long userId, User user, DiaryRequest.UserInfo request){
+        if(!userId.equals(user.getId())) throw new PermissionException();
+        else{
+            System.out.println(user);
+            user.updateUserInfo(request);
+            user.setUpdatedAt(LocalDateTime.now());
+            userRepository.save(user);
+        }
         return DiaryResponse.UserInfo.build(user);
     }
 
     @Transactional
-    public void deleteUserInfo(Long userId){
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    public void deleteUserInfo(Long userId, User user){
+        if(!userId.equals(user.getId())) throw new PermissionException();
         user.setDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
     }
 
 }

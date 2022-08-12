@@ -23,7 +23,7 @@ public class SocialLoginUserRepository {
     public User findByProviderAndOauthId(SocialProvider provider, String oauthId) {
         return queryFactory
                 .selectFrom(user)
-                .where(user.provider.eq(provider), user.oauthId.eq(oauthId))
+                .where(user.provider.eq(provider), user.oauthId.eq(oauthId), user.deletedAt.isNull())
                 .fetchOne();
     }
 

@@ -29,14 +29,14 @@ public class DiaryController {
     }
 
     @PatchMapping("/user/info/{userId}")
-    public ResponseEntity<DiaryResponse.UserInfo> updateUserInfo(@PathVariable("userId") Long userId,@RequestBody DiaryRequest.UserInfo request){
-        DiaryResponse.UserInfo userInfoResponse = diaryService.updateUserInfo(userId, request);
+    public ResponseEntity<DiaryResponse.UserInfo> updateUserInfo(@PathVariable("userId") Long userId, @CurrentUser CustomUserDetails customUserDetails, @RequestBody DiaryRequest.UserInfo request){
+        DiaryResponse.UserInfo userInfoResponse = diaryService.updateUserInfo(userId, customUserDetails.getUser(), request);
         return ResponseEntity.ok().body(userInfoResponse);
     }
 
     // TODO : uri path 수정
     @PatchMapping("/user/account/{userId}")
-    public void deleteUserInfo(@PathVariable("userId") Long userId){
-        diaryService.deleteUserInfo(userId);
+    public void deleteUserInfo(@PathVariable("userId") Long userId, @CurrentUser CustomUserDetails customUserDetails){
+        diaryService.deleteUserInfo(userId, customUserDetails.getUser());
     }
 }
