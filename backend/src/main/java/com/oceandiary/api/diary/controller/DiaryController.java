@@ -27,4 +27,10 @@ public class DiaryController {
         DiaryResponse.GetDiaryContents response = diaryService.getDiaryInfo(userId);
         return ResponseEntity.ok().body(response);
     }
+
+    @PatchMapping("/user/{userId}")
+    public ResponseEntity<DiaryResponse.UserInfo> updateUserInfo(@PathVariable("userId") Long userId,@RequestBody DiaryRequest.UserInfo request){
+        DiaryResponse.UserInfo userInfoResponse = diaryService.updateUserInfo(userId, request);
+        return ResponseEntity.ok().body(userInfoResponse);
+    }
 }

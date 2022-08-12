@@ -71,4 +71,24 @@ public class DiaryResponse {
         }
 
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class UserInfo{
+        private Long id;
+        private String name;
+        private String email;
+        private LocalDate birth;
+
+        public static UserInfo build(User user){
+            return UserInfo.builder()
+                    .id(user.getId())
+                    .name(user.getName())
+                    .email(user.getEmail())
+                    .birth(user.getBirth())
+                    .build();
+        }
+    }
 }
