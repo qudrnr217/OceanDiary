@@ -1,25 +1,23 @@
-import { apiInstance } from "@/api/index.js";
-import { userStore } from "@/store/modules/userStore.js";
-const api = apiInstance();
+import { authorizedApiInstance } from "@/api/index.js";
+// import { useStore } from "vuex";
+// const store = useStore();
 
-async function getRoomList(category, lastRoomId, success, fail) {
-  const token = userStore.token;
+async function getRoomList(token, category, lastRoomId, success, fail) {
+  const authApi = authorizedApiInstance(token);
   if (token == "") return null;
-  api.headers = { Authorization: token };
-  await api
-    .get(`/rooms?category=${category}&lastRoomId=${lastRoomId}`)
+  await authApi
+    .get(`/api/rooms?category=${category}&lastRoomId=${lastRoomId}`)
     .then(success)
     .catch(fail);
 }
-
-async function createRoom(roomInfo, imageFile, success, fail) {
-  const token = userStore.token;
+async function createRoom(token, data, success, fail) {
+  const authApi = authorizedApiInstance(token);
   if (token == "") return null;
-  api.headers = { Authorization: token };
-  const data = {
-    form: roomInfo,
-    file: imageFile,
-  };
-  await api.post(`/rooms`, JSON.stringify(data)).then(success).catch(fail);
+  await authApi.post(`/api/rooms`, data).then(success).catch(fail);
 }
-export { getRoomList, createRoom };
+async function joinRoom(token, data, success, fail) {
+  const authApi = authorizedApiInstance(token);
+  if (token == "") return null;
+  await authApi.post(`/api/rooms`, data).then(success).catch(fail);
+}
+export { getRoomList, createRoom, joinRoom };

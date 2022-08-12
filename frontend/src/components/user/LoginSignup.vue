@@ -59,7 +59,9 @@ export default {
         day: "",
       },
     });
-
+    /*
+    (TODO) 요청 시 oauthID 전달, accessToken, refreshToken 관련
+    */
     const urlParams = new URL(location.href).searchParams;
     const social = urlParams.get("social");
     const oauthId = urlParams.get("oauthId");
@@ -80,10 +82,11 @@ export default {
           // vuex에 회원 정보 업데이트
           store.commit("userStore/SET_NAME", response.data.name);
           store.commit("userStore/SET_TOKEN", response.data.accessToken);
+          console.log(response.data.accessToken);
           store.commit("userStore/SET_USERID", response.data.userId);
           router.push({
             name: "station-chat",
-            params: { nextLink: "station/map", speech: "어디로 가시나요?" },
+            params: { nextLink: "map", speech: "어디로 가시나요?" },
           });
         },
         (error) => {
