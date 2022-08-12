@@ -1,6 +1,7 @@
 package com.oceandiary.api.user.entity;
 
 import com.oceandiary.api.common.entity.BaseEntity;
+import com.oceandiary.api.diary.dto.DiaryRequest;
 import com.oceandiary.api.diary.entity.Stamp;
 import com.oceandiary.api.room.entity.Dropout;
 import com.oceandiary.api.room.entity.Room;
@@ -66,4 +67,15 @@ public class User extends BaseEntity {
         this.visitedAt = LocalDateTime.now();
     }
 
+    public void updateUserInfo(DiaryRequest.UserInfo request){
+        if(request.getName() != null){
+            this.name = request.getName();
+        }
+        if(request.getEmail() != null){
+            this.email = request.getEmail();
+        }
+        if(request.getBirth() != null){
+            this.birth = request.getBirth();
+        }
+    }
 }

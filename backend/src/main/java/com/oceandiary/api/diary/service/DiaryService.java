@@ -41,4 +41,10 @@ public class DiaryService {
         return DiaryResponse.GetDiaryContents.build(findUser);
     }
 
+    public DiaryResponse.UserInfo updateUserInfo(Long userId, DiaryRequest.UserInfo request){
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        user.updateUserInfo(request);
+        return DiaryResponse.UserInfo.build(user);
+    }
+
 }
