@@ -31,6 +31,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors()
                 .and()
                 .httpBasic().disable()
+                .headers().frameOptions().sameOrigin()
+                .and()
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -45,6 +47,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PATCH, "/api/rooms/*/info").authenticated()
                 .antMatchers(HttpMethod.POST, "/api/rooms/*/participants/*").authenticated()
                 .antMatchers("/api/rooms/**").permitAll()
+                .antMatchers("/api/ws/**").permitAll()
                 .anyRequest().authenticated() // 그외 나머지 요청은 모두 인증된 회원만 접근 가능
                 .and()
                 .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // jwt token 필터를 id/password 인증 필터 전에 추가 (TODO: oauth 설정 후 변경 필요)

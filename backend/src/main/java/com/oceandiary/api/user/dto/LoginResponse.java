@@ -1,4 +1,4 @@
-package com.oceandiary.api.user.response;
+package com.oceandiary.api.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
