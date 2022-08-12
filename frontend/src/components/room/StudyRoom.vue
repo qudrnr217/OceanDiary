@@ -4,23 +4,30 @@
       <img src="@/assets/아이콘/coffe_icon.png" alt="" class="title-icon" />
       <div class="title-name">두 시의 도서관 스터디</div>
       <div class="exit-btn">
-        <button class="button-next">나가기</button>
+        <button class="button-next" @click="joinSession()">나가기</button>
       </div>
     </div>
     <div class="user">
       <div class="user-wrap">
         <div class="camera-wrap">
-          <div class="user1" @click="joinSession()">
-            <user-video
-              :streamManager="state.publisher"
-              :camera="state.camera"
-            />
+          <div class="user1">
+            <user-video :streamManager="state.publisher" />
           </div>
-          <div class="user2"></div>
-          <div class="user3"></div>
-          <div class="user4"></div>
-          <div class="user5"></div>
-          <div class="user6"></div>
+          <div class="user2">
+            <user-video :streamManager="state.subscribers[0]" />
+          </div>
+          <div class="user3">
+            <user-video :streamManager="state.subscribers[1]" />
+          </div>
+          <div class="user4">
+            <user-video :streamManager="state.subscribers[2]" />
+          </div>
+          <div class="user5">
+            <user-video :streamManager="state.subscribers[3]" />
+          </div>
+          <div class="user6">
+            <user-video :streamManager="state.subscribers[4]" />
+          </div>
         </div>
         <div class="chat-wrap">
           <div class="share">
@@ -39,6 +46,7 @@
                 src="@/assets/아이콘/[아이콘]카메라_ON.png"
                 alt=""
                 class="camera-icon"
+                @click="camera_toggle()"
               />
               <img
                 src="@/assets/아이콘/[아이콘]화면공유.png"
@@ -80,6 +88,7 @@ export default {
 
   setup() {
     const store = useStore();
+
     const state = reactive({
       OV: undefined,
       session: undefined,
@@ -92,25 +101,56 @@ export default {
       mySessionId: store.state.roomStore.sessionId,
       myUserName: "Participant" + Math.floor(Math.random() * 100),
     });
+    var toggle = true;
+    //카메라 On/Off
+    var camera_toggle = () => {
+      console.log("camera toggle!!!");
+      console.log("poublisher: ", state.publisher);
+      console.log("subscribers: ", state.subscribers);
+      console.log("session: ", state.session);
+      console.log(
+        "누구냐!:?" + state.publisher.session.connection.connectionId
+      );
+
+      console.log("현재 커넥션 id: " + store.state.roomStore.connectionId);
+      //publisher 일 경우
+      if (
+        state.publisher.session.connection.connectionId ===
+        store.state.roomStore.connectionId
+      ) {
+        console.log("hi");
+      } else if (
+        state.subscribers[0].stream.connection.connectionId ===
+        store.state.roomStore.connectionId
+      ) {
+        console.log("bye");
+      }
+      //subscriber 일 경우
+
+      toggle = !toggle;
+      // state.publisher.properties.publishVideo = false;
+
+      // state.publisher.properties.publishVideo = false;
+      state.publisher.publishVideo(toggle);
+    };
 
     var joinSession = () => {
       console.log("JoinSession!!");
       console.log(state.openvidu_token);
       // --- Get an OpenVidu object ---
       state.OV = new OpenVidu();
-      state.OV.setAdvancedConfiguration({
-        noStreamPlayingEventExceptionTimeout: 10000,
-        iceConnectionDisconnectedExceptionTimeout: 10000,
-      });
+
       // --- Init a session ---
       state.session = state.OV.initSession();
 
       //새로운 사람 입장
       state.session.on("streamCreated", ({ stream }) => {
         console.log("subscriber 환영~~~~");
-        console.log("stream: " + stream);
-        const subscribers = state.session.subscribe(stream);
-        console.log("subscribers: " + subscribers);
+        console.log("stream: ", stream);
+        const subscriber = state.session.subscribe(stream);
+
+        state.subscribers.push(subscriber);
+        console.log("subscriber: ", subscriber);
       });
 
       //사람 나갔을 때
@@ -149,6 +189,7 @@ export default {
           state.publisher = publisher;
 
           state.session.publish(state.publisher);
+          console.log("publisher: ", state.publisher);
           // console.log(JSON.stringify(state.publisher));
         })
         .catch((error) => {
@@ -158,6 +199,39 @@ export default {
             error.message
           );
         });
+
+      // state.session.on("publisherStartSpeaking", (event) => {
+      //   const array = event.connection.data.split('"');
+      //   const tmp = array[3].split(",");
+      //   const targetPlayerId = tmp[1];
+      // console.log(event.connection.data);
+      // console.log(targetPlayerId);
+      // if (state.playerId === targetPlayerId) {
+      //   state.playerMe.isTalking = true;
+      // } else {
+      //   for (let i = 0; i < state.playersGameInfo.length; i++) {
+      //     if (state.playersGameInfo[i].playerId === targetPlayerId) {
+      //       state.playersGameInfo[i].isTalking = true;
+      //       break;
+      //     }
+      //   }
+      // }
+      // });
+      // state.session.on("publisherStopSpeaking", (event) => {
+      //   const array = event.connection.data.split('"');
+      //   const tmp = array[3].split(",");
+      //   const targetPlayerId = tmp[1];
+      //   if (state.playerId === targetPlayerId) {
+      //     state.playerMe.isTalking = false;
+      //   } else {
+      //     for (let i = 0; i < state.playersGameInfo.length; i++) {
+      //       if (state.playersGameInfo[i].playerId === targetPlayerId) {
+      //         state.playersGameInfo[i].isTalking = false;
+      //         break;
+      //       }
+      //     }
+      //   }
+      // });
     }; //end of join Session
 
     var updateMainVideoStreamManager = (stream) => {
@@ -169,6 +243,7 @@ export default {
       state,
       joinSession,
       updateMainVideoStreamManager,
+      camera_toggle,
     };
   },
 };
@@ -209,7 +284,7 @@ export default {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  /* background-color: blueviolet; */
+  background-color: blueviolet;
 
   position: relative;
   right: 3%;
