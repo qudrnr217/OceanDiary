@@ -1,30 +1,39 @@
 <template>
   <div class="box main-box">
-    <div id="left" class="content">
-      <router-link :to="{ name: 'login-social' }" class="button-ticket">
-        <div class="name">
-          <h1><span style="font-size: 50px">정기권</span> 구입</h1>
-        </div>
-        <div class="image">
-          <img
-            src="~@/assets/아이콘/[아이콘]정기권_상단.png"
-            class="image-ticket"
-          />
-        </div>
-      </router-link>
+    <div class="guide-wrap">
+      <vue-writer
+        :array="['티켓을 선택하여 로그인하세요!']"
+        :typeSpeed="70"
+        :iterations="1"
+      />
     </div>
-    <div id="right" class="content">
-      <router-link :to="{ name: 'login-single' }" class="button-ticket">
-        <div class="name">
-          <h1><span style="font-size: 50px">1회권</span> 구입</h1>
-        </div>
-        <div class="image">
-          <img
-            src="~@/assets/아이콘/[아이콘]1회권_상단.png"
-            class="image-ticket"
-          />
-        </div>
-      </router-link>
+    <div class="content-wrap">
+      <div id="left" class="ticket-wrap">
+        <router-link :to="{ name: 'login-social' }" class="button-ticket">
+          <div class="name">
+            <h1><span style="font-size: 50px">정기권</span> 구입</h1>
+          </div>
+          <div class="image">
+            <img
+              src="~@/assets/아이콘/[아이콘]정기권_상단.png"
+              class="image-ticket"
+            />
+          </div>
+        </router-link>
+      </div>
+      <div id="right" class="ticket-wrap">
+        <router-link :to="{ name: 'login-single' }" class="button-ticket">
+          <div class="name">
+            <h1><span style="font-size: 50px">1회권</span> 구입</h1>
+          </div>
+          <div class="image">
+            <img
+              src="~@/assets/아이콘/[아이콘]1회권_상단.png"
+              class="image-ticket"
+            />
+          </div>
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -34,7 +43,10 @@ export default {};
 </script>
 
 <style scoped>
-.content {
+.content-wrap {
+  height: 85%;
+}
+.ticket-wrap {
   height: 100%;
   width: 50%;
   display: flex;
@@ -49,8 +61,7 @@ export default {};
   border-radius: 10px;
 }
 .button-ticket:hover {
-  animation: flash;
-  animation-duration: 1s; /* don't forget to set a duration! */
+  box-shadow: 0px 10px 0px #72ab45;
 }
 .name {
   width: 100%;
