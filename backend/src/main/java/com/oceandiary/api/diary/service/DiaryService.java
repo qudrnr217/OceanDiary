@@ -39,10 +39,7 @@ public class DiaryService {
     public DiaryResponse.GetDiaryContents getDiaryInfo(Long userId){
         User findUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         List<Stamp> stamps = stampRepository.findAllByUserOrderByIdDesc(findUser);
-        User descUser = User.builder().id(findUser.getId()).name(findUser.getName())
-                        .email(findUser.getEmail()).birth(findUser.getBirth())
-                        .visitedAt(findUser.getVisitedAt()).stamps(stamps).build();
-        return DiaryResponse.GetDiaryContents.build(descUser);
+        return DiaryResponse.GetDiaryContents.build(findUser, stamps);
     }
 
 }
