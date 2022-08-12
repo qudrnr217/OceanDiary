@@ -64,6 +64,7 @@ public class DiaryResponse {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class GetDiaryContents{
+
         private Long id;
         private String name;
         private String email;
