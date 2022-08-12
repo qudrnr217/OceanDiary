@@ -1,4 +1,4 @@
-package com.oceandiary.api.room.request;
+package com.oceandiary.api.room.dto;
 
 import com.oceandiary.api.common.category.Category;
 import lombok.AllArgsConstructor;

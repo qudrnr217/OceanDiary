@@ -8,7 +8,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,13 +50,12 @@ public class DiaryResponse {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class GetDiaryContents{
-
         private Long id;
         private String name;
         private String email;
         private LocalDate birth;
         private LocalDateTime visitedAt;
-        private List<DiaryResponse.GetStamp> stamps = new ArrayList<>();
+        private List<DiaryResponse.GetStamp> stamps;
 
         public static DiaryResponse.GetDiaryContents build(User user, List<Stamp> stamps){
             return GetDiaryContents.builder()

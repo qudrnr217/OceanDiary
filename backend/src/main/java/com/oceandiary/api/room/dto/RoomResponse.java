@@ -7,7 +7,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class RoomResponse {
-
+    @Getter
+    @Builder
+    public static class OnlyId {
+        private Long roomId;
+    }
     @Getter
     @Builder
     public static class CreateRoom {

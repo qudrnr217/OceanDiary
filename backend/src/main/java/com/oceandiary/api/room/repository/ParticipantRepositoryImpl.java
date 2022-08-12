@@ -1,7 +1,7 @@
 package com.oceandiary.api.room.repository;
 
 
-import com.oceandiary.api.room.response.RoomResponse;
+import com.oceandiary.api.room.dto.RoomResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 

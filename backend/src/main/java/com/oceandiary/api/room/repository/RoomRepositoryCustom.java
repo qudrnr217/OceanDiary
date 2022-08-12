@@ -1,8 +1,8 @@
 package com.oceandiary.api.room.repository;
 
 import com.oceandiary.api.room.entity.Room;
-import com.oceandiary.api.room.request.RoomRequest;
-import com.oceandiary.api.room.response.RoomResponse;
+import com.oceandiary.api.room.dto.RoomRequest;
+import com.oceandiary.api.room.dto.RoomResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

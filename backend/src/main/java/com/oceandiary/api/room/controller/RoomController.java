@@ -1,8 +1,8 @@
 package com.oceandiary.api.room.controller;
 
 import com.oceandiary.api.common.utils.CookieUtils;
-import com.oceandiary.api.room.request.RoomRequest;
-import com.oceandiary.api.room.response.RoomResponse;
+import com.oceandiary.api.room.dto.RoomRequest;
+import com.oceandiary.api.room.dto.RoomResponse;
 import com.oceandiary.api.room.service.RoomService;
 import com.oceandiary.api.user.security.userdetails.CurrentUser;
 import com.oceandiary.api.user.security.userdetails.CustomUserDetails;
@@ -38,10 +38,10 @@ public class RoomController {
     }
 
     @DeleteMapping("/{roomId}/participants/{participantId}")
-    public void exitRoom(@PathVariable("roomId") Long roomId,
+    public RoomResponse.OnlyId exitRoom(@PathVariable("roomId") Long roomId,
                          @PathVariable Long participantId,
                          @CurrentUser CustomUserDetails user) {
-        roomService.exitRoom(roomId, participantId, Optional.ofNullable(user).map(CustomUserDetails::getUser).orElse(null));
+        return roomService.exitRoom(roomId, participantId, Optional.ofNullable(user).map(CustomUserDetails::getUser).orElse(null));
     }
 
     @GetMapping("")

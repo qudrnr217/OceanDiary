@@ -11,8 +11,8 @@ import com.oceandiary.api.file.service.S3Service;
 import com.oceandiary.api.room.entity.*;
 import com.oceandiary.api.room.exception.PasswordNotValidException;
 import com.oceandiary.api.room.repository.*;
-import com.oceandiary.api.room.request.RoomRequest;
-import com.oceandiary.api.room.response.RoomResponse;
+import com.oceandiary.api.room.dto.RoomRequest;
+import com.oceandiary.api.room.dto.RoomResponse;
 import com.oceandiary.api.user.entity.User;
 import io.openvidu.java.client.*;
 import lombok.extern.slf4j.Slf4j;
@@ -213,7 +213,7 @@ public class RoomService {
     /**
      * 1. 방장이 나갈 경우 세션을 종료한다.
      */
-    public void exitRoom(Long roomId, Long participantId, User user) {
+    public RoomResponse.OnlyId exitRoom(Long roomId, Long participantId, User user) {
 
         try {
             RoomOnRedis roomOnRedis = roomOnRedisRepository.findById(roomId).orElseThrow();
@@ -255,6 +255,7 @@ public class RoomService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return RoomResponse.OnlyId.builder().roomId(roomId).build();
     }
 
     /**
