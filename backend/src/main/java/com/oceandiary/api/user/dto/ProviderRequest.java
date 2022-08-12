@@ -1,4 +1,4 @@
-package com.oceandiary.api.user.request;
+package com.oceandiary.api.user.dto;
 
 import lombok.Data;
 

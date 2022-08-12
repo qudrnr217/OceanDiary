@@ -1,8 +1,8 @@
 package com.oceandiary.api.user.controller;
 
 import com.oceandiary.api.common.utils.CookieUtils;
-import com.oceandiary.api.user.request.ProviderRequest;
-import com.oceandiary.api.user.response.LoginResponse;
+import com.oceandiary.api.user.dto.ProviderRequest;
+import com.oceandiary.api.user.dto.LoginResponse;
 import com.oceandiary.api.user.service.LoginService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
