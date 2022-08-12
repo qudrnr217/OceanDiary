@@ -47,12 +47,9 @@ public class DiaryService {
     @Transactional
     public DiaryResponse.UserInfo updateUserInfo(Long userId, User user, DiaryRequest.UserInfo request){
         if(!userId.equals(user.getId())) throw new PermissionException();
-        System.out.println(user);
         user.updateUserInfo(request);
         user.setUpdatedAt(LocalDateTime.now());
-        System.out.println(user);
         userRepository.save(user);
-
         return DiaryResponse.UserInfo.build(user);
     }
 
