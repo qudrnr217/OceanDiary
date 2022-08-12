@@ -60,13 +60,18 @@ public class RoomController {
     }
 
     @PatchMapping("/{roomId}/info")
-    public void updateRoomInfo(@PathVariable(name = "roomId") Long roomId, @RequestPart(value = "form") RoomRequest.UpdateRoom request, @RequestPart(value = "file") MultipartFile file, @CurrentUser CustomUserDetails user) {
-        roomService.updateRoomInfo(roomId, request, file, user.getUser());
+    public RoomResponse.OnlyId updateRoomInfo(@PathVariable(name = "roomId") Long roomId, @RequestBody RoomRequest.UpdateRoom request, @CurrentUser CustomUserDetails user) {
+        return roomService.updateRoomInfo(roomId, request, user.getUser());
+    }
+
+    @PostMapping("/{roomId}/image")
+    public RoomResponse.OnlyId updateRoomImage(@PathVariable(name = "roomId") Long roomId, @RequestPart(value = "file") MultipartFile file, @CurrentUser CustomUserDetails user) {
+        return roomService.updateRoomImage(roomId, file, user.getUser());
     }
 
     @PostMapping("/{roomId}/participants/{participantId}")
-    public void dropoutParticipant(@PathVariable(name = "roomId") Long roomId, @PathVariable("participantId") Long participantId, @CurrentUser CustomUserDetails user) {
-        roomService.dropoutParticipant(roomId, participantId, user.getUser());
+    public RoomResponse.OnlyId dropoutParticipant(@PathVariable(name = "roomId") Long roomId, @PathVariable("participantId") Long participantId, @CurrentUser CustomUserDetails user) {
+        return roomService.dropoutParticipant(roomId, participantId, user.getUser());
     }
 
 }

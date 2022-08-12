@@ -1,4 +1,4 @@
-= 바다마을 다이어리 API 문서 (Social Login: NAVER)
+= 소셜로그인 네이버 API 문서
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs

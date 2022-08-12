@@ -51,7 +51,7 @@ public class Room extends BaseEntity {
 
     private String pw;
 
-    public void updateInfo(RoomRequest.UpdateRoom request, Image newImage) {
+    public void updateInfo(RoomRequest.UpdateRoom request) {
         if (request.getTitle() != null) {
             this.title = request.getTitle();
         }
@@ -67,8 +67,10 @@ public class Room extends BaseEntity {
         if (request.getPw() != null) {
             this.pw = request.getPw();
         }
-        if (newImage != null) {
-            this.image = newImage;
+    }
+    public void updateImage(Image image) {
+        if (image != null) {
+            this.image = image;
         }
     }
 }

@@ -1,5 +1,9 @@
 = 바닷마을 다이어리 API 문서
 
-- link:/docs/user.html[사용자(User) API]
+== *USER*
+- link:/docs/user.html[유저 API]
 - link:/docs/naver-login.html[네이버 로그인 API]
 - link:/docs/kakao-login.html[카카오 로그인 API]
+
+== *WebRTC - ROOM*
+- link:/docs/room.html[방 API]
