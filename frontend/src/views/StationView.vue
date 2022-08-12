@@ -14,11 +14,8 @@ export default {
 <style scoped>
 .background {
   background-image: url("~@/assets/[03_티켓확인]타는곳(기존이미지).png");
-}
-.banner {
-  height: 60vh;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 </style>

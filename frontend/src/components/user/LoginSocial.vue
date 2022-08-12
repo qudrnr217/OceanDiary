@@ -1,114 +1,62 @@
 <template>
   <div class="box main-box">
     <div class="guide-wrap">
-      <div class="guide-text">
-        <VueWriter
-          :array="['로그인 방식을 선택해주세요.']"
-          :typespeed="1"
-          :iterations="1"
-        ></VueWriter>
-      </div>
+      <vue-writer
+        :array="['로그인 방식을 선택해주세요.']"
+        :typeSpeed="70"
+        :iterations="1"
+      ></vue-writer>
     </div>
     <div class="content-wrap">
-      <div
-        class="content"
-        href="https://nid.naver.com/oauth2.0/authorize?client_id=Xa0_QAw9WqjfHiiycTsd&response_type=code&redirect_uri=http://localhost:8080/oauth/naver"
-      >
+      <div class="content" @click="sendGoogleUrl()">
         <img src="~@/assets/이미지/[이미지]구글.png" class="social-logo" />
       </div>
-      <div
-        class="content"
-        href="https://i7a406.p.ssafy.io:443/kakao/login?redirect_uri=https://i7a406.p.ssafy.io/oauth/kakao"
-      >
+      <div class="content" @click="sendKakaoUrl()">
         <img src="~@/assets/이미지/[이미지]카카오톡.png" class="social-logo" />
       </div>
-      <div class="content">
-        <!-- <router-link :to="{ name: 'login-single' }" class="button-ticket"> -->
-        <img
-          src="~@/assets/이미지/[이미지]네이버.png"
-          class="social-logo"
-          @click="sendNaverUrl()"
-        />
-        <!-- </router-link> -->
+      <div class="content" @click="sendNaverUrl()">
+        <img src="~@/assets/이미지/[이미지]네이버.png" class="social-logo" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-// import { login } from "@/api/login.js";
+import { naverState } from "@/api/login.js";
 export default {
   data() {
     return {
-      code: "",
-      state: "",
+      naverState: "",
     };
   },
   beforeCreate() {
-    // const urlParams = new URL(location.href).searchParams;
-    // const code = urlParams.get("code");
-    // if (code != null) login(code);
-
-    axios(
-      {
-        methods: "get",
-        // url: "https://i7a406.p.ssafy.io/api/naver/state",
-        // url: "/api/naver/state",
-        url: "http://localhost:8080/api/naver/state",
+    naverState(
+      (response) => {
+        console.log("네이버 상태코드 발급완료 : " + response.data.state);
+        this.naverState = response.data.state;
       },
-      { withCredentials: true }
-    ).then((response) => {
-      console.log(response);
-      this.state = response.data.state;
-      console.log(this.state);
-      // this.state = response.data.state;
-    });
+      (error) => {
+        console.log(error);
+      }
+    );
   },
 
   mounted() {},
   methods: {
-    /*
-    1. 카카오 서버에 인가코드 요청을 보낸다.
-    2. 로그인 창이 생성된다.
-    3. 로그인 성공 시 인가코드가 반환된다.
-    4. 반환된 인가 코드로 백엔드에 로그인 요청을 보낸다.
-    5. isExist가 False라면, 회원가입 화면으로 넘어간다.
-    6. isExist가 True라면, 바로 승차화면으로 넘어간다.
-     */
-    kakaoLogin() {
-      window.Kakao.init("ad93b4574b9fa55858c5944c66785045"); // Kakao Developers에서 요약 정보 -> JavaScript 키
-      const params = {
-        redirectUri: "http://localhost:8080/login/social",
-      };
-      window.Kakao.Auth.authorize(params);
+    sendGoogleUrl() {
+      alert("준비중입니다.");
     },
-
+    sendKakaoUrl() {
+      location.href = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=2cf03b4e3f6b70ea1253b492a2047118&redirect_uri=https://i7a406.p.ssafy.io/oauth2/kakao`;
+    },
     sendNaverUrl() {
-      // console.log(this.state);
-      // location.href = `https://nid.naver.com/oauth2.0/authorize?client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=https://i7a406.p.ssafy.io/oauth2/redirect&state=${this.state}`;
-      location.href = `https://nid.naver.com/oauth2.0/authorize?client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=http://localhost:8081/oauth2/redirect&state=${this.state}`;
+      location.href = `https://nid.naver.com/oauth2.0/authorize?&state=${this.naverState}&client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=https://i7a406.p.ssafy.io/oauth2/naver`;
     },
   },
 };
 </script>
 
 <style scoped>
-.guide-wrap {
-  height: 20%;
-  text-align: left;
-  padding-left: 30px;
-  display: flex;
-  align-items: center;
-}
-.guide-text {
-  color: grey;
-  font-size: 30px;
-}
-.content-wrap {
-  display: flex;
-  width: 100%;
-}
 .content {
   height: 100%;
   width: 50%;
@@ -118,33 +66,11 @@ export default {
   padding: 50px;
 }
 .content:hover {
-  animation: flash;
-  animation-duration: 1s; /* don't forget to set a duration! */
+  box-shadow: 0px 10px 0px #72ab45;
 }
 .social-logo {
   width: 100%;
   border-radius: 25%;
-  filter: drop-shadow(3px 3px 3px #000);
-}
-.name {
-  width: 100%;
-  height: 50%;
-  display: flex;
-  align-items: center;
-  text-align: center;
-  justify-content: center;
-  margin: auto;
-}
-.image {
-  height: 50%;
-  display: flex;
-  justify-content: center;
-  align-content: center;
-}
-.image-ticket {
-  width: 70%;
-  height: 100%;
-  margin: auto;
 }
 #left {
   float: left;
