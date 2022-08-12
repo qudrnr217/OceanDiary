@@ -28,9 +28,14 @@ public class DiaryController {
         return ResponseEntity.ok().body(response);
     }
 
-    @PatchMapping("/user/{userId}")
-    public ResponseEntity<DiaryResponse.UserInfo> updateUserInfo(@PathVariable("userId") Long userId,@RequestBody DiaryRequest.UserInfo request){
-        DiaryResponse.UserInfo userInfoResponse = diaryService.updateUserInfo(userId, request);
+    @PatchMapping("/user/{userId}/info")
+    public ResponseEntity<DiaryResponse.UserInfo> updateUserInfo(@PathVariable("userId") Long userId, @CurrentUser CustomUserDetails customUserDetails, @RequestBody DiaryRequest.UserInfo request){
+        DiaryResponse.UserInfo userInfoResponse = diaryService.updateUserInfo(userId, customUserDetails.getUser(), request);
         return ResponseEntity.ok().body(userInfoResponse);
+    }
+
+    @PatchMapping("/user/{userId}")
+    public void deleteUserInfo(@PathVariable("userId") Long userId, @CurrentUser CustomUserDetails customUserDetails){
+        diaryService.deleteUserInfo(userId, customUserDetails.getUser());
     }
 }

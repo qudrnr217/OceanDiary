@@ -8,8 +8,8 @@ import com.oceandiary.api.user.entity.User;
 import com.oceandiary.api.user.exception.UserNotFoundException;
 import com.oceandiary.api.user.repository.SocialLoginUserRepository;
 import com.oceandiary.api.user.repository.UserRepository;
-import com.oceandiary.api.user.request.ProviderRequest;
-import com.oceandiary.api.user.response.LoginResponse;
+import com.oceandiary.api.user.dto.ProviderRequest;
+import com.oceandiary.api.user.dto.LoginResponse;
 import com.oceandiary.api.user.security.token.Token;
 import com.oceandiary.api.user.security.token.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,6 @@ public class LoginService {
     public LoginResponse.Login naverLogin(ProviderRequest.LoginRequest request, HttpSession session){
         String accessToken = getNaverAccessToken(request, session);
         String naverUniqueId = getNaverUniqueId(accessToken);
-
         User foundUser = socialLoginUserRepository.findByProviderAndOauthId(SocialProvider.NAVER, naverUniqueId);
         return checkUser(foundUser, naverUniqueId);
     }
@@ -83,14 +82,15 @@ public class LoginService {
 
     public LoginResponse.Login checkUser(User foundUser, String uniqueId){
         LoginResponse.Login response;
-        if(foundUser != null){
+        if(foundUser != null && foundUser.getDeletedAt() == null){
             response = LoginResponse.Login.builder()
                     .name(foundUser.getName())
                     .userId(foundUser.getId())
                     .isExist(true)
+                    .oauthId(uniqueId)
                     .accessToken(tokenProvider.generateAccessToken(foundUser).getToken())
                     .build();
-        }else{
+        } else{
             response = LoginResponse.Login.builder()
                     .isExist(false)
                     .oauthId(uniqueId)

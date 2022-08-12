@@ -2,8 +2,8 @@ package com.oceandiary.api.user.controller;
 
 import com.google.gson.Gson;
 import com.oceandiary.MvcTest;
-import com.oceandiary.api.user.request.ProviderRequest;
-import com.oceandiary.api.user.response.LoginResponse;
+import com.oceandiary.api.user.dto.ProviderRequest;
+import com.oceandiary.api.user.dto.LoginResponse;
 import com.oceandiary.api.user.service.LoginService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

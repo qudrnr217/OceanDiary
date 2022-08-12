@@ -1,5 +1,6 @@
 package com.oceandiary.api.diary.service;
 
+import com.oceandiary.api.common.exception.PermissionException;
 import com.oceandiary.api.diary.dto.DiaryRequest;
 import com.oceandiary.api.diary.dto.DiaryResponse;
 import com.oceandiary.api.diary.entity.Stamp;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,10 +44,20 @@ public class DiaryService {
         return DiaryResponse.GetDiaryContents.build(findUser, stamps);
     }
 
-    public DiaryResponse.UserInfo updateUserInfo(Long userId, DiaryRequest.UserInfo request){
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    @Transactional
+    public DiaryResponse.UserInfo updateUserInfo(Long userId, User user, DiaryRequest.UserInfo request){
+        if(!userId.equals(user.getId())) throw new PermissionException();
         user.updateUserInfo(request);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
         return DiaryResponse.UserInfo.build(user);
+    }
+
+    @Transactional
+    public void deleteUserInfo(Long userId, User user){
+        if(!userId.equals(user.getId())) throw new PermissionException();
+        user.setDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
     }
 
 }
