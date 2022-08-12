@@ -85,7 +85,7 @@ public class RoomService {
         ConnectionProperties connectionProperties =
                 new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).role(OpenViduRole.MODERATOR).build();
 
-        log.info("openvidu connection successful");
+        log.info("OpenVidu connection successful");
 
         if (roomOnRedisRepository.findByCreatedBy(user.getId()).isPresent()) {
             throw new BusinessException("이미 방을 생성한 유저가 다시 생성함");
@@ -112,9 +112,9 @@ public class RoomService {
                     .build();
 
             Room newRoom = roomRepository.save(room);
-            log.info("생성된 방: {}", newRoom);
+            log.info("Session created: {}", newRoom);
 
-            // Create a new OpenVidu Session
+            // OpenVidu API: Create a new OpenVidu Session
             Session session = this.openVidu.createSession();
             // Generate a new Connection with the recently created connectionProperties
             Connection connection = session.createConnection(connectionProperties);
@@ -157,14 +157,13 @@ public class RoomService {
      * 1. 참가자가 이전에 강퇴당한 사람인지 확인한다.
      * 2. 현재 방의 curNum이 maxNum이 되었다면 입장할 수 없다.
      */
-    public RoomResponse.EnterRoom enterRoom(RoomRequest.EnterRoom request, Long roomId, User user) {
+    public RoomResponse.EnterRoom enterRoom(RoomRequest.EnterRoom request, Long roomId, User user, String name) {
 
-        String serverData = "{\"userId\": \"" + user.getId() + "\"," +
-                "\"name\": \"" + user.getName() + "\"}";
+        String serverData = "{\"userId\": \"" + (user != null ? "" + user.getId().toString() : "null") + "\"," + "\"name\": \"" + (user != null ? user.getName() : name) + "\"}";
         ConnectionProperties connectionProperties =
                 new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).role(OpenViduRole.PUBLISHER).build();
 
-        if (dropoutRepository.findByUser_idAndRoom_id(user.getId(), roomId).isPresent()) {
+        if (user != null && dropoutRepository.findByUser_idAndRoom_id(user.getId(), roomId).isPresent()) {
             throw new BusinessException("이미 강퇴당한 사용자는 입장할 수 없습니다.");
         }
 
@@ -173,8 +172,6 @@ public class RoomService {
             Session session = getSession(sessionId);
 
             Connection connection = session.createConnection(connectionProperties);
-            log.info("connectionId: {}", connection.getConnectionId());
-
             String token = connection.getToken();
             Room room = roomRepository.findById(roomId).orElseThrow();
 
@@ -185,8 +182,8 @@ public class RoomService {
 
             Participant newParticipant = Participant.builder()
                     .room(room)
-                    .user(user)
-                    .name(user.getName())
+                    .user(user != null ? user : null)
+                    .name(user != null ? user.getName() : name)
                     .enterDate(LocalDateTime.now())
                     .build();
 
@@ -213,6 +210,9 @@ public class RoomService {
         }
     }
 
+    /**
+     * 1. 방장이 나갈 경우 세션을 종료한다.
+     */
     public void exitRoom(Long roomId, Long participantId, User user) {
 
         try {
@@ -223,8 +223,7 @@ public class RoomService {
 
             Room room = roomRepository.findById(roomId).orElseThrow();
 
-            if (user.getId() == roomOnRedis.getCreatedBy()) {  // 방장이 나갈경우
-                session.close();
+            if (user != null && user.getId() == roomOnRedis.getCreatedBy()) {  // 방장이 나갈경우
                 for (Long pid : participantOnRedis.getParticipantTokenMap().keySet()) {
                     addStampAndUpdateVisitedAtBeforeExit(room, pid);
                 }
@@ -237,11 +236,13 @@ public class RoomService {
             participantOnRedis.removeParticipant(participantId);
 
             if (participantOnRedis.getParticipantTokenMap().isEmpty()) {  // 방에 더이상 참가자가 없을경우
+                // 세션 종료
+                session.close();
                 participantOnRedisRepository.deleteById(roomId);
                 roomOnRedisRepository.deleteById(roomId);
                 room = roomRepository.findById(roomId).orElseThrow();
                 room.setDeletedAt(LocalDateTime.now());
-                log.info("방 세션 종료");
+                log.info("Session destroyed");
             } else {  // 방에 아직 참가자가 있을경우
                 participantOnRedisRepository.save(participantOnRedis);
             }
@@ -256,6 +257,11 @@ public class RoomService {
         }
     }
 
+    /**
+     * default 5개의 방목록을 첫페이지일 경우 가장 최신 것중 5개를 가져온다.
+     * 그 다음부터는 마지막에 가져온 roomId보다 작은 5개를 가져온다.
+     * 조건: Redis안에 룸이 존재하는 방들만 가져온다.
+     */
     public Page<RoomResponse.SearchRooms> search(RoomRequest.RoomSearchCondition condition, Pageable pageable) {
         Page<RoomResponse.SearchRooms> page = roomRepository.search(condition, pageable);
         Iterator<RoomResponse.SearchRooms> searchedRoomsIterator = page.getContent().iterator();
@@ -328,12 +334,12 @@ public class RoomService {
         return participantInfos;
     }
 
+    /**
+     * 1. 수정하는 사람이 방장인지 확인한다.
+     * 2. 이미지 파일 수정인지 확인한다.
+     * 3. maxNum이 curNum보다 큰지 확인한다. 크거나 같은 경우만 수정 가능하게 한다.
+     */
     public void updateRoomInfo(Long roomId, RoomRequest.UpdateRoom request, MultipartFile file, User user) {
-        /**
-         * 1. 수정하는 사람이 방장인지 확인한다.
-         * 2. 이미지 파일 수정인지 확인한다.
-         * 3. maxNum이 curNum보다 큰지 확인한다. 크거나 같은 경우만 수정 가능하게 한다.
-         * */
 
         if (roomRepository.findById(roomId).orElseThrow().getUser().getId() != user.getId()) {
             throw new BusinessException("방 수정 권한이 없습니다.");
@@ -373,11 +379,11 @@ public class RoomService {
             Session session = getSession(roomOnRedisRepository.findById(roomId).orElseThrow().getSessionId());
             ParticipantOnRedis participants = participantOnRedisRepository.findById(roomId).orElseThrow();
             String connectionId = participants.getParticipantConnectionMap().get(participantId);
-            log.info("connectionId: {}", connectionId);
+            // OpenVidu API: force disconnect participant
             session.forceDisconnect(connectionId);
             participants.getParticipantTokenMap().remove(participantId);
             participants.getParticipantConnectionMap().remove(participantId);
-            participantOnRedisRepository.save(participants);
+            participants = participantOnRedisRepository.save(participants);
             Participant participant = participantRepository.findById(participantId).orElseThrow();
             participant.addExitDate();
             Dropout dropout = Dropout.builder()
@@ -386,6 +392,15 @@ public class RoomService {
                     .name(participant.getName())
                     .build();
             dropoutRepository.save(dropout);
+            if (participants.getParticipantTokenMap().isEmpty()) {  // 방에 더이상 참가자가 없을경우
+                // 세션 종료
+                session.close();
+                participantOnRedisRepository.deleteById(roomId);
+                roomOnRedisRepository.deleteById(roomId);
+                Room room = roomRepository.findById(roomId).orElseThrow();
+                room.setDeletedAt(LocalDateTime.now());
+                log.info("Session destroyed");
+            }
         } catch (OpenViduJavaClientException | OpenViduHttpException e) {
             throw new RuntimeException(e);
         }
@@ -415,16 +430,24 @@ public class RoomService {
     private void addStampAndUpdateVisitedAtBeforeExit(Room room, Long participantId) {
         Participant participant = participantRepository.findById(participantId).orElseThrow();
         participant.addExitDate();
-        // 스탬프 저장
-        createStamp(DiaryRequest.StampCreate.builder()
-                .category(room.getCategory())
-                .enterTime(participant.getEnterDate())
-                .exitTime(participant.getExitDate())
-                .build(), participant.getUser());
-        // 최근 방문시각 저장
-        participant.getUser().updateVisitedAt();
+
+        if (participant.getUser() != null) {
+            // 스탬프 저장
+            createStamp(DiaryRequest.StampCreate.builder()
+                    .category(room.getCategory())
+                    .enterTime(participant.getEnterDate())
+                    .exitTime(participant.getExitDate())
+                    .build(), participant.getUser());
+            // 최근 방문시각 저장
+            participant.getUser().updateVisitedAt();
+        }
     }
 
+    /**
+     * Redis와 MySQL에서 저장하고 있는 Room의 부정합성을 해결한다.
+     * Redis와 MySQL 서버에서 저장하고 있는 Room들의 정합성이 다른 경우가 발생한다.
+     * -> 서버가 재배포되면 Redis는 초기화되고 MySQL에는 현재 진행중인 Room들이 남게되어 둘간의 정합성이 맞지 않게된다.
+     */
     private void resolveInconsistency() {
         List<Room> searchedUndeletedRooms = roomRepository.searchUndeletedRooms();
         for (Room searchedUndeletedRoom : searchedUndeletedRooms) {

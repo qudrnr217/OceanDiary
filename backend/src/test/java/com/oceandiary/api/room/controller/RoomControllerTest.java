@@ -93,7 +93,7 @@ class RoomControllerTest extends MvcTest {
                 .connectionId("connection-id")
                 .build();
 
-        given(roomService.enterRoom(any(RoomRequest.EnterRoom.class), anyLong(), any(User.class)))
+        given(roomService.enterRoom(any(RoomRequest.EnterRoom.class), anyLong(), any(User.class), any()))
                 .willReturn(response);
 
         Long roomId = 1L;
@@ -118,7 +118,7 @@ class RoomControllerTest extends MvcTest {
                                 fieldWithPath("connectionId").description("Connection 객체의 아이디")
                         )
                 ));
-        verify(roomService).enterRoom(any(RoomRequest.EnterRoom.class), anyLong(), any(User.class));
+        verify(roomService).enterRoom(any(RoomRequest.EnterRoom.class), anyLong(), any(User.class), any());
     }
 
     @Test
