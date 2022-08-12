@@ -1,20 +1,40 @@
 <template>
-  <div class="background-wrap">
-    <div class="text-box">
-      <div class="text-header">
-        <img
-          src="@/assets/아이콘/icon_locationpoint.png"
-          alt="location 아이콘"
-        />
-        <div class="text-title">{{ title }}</div>
+  <div class="center">
+    <div class="box main-box">
+      <div class="box-header">
+        <div class="logo">
+          <img src="" ref="icon" class="icon-symbol" />
+          {{ title }}
+        </div>
         <img
           src="@/assets/아이콘/[아이콘]방생성.png"
-          class="create-btn"
+          class="icon-create"
           alt="방생성"
           @click="create_room()"
         />
       </div>
-      <div class="text-middle"></div>
+      <div class="box-list">
+        <div v-for="item of items" :key="item.roomId">
+          <div class="room-card">
+            <div class="room-card-thumbnail-wrap">
+              <div class="room-card-thumbnail"></div>
+            </div>
+            <div class="room-card-text-wrap">
+              <div class="room-card-title">
+                {{ item.title }}
+              </div>
+            </div>
+            <div class="room-card-button-wrap">
+              <div ref="capacity" class="room-card-capacity">
+                ● {{ item.curNum }} / {{ item.maxNum }}
+              </div>
+              <div ref="button" class="room-card-button">
+                <div class="button-next">입장</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -22,61 +42,153 @@
 <script>
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { onMounted, ref } from "vue";
+import { names, icons, indexes, themeColors } from "@/const/const.js";
+// import { getRoomList } from "@/api/webrtc.js";
 
 export default {
   setup() {
     const store = useStore();
-    var title = store.state.locationStore.location_name;
     const router = useRouter();
-    var create_room = () => {
+
+    const urlParams = new URL(location.href).searchParams;
+    const dest = urlParams.get("dest");
+    const index = indexes[dest];
+    const title = names[index];
+    const iconPath = require(`@/assets/아이콘/${icons[index]}`);
+    const darkColor = themeColors[index][0];
+    const brightColor = themeColors[index][1];
+    // const items = getRoomList(dest, 0);
+    const items = [
+      {
+        roomId: 1,
+        imageId: 1,
+        title: "방1입니다.",
+        maxNum: 6,
+        curNum: 1,
+        isOpen: false,
+      },
+      {
+        roomId: 2,
+        imageId: 2,
+        title: "방2입니다.",
+        maxNum: 6,
+        curNum: 2,
+        isOpen: true,
+      },
+      {
+        roomId: 3,
+        imageId: 3,
+        title: "방3입니다.",
+        maxNum: 6,
+        curNum: 2,
+        isOpen: true,
+      },
+    ];
+
+    const create_room = () => {
       console.log(store.state.locationStore.create_name);
-      router.push({ name: store.state.locationStore.create_name });
+      router.push({
+        name: "room-create",
+        query: { dest: dest },
+      });
     };
+    /*
+    (TODO) 색상 변경이 theme color로 바뀌지 않는 버그
+    */
+    const icon = ref(null);
+    const capacity = ref(null);
+    const button = ref(null);
+    onMounted(() => {
+      icon.value.src = iconPath;
+      capacity.value.style = `color: ${darkColor};`;
+      button.value.style = `background: ${brightColor};`;
+    });
     return {
       title,
+      iconPath,
+      items,
+      icon,
+      capacity,
+      button,
       create_room,
     };
   },
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.background-wrap {
-  width: 100vw;
-  height: 100vh;
-  /* background-color: red; */
-
+.main-box {
+  height: 70%;
+  padding: 40px 80px;
+}
+.box-header {
+  height: 15%;
+  font-size: 50px;
+}
+.logo {
   display: flex;
+  float: left;
+}
+.icon-symbol {
+  width: 50px;
+  height: 50px;
+  margin-right: 20px;
+}
+.icon-create {
+  width: 50px;
+  height: 50px;
+  float: right;
+}
+.room-card {
+  background-color: #d1d8df;
+  border-radius: 20px;
+  width: 100%;
+  height: 150px;
+  margin-bottom: 20px;
+  display: flex;
+}
+.room-card-thumbnail-wrap {
+  width: 30%;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: center;
 }
-
-.background-wrap > .text-box {
-  /* background-color: blue; */
-  width: 55vw;
-  height: 80vh;
+.room-card-text-wrap {
+  width: 55%;
 }
-
-.text-box > .text-header {
-  height: 10%;
-  padding: 1em;
-  /* background-color: purple; */
-
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
+.room-card-button-wrap {
+  width: 15%;
 }
-
-.text-box > .text-middle {
+.room-card-thumbnail {
+  width: 80%;
   height: 80%;
-  /* background-color: orange; */
+  background-color: blue;
+  border-radius: 20px;
 }
-
-.create-btn {
-  width: 3vw;
-  /* height: 5vh; */
-  position: relative;
-  left: 83%;
+.room-card-title {
+  height: 35%;
+  font-size: 30px;
+  display: flex;
+  align-items: center;
+}
+.room-card-info {
+  height: 65%;
+}
+.room-card-capacity {
+  height: 35%;
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+}
+.room-card-button {
+  height: 55%;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+}
+.box-list {
+  height: 85%;
+  overflow: scroll;
 }
 </style>

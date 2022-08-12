@@ -1,67 +1,124 @@
 <template>
-  <div class="background-wrap">
-    <div class="text-box">
-      <div class="text-header">
-        <img src="@/assets/아이콘/coffe_icon.png" alt="location 아이콘" />
-        <div class="text-title">스터디생성</div>
-        <div class="right-wrap">
+  <div class="center">
+    <div class="box main-box">
+      <div class="box-header">
+        <div class="logo">
+          <img src="" ref="icon" class="icon-symbol" />
+          {{ type }} 생성
+        </div>
+        <div class="lock">
           <img
             src="@/assets/아이콘/icon_lock.png"
-            class="lock"
-            alt="방생성"
+            class="icon-lock"
             @click="show = !show"
             v-if="show"
           />
-          <input type="password" class="password" v-show="show" />
+          <input type="password" class="room-create-input" v-show="show" />
           <img
             src="@/assets/아이콘/[아이콘]방_공개.png"
-            class="lock"
-            alt="방생성"
+            class="icon-lock"
             @click="show = !show"
             v-if="!show"
           />
         </div>
       </div>
-      <div class="text-middle">
-        <div class="title-wrap">
-          <div class="title-name">제목 :</div>
-          <input type="text" class="title_text" />
+      <div class="box-list">
+        <table class="room-create-form">
+          <tr>
+            <th>제목 :</th>
+            <td>
+              <input
+                v-model="roomInfo.title"
+                type="text"
+                class="room-create-input"
+              />
+            </td>
+          </tr>
+          <tr>
+            <th>규칙 :</th>
+            <td>
+              <textarea class="room-create-input" style="height: 180px" />
+            </td>
+          </tr>
+          <tr>
+            <th>인원 :</th>
+            <td>
+              <input
+                type="number"
+                class="room-create-input"
+                style="width: 30%"
+              />
+            </td>
+          </tr>
+          <tr>
+            <th>이미지 :</th>
+            <td>
+              <div class="button-next" style="width: 30%">첨부파일</div>
+            </td>
+          </tr>
+        </table>
+        <div class="room-create-button">
+          <div class="button-metro" @click="create()">생 성</div>
         </div>
-        <div class="rule-wrap">
-          <div class="rule">규칙 :</div>
-          <input type="text" class="rule-text" />
-        </div>
-        <div class="count-wrap">
-          <div class="count">인원 :</div>
-          <input type="number" class="count-text" />
-          <div class="count-last">명</div>
-        </div>
-        <div class="img-wrap">
-          <div class="image">이미지 :</div>
-          <div class="select-file">파일 선택</div>
-          <!-- <img src="" alt=""> -->
-        </div>
-      </div>
-      <div class="text-footer">
-        <button class="button-next">생성</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from "@vue/reactivity";
-import { useStore } from "vuex";
-
+import { useRouter } from "vue-router";
+import { onMounted, reactive, ref } from "vue";
+import { icons, indexes, types } from "@/const/const.js";
+import { createRoom } from "@/api/webrtc.js";
 export default {
   setup() {
-    const store = useStore();
-    var title = store.state.locationStore.location_name;
-    var show = ref(false);
+    const router = useRouter();
 
+    const urlParams = new URL(location.href).searchParams;
+    const dest = urlParams.get("dest");
+    const index = indexes[dest];
+    const type = types[dest];
+    const iconPath = require(`@/assets/아이콘/${icons[index]}`);
+
+    const roomInfo = reactive({
+      categoryId: "",
+      title: "",
+      rule: "",
+      maxNum: 0,
+      isOpen: false,
+      pw: "1234",
+    });
+    roomInfo.categoryId = dest.toUpperCase();
+    const imageFile = ref("");
+    var show = ref(false);
+    var icon = ref(null);
+
+    const create = () => {
+      createRoom(
+        roomInfo,
+        imageFile,
+        () => {
+          alert("방을 생성했습니다!");
+          router.push({
+            name: "lobby",
+            query: { dest: dest },
+          });
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    };
+    onMounted(() => {
+      icon.value.src = iconPath;
+    });
     return {
-      title,
+      roomInfo,
       show,
+      iconPath,
+      icon,
+      type,
+      create,
     };
   },
 };
@@ -69,170 +126,63 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.background-wrap {
-  width: 100vw;
-  height: 100vh;
-  /* background-color: red; */
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.main-box {
+  width: 800px;
+  min-width: 800px;
+  height: 500px;
+  padding: 40px 80px;
 }
-
-.background-wrap > .text-box {
-  /* background-color: blue; */
-  width: 55vw;
-  height: 80vh;
-}
-
-.text-box > .text-header {
-  height: 10%;
-  padding: 1em;
-  /* background-color: purple; */
-
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.text-box > .text-middle {
-  height: 75%;
-  /* background-color: orange; */
-}
-
-.lock {
-  width: 3vw;
-  /* height: 5vh; */
-  position: relative;
-  /* left: 50%; */
-}
-
-.text-box > .text-footer {
-  height: 10%;
-  /* background-color: aqua; */
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-.right-wrap {
-  width: 80%;
-  /* background-color: aquamarine; */
-  display: flex;
-  justify-content: flex-end;
-}
-
-.password {
-  border: 2px solid #d1d8df;
-  border-radius: 16px;
-  width: 30%;
-}
-
-.text-middle > .title-wrap {
-  /* background-color: cadetblue; */
-  height: 20%;
-
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.text-middle > .rule-wrap {
-  /* background-color: yellow; */
-  height: 35%;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.text-middle > .count-wrap {
-  /* background-color: violet; */
+.box-header {
   height: 15%;
+  font-size: 50px;
+}
+.lock {
   display: flex;
-  justify-content: flex-start;
   align-items: center;
+  float: right;
 }
-
-.text-middle > .img-wrap {
-  /* background-color: tomato; */
-  height: 30%;
+.logo {
   display: flex;
-  justify-content: flex-start;
+  float: left;
+}
+.icon-symbol {
+  width: 50px;
+  height: 50px;
+  margin-right: 20px;
+}
+.icon-lock {
+  width: 50px;
+  height: 50px;
+}
+.room-create-input {
+  border: solid 2px #d1d8df;
+  border-radius: 10px;
+  width: 200px;
+  height: 50px;
+  font-size: 30px;
+  font-family: "retro";
+}
+.room-create-form {
+  width: 80%;
+  text-align: left;
+  font-size: 30px;
+}
+.room-create-form tr {
+  padding-bottom: 20px;
+}
+.room-create-form th {
+  padding-left: 20px;
+  padding-top: 15px;
+  display: flex;
+  align-items: start;
+}
+.room-create-form .room-create-input {
+  width: 100%;
+}
+.room-create-button {
+  display: flex;
   align-items: center;
-}
-
-.title-name {
-  position: relative;
-  left: 10%;
-}
-
-.title_text {
-  width: 76%;
-  height: 60%;
-  position: relative;
-  left: 14%;
-  border: 2px solid #d1d8df;
-  border-radius: 16px;
-}
-
-.rule {
-  position: relative;
-  left: 10%;
-}
-
-.rule-text {
-  width: 76%;
-  height: 80%;
-  position: relative;
-  left: 14%;
-  border: 2px solid #d1d8df;
-  border-radius: 16px;
-}
-
-.count {
-  position: relative;
-  left: 10%;
-}
-
-.count-text {
-  width: 8%;
-  height: 60%;
-  position: relative;
-  left: 14%;
-  border: 2px solid #d1d8df;
-  border-radius: 16px;
-}
-
-.count-last {
-  position: relative;
-  left: 17%;
-}
-
-.image {
-  position: relative;
-  left: 10%;
-}
-
-.select-file {
-  width: 15%;
-  height: 25%;
-  background: #d1d8df;
-  border: 2px solid #d1d8df;
-  border-radius: 16px;
-  position: relative;
-  left: 12%;
-
-  display: flex;
   justify-content: center;
-  align-items: center;
+  margin-top: 30px;
 }
-
-.button-next {
-  background: #f7d794;
-}
-/* <div class="text-middle">
-        <div class="title-wrap"></div>
-        <div class="rule-wrap"></div>
-        <div class="count-wrap"></div>
-        <div class="img-wrap"></div> */
 </style>

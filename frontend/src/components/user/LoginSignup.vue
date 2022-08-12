@@ -39,8 +39,8 @@
 <script>
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import { signup } from "@/api/login.js";
 import { reactive } from "vue";
+import { signup } from "@/api/login.js";
 
 export default {
   setup() {
@@ -65,11 +65,13 @@ export default {
     const oauthId = urlParams.get("oauthId");
 
     var submit = () => {
+      // 회원가입 요청에 필요한 birth, oauthId를 형식에 맞게 준비한다.
       state.userinfo.birth.setFullYear(state.date.year);
       state.userinfo.birth.setMonth(state.date.month);
       state.userinfo.birth.setDate(state.date.day);
       state.userinfo.oauthId = oauthId;
 
+      // 회원가입 요청을 보낸다.
       signup(
         social,
         state.userinfo,
@@ -79,7 +81,10 @@ export default {
           store.commit("userStore/SET_NAME", response.data.name);
           store.commit("userStore/SET_TOKEN", response.data.accessToken);
           store.commit("userStore/SET_USERID", response.data.userId);
-          router.push({ name: "station_where" });
+          router.push({
+            name: "station-chat",
+            params: { nextLink: "station/map", speech: "어디로 가시나요?" },
+          });
         },
         (error) => {
           console.log(error);

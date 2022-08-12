@@ -1,40 +1,40 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
-import StationView from "../views/StationView.vue";
 
 const routes = [
   {
     path: "/",
-    name: "home",
-    component: HomeView,
+    name: "main",
+    component: () => import("@/views/MainView.vue"),
   },
+  // 로그인 관련
   {
     path: "/login",
     name: "login",
     component: () => import("@/views/UserView.vue"),
     children: [
       {
-        path: "/login/menu",
+        path: "menu",
         name: "login-menu",
         component: () => import("@/components/user/LoginMenu.vue"),
       },
       {
-        path: "/login/social",
+        path: "social",
         name: "login-social",
         component: () => import("@/components/user/LoginSocial.vue"),
       },
       {
-        path: "/login/single",
+        path: "single",
         name: "login-single",
         component: () => import("@/components/user/LoginSingle.vue"),
       },
       {
-        path: "/login/signup",
+        path: "signup",
         name: "login-signup",
         component: () => import("@/components/user/LoginSignup.vue"),
       },
     ],
   },
+  // oauth 관련
   {
     path: "/oauth2/naver",
     name: "NaverHandler",
@@ -45,153 +45,96 @@ const routes = [
     name: "KakaoHandler",
     component: () => import("@/components/user/oauth/KakaoHandler.vue"),
   },
+  // station 관련
   {
     path: "/station",
     name: "station",
-    component: StationView,
+    component: () => import("@/views/StationView.vue"),
     children: [
       {
         path: "home",
-        name: "station_home",
-        component: () => import("@/components/station/NameChat.vue"),
+        name: "station-chat",
+        props: true,
+        component: () => import("@/components/station/StationChat.vue"),
       },
       {
         path: "input",
-        name: "station_input",
-        component: () => import("@/components/station/InputBox.vue"),
-      },
-      {
-        path: "where",
-        name: "station_where",
-        component: () => import("@/components/station/WhereChat.vue"),
+        name: "station-input",
+        component: () => import("@/components/station/StationInput.vue"),
       },
       {
         path: "map",
-        name: "station_map",
+        name: "station-map",
         component: () => import("@/components/station/StationMap.vue"),
       },
+    ],
+  },
+  // 이동화면 관련
+  {
+    path: "/train",
+    name: "train",
+    component: () => import("@/views/TrainView.vue"),
+    children: [
       {
         path: "depart",
-        name: "station_depart",
-        component: () => import("@/components/moving/DepartView.vue"),
+        name: "train-depart",
+        component: () => import("@/components/train/TrainDepart.vue"),
+      },
+      {
+        path: "move",
+        name: "train-move",
+        component: () => import("@/components/train/TrainMove.vue"),
+      },
+      {
+        path: "arrive",
+        name: "train-arrive",
+        component: () => import("@/components/train/TrainArrive.vue"),
       },
     ],
   },
+  // 방 생성 관련,
   {
-    path: "/moving",
-    name: "station_moving",
-    component: () => import("@/components/moving/MovingView.vue"),
-  },
-  {
-    path: "/cafe",
-    name: "station_cafe",
-    component: () => import("@/components/arrive/ArriveCafe.vue"),
-  },
-  {
-    path: "/ocean",
-    name: "station_ocean",
-    component: () => import("@/components/arrive/ArriveOcean.vue"),
-  },
-  {
-    path: "/festival",
-    name: "station_festival",
-    component: () => import("@/components/arrive/ArriveFestival.vue"),
-  },
-  {
-    path: "/house",
-    name: "station_house",
-    component: () => import("@/components/arrive/ArriveHome.vue"),
-  },
-  {
-    path: "/library",
-    name: "station_library",
-    component: () => import("@/components/arrive/ArriveLibrary.vue"),
-  },
-  {
-    path: "/festival_bg",
-    name: "festival",
-    component: () => import("@/views/FestivalView.vue"),
+    path: "/lobby",
+    name: "lobby",
+    component: () => import("@/views/LobbyView.vue"),
     children: [
       {
-        path: "home",
-        name: "festival_home",
+        path: "list",
+        name: "room-list",
         component: () => import("@/components/room/RoomList.vue"),
       },
       {
         path: "create",
-        name: "festival_create",
+        name: "room-create",
         component: () => import("@/components/room/RoomCreate.vue"),
       },
     ],
   },
-  {
-    path: "/cafe_bg",
-    name: "cafe",
-    component: () => import("@/views/CafeView.vue"),
-    children: [
-      {
-        path: "home",
-        name: "cafe_home",
-        component: () => import("@/components/room/RoomList.vue"),
-      },
-      {
-        path: "create",
-        name: "cafe_create",
-        component: () => import("@/components/room/RoomCreate.vue"),
-      },
-    ],
-  },
-  {
-    path: "/house_bg",
-    name: "house",
-    component: () => import("@/views/HouseView.vue"),
-    children: [
-      {
-        path: "home",
-        name: "house_home",
-        component: () => import("@/components/room/RoomList.vue"),
-      },
-      {
-        path: "create",
-        name: "house_create",
-        component: () => import("@/components/room/RoomCreate.vue"),
-      },
-    ],
-  },
-  {
-    path: "/library_bg",
-    name: "library",
-    component: () => import("@/views/LibraryView.vue"),
-    children: [
-      {
-        path: "home",
-        name: "library_home",
-        component: () => import("@/components/room/RoomList.vue"),
-      },
-      {
-        path: "create",
-        name: "library_create",
-        component: () => import("@/components/room/RoomCreate.vue"),
-      },
-    ],
-  },
-  {
-    path: "/ocean_bg",
-    name: "ocean",
-    component: () => import("@/views/OceanView.vue"),
-    children: [
-      {
-        path: "home",
-        name: "ocean_home",
-        component: () => import("@/components/room/RoomList.vue"),
-      },
-      {
-        path: "create",
-        name: "ocean_create",
-        component: () => import("@/components/room/RoomCreate.vue"),
-      },
-    ],
-  },
+  // {
+  //   path: "/festival",
+  //   name: "festival",
+  //   component: () => import("@/views/FestivalView.vue"),
+  // },
+  // {
+  //   path: "/cafe",
+  //   name: "cafe",
+  //   component: () => import("@/views/CafeView.vue"),
+  // },
+  // {
+  //   path: "/house",
+  //   name: "house",
+  //   component: () => import("@/views/HouseView.vue"),
+  // },
+  // {
+  //   path: "/library",
+  //   name: "library",
+  //   component: () => import("@/views/LibraryView.vue"),
+  // },
+  // {
+  //   path: "/ocean",
+  //   name: "ocean",
+  //   component: () => import("@/views/OceanView.vue"),
+  // },
 ];
 
 const router = createRouter({
