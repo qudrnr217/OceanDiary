@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,10 +43,18 @@ public class DiaryService {
         return DiaryResponse.GetDiaryContents.build(findUser, stamps);
     }
 
+    @Transactional
     public DiaryResponse.UserInfo updateUserInfo(Long userId, DiaryRequest.UserInfo request){
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         user.updateUserInfo(request);
+        user.setUpdatedAt(LocalDateTime.now());
         return DiaryResponse.UserInfo.build(user);
+    }
+
+    @Transactional
+    public void deleteUserInfo(Long userId){
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        user.setDeletedAt(LocalDateTime.now());
     }
 
 }

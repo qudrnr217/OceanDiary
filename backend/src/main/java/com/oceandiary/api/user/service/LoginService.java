@@ -46,7 +46,6 @@ public class LoginService {
     public LoginResponse.Login naverLogin(ProviderRequest.LoginRequest request, HttpSession session){
         String accessToken = getNaverAccessToken(request, session);
         String naverUniqueId = getNaverUniqueId(accessToken);
-
         User foundUser = socialLoginUserRepository.findByProviderAndOauthId(SocialProvider.NAVER, naverUniqueId);
         return checkUser(foundUser, naverUniqueId);
     }
@@ -83,14 +82,15 @@ public class LoginService {
 
     public LoginResponse.Login checkUser(User foundUser, String uniqueId){
         LoginResponse.Login response;
-        if(foundUser != null){
+        if(foundUser != null && foundUser.getDeletedAt() == null){
             response = LoginResponse.Login.builder()
                     .name(foundUser.getName())
                     .userId(foundUser.getId())
                     .isExist(true)
+                    .oauthId(uniqueId)
                     .accessToken(tokenProvider.generateAccessToken(foundUser).getToken())
                     .build();
-        }else{
+        } else{
             response = LoginResponse.Login.builder()
                     .isExist(false)
                     .oauthId(uniqueId)

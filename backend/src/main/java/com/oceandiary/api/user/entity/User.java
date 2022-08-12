@@ -78,4 +78,5 @@ public class User extends BaseEntity {
             this.birth = request.getBirth();
         }
     }
+
 }
