@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -39,11 +40,21 @@ public class WebMvcConfig implements WebMvcConfigurer {
         characterEncodingFilter.setForceEncoding(true);
         return characterEncodingFilter;
     }
+
     /****************************************************************************************
      * 리프레시 토큰 인터셉터
      * 발급 시도 시 사용되도록
      ****************************************************************************************/
     public void addInterceptors(InterceptorRegistry interceptorRegistry) {
         interceptorRegistry.addInterceptor(tokenInterceptor).addPathPatterns("/api/user/refresh");
+    }
+
+    /****************************************************************************************
+     * RestDocs API 문서 index.html 뷰 컨트롤러
+     * https://i7a406.p.ssafy.io/docs -> https://i7a406.p.ssafy.io/docs/index.html 으로 매핑하기 위함
+     ****************************************************************************************/
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/docs").setViewName("forward:/docs/index.html");
     }
 }
