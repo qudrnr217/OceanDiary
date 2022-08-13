@@ -25,7 +25,7 @@ public class DiaryService {
     private final StampRepository stampRepository;
 
     @Transactional
-    public DiaryResponse.StampOnlyId create(DiaryRequest.StampCreate request, User user){
+    public DiaryResponse.StampOnlyId createStamp(DiaryRequest.StampCreate request, User user){
         Stamp stamp = Stamp.create(user, request.getCategory(), request.getEnterTime(), request.getExitTime());
         System.out.println(stamp.toString());
         Stamp savedStamp = stampRepository.save(stamp);
@@ -38,7 +38,7 @@ public class DiaryService {
         return stamps.stream().map(stamp -> DiaryResponse.GetStamp.build(stamp)).collect(Collectors.toList());
     }
 
-    public DiaryResponse.GetDiaryContents getDiaryInfo(Long userId){
+    public DiaryResponse.GetDiaryContents getDiaryContents(Long userId){
         User findUser = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         List<Stamp> stamps = stampRepository.findAllByUserOrderByIdDesc(findUser);
         return DiaryResponse.GetDiaryContents.build(findUser, stamps);
@@ -54,10 +54,11 @@ public class DiaryService {
     }
 
     @Transactional
-    public void deleteUserInfo(Long userId, User user){
+    public DiaryResponse.UserOnlyId deleteUserInfo(Long userId, User user){
         if(!userId.equals(user.getId())) throw new PermissionException();
         user.setDeletedAt(LocalDateTime.now());
         userRepository.save(user);
+        return DiaryResponse.UserOnlyId.build(user);
     }
 
 }
