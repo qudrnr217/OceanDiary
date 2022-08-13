@@ -25,7 +25,7 @@ include::{snippets}/create-stamp/response-fields.adoc[]
 
 == *다이어리 조회*
 
-`Get /api/diary/user/{userId}`
+`GET /api/diary/user/{userId}`
 
 요청 HTTP Reqeust
 
