@@ -17,14 +17,14 @@ public class DiaryController {
     private final DiaryService diaryService;
 
     @PostMapping("/stamp")
-    public ResponseEntity<DiaryResponse.StampOnlyId> create(@RequestBody DiaryRequest.StampCreate request, @CurrentUser CustomUserDetails customUserDetails) {
-        DiaryResponse.StampOnlyId response = diaryService.create(request, customUserDetails.getUser());
+    public ResponseEntity<DiaryResponse.StampOnlyId> createStamp(@RequestBody DiaryRequest.StampCreate request, @CurrentUser CustomUserDetails customUserDetails) {
+        DiaryResponse.StampOnlyId response = diaryService.createStamp(request, customUserDetails.getUser());
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<DiaryResponse.GetDiaryContents> getDiary(@PathVariable("userId") Long userId) {
-        DiaryResponse.GetDiaryContents response = diaryService.getDiaryInfo(userId);
+        DiaryResponse.GetDiaryContents response = diaryService.getDiaryContents(userId);
         return ResponseEntity.ok().body(response);
     }
 
@@ -35,7 +35,8 @@ public class DiaryController {
     }
 
     @PatchMapping("/user/{userId}")
-    public void deleteUserInfo(@PathVariable("userId") Long userId, @CurrentUser CustomUserDetails customUserDetails){
-        diaryService.deleteUserInfo(userId, customUserDetails.getUser());
+    public ResponseEntity<DiaryResponse.UserOnlyId> deleteUserInfo(@PathVariable("userId") Long userId, @CurrentUser CustomUserDetails customUserDetails){
+        DiaryResponse.UserOnlyId response = diaryService.deleteUserInfo(userId, customUserDetails.getUser());
+        return ResponseEntity.ok().body(response.builder().userId(userId).build());
     }
 }

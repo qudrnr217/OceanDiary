@@ -25,7 +25,6 @@ public class DiaryRequest {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class UserInfo{
-        private Long id;
         private String name;
         private String email;
         private LocalDate birth;

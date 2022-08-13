@@ -50,24 +50,28 @@ public class DiaryResponse {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class GetDiaryContents{
-        private Long id;
-        private String name;
-        private String email;
-        private LocalDate birth;
-        private LocalDateTime visitedAt;
+        private UserInfo userInfo;
         private List<DiaryResponse.GetStamp> stamps;
 
         public static DiaryResponse.GetDiaryContents build(User user, List<Stamp> stamps){
             return GetDiaryContents.builder()
-                    .id(user.getId())
-                    .name(user.getName())
-                    .email(user.getEmail())
-                    .birth(user.getBirth())
-                    .visitedAt(user.getVisitedAt())
+                    .userInfo(UserInfo.build(user))
                     .stamps(stamps.stream().map(DiaryResponse.GetStamp::build).collect(Collectors.toList()))
                     .build();
         }
 
+    }
+
+    @Getter
+    @Builder
+    public static class UserOnlyId{
+        private Long userId;
+
+        public static UserOnlyId build(User user){
+            return UserOnlyId.builder()
+                    .userId(user.getId())
+                    .build();
+        }
     }
 
     @Getter
@@ -79,6 +83,7 @@ public class DiaryResponse {
         private String name;
         private String email;
         private LocalDate birth;
+        private LocalDateTime visitedAt;
 
         public static UserInfo build(User user){
             return UserInfo.builder()
@@ -86,6 +91,7 @@ public class DiaryResponse {
                     .name(user.getName())
                     .email(user.getEmail())
                     .birth(user.getBirth())
+                    .visitedAt(user.getVisitedAt())
                     .build();
         }
     }
