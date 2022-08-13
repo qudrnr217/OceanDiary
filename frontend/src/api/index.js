@@ -11,10 +11,8 @@ function apiInstance() {
   });
   return instance;
 }
-
-function authorizedApiInstance(token) {
+function authApiInstance(token) {
   const instance = axios.create({
-    // baseURL: API_BASE_URL,
     headers: {
       "Content-type": "application/json",
       Authorization: token,
@@ -22,4 +20,4 @@ function authorizedApiInstance(token) {
   });
   return instance;
 }
-export { apiInstance, authorizedApiInstance };
+export { apiInstance, authApiInstance };
