@@ -23,6 +23,7 @@
 
 <script>
 import { naverState } from "@/api/login.js";
+import { REDIRECT_URL } from "@/const/url.js";
 export default {
   data() {
     return {
@@ -47,10 +48,10 @@ export default {
       alert("준비중입니다.");
     },
     sendKakaoUrl() {
-      location.href = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=2cf03b4e3f6b70ea1253b492a2047118&redirect_uri=https://i7a406.p.ssafy.io/oauth2/kakao`;
+      location.href = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=2cf03b4e3f6b70ea1253b492a2047118&redirect_uri=${REDIRECT_URL}/oauth2/kakao`;
     },
     sendNaverUrl() {
-      location.href = `https://nid.naver.com/oauth2.0/authorize?&state=${this.naverState}&client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=https://i7a406.p.ssafy.io/oauth2/naver`;
+      location.href = `https://nid.naver.com/oauth2.0/authorize?&state=${this.naverState}&client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=${REDIRECT_URL}/oauth2/naver`;
     },
   },
 };

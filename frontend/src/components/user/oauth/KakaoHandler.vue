@@ -24,12 +24,15 @@ export default {
             console.log("서버에 로그인 요청 : 성공");
             console.log("발급된 토큰 : " + data.data.accessToken);
             store.commit("userStore/SET_TOKEN", data.data.accessToken);
-            router.push({ name: "station_where" });
+            router.push({
+              name: "station-chat",
+              params: { nextLink: "map", speech: "어디로 가시나요?" },
+            });
           } else {
             //아이디가 없을 경우
             console.log("서버에 로그인 요청 : 실패 (-> 회원가입)");
             console.log("임시 oauthId : " + data.data.oauthId);
-            store.commit("userStore/SET_OAUTH", data.data.oauthId);
+            store.commit("userStore/SET_OAUTH_ID", data.data.oauthId);
             router.push({ name: "login-signup", query: { social: "kakao" } });
           }
         },

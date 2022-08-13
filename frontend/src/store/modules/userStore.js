@@ -4,7 +4,7 @@ const userStore = {
     isLogin: false,
     social: "",
     token: "",
-    oauth: "",
+    oauthId: "",
     name: "",
     email: "",
     birth: "",
@@ -28,8 +28,8 @@ const userStore = {
     SET_TOKEN: (state, token) => {
       state.token = "Bearer " + token;
     },
-    SET_OAUTH: (state, oauth) => {
-      state.oauth = oauth;
+    SET_OAUTH_ID: (state, oauthId) => {
+      state.oauthId = oauthId;
     },
     SET_NAME: (state, name) => {
       state.name = name;

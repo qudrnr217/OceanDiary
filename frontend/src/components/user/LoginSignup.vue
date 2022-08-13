@@ -1,37 +1,65 @@
 <template>
-  <div class="text-box">
-    <div class="text-wrap">
-      <VueWriter
+  <div class="box main-box">
+    <div class="guide-wrap">
+      <vue-writer
         :array="[`정보를 입력한 후, '발급' 버튼을 눌러주세요.`]"
-        :typespeed="1"
+        :typeSpeed="70"
         :iterations="1"
-      ></VueWriter>
+      ></vue-writer>
     </div>
-    <div class="name-wrap">
-      <div class="name-box">이름</div>
-      <input type="text" v-model="state.userinfo.name" class="name-input" />
-      <div class="ticket-title">정기권</div>
+    <div style="display: flex; width: 100%; height: 70%">
+      <div
+        style="
+          width: 40%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        "
+      >
+        <img src="@/assets/아이콘/[아이콘]정기권_상단.png" style="width: 80%" />
+      </div>
+      <div style="width: 60%; display: flex; align-items: center">
+        <table class="signup-form">
+          <tr>
+            <th>이름 :</th>
+            <td>
+              <input
+                type="text"
+                v-model="form.userinfo.name"
+                class="signup-input"
+              />
+            </td>
+          </tr>
+          <tr>
+            <th>이메일 :</th>
+            <td>
+              <input
+                type="email"
+                v-model="form.userinfo.email"
+                class="signup-input"
+              />
+            </td>
+          </tr>
+          <tr>
+            <th>생년월일 :</th>
+            <td>
+              <div style="display: flex; align-items: center">
+                <input class="signup-input" v-model="form.date.year" />
+                년
+                <input class="signup-input" v-model="form.date.month" />
+                월
+                <input class="signup-input" v-model="form.date.day" />
+                일
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
     </div>
-    <div class="email-wrap">
-      <div class="name-box">이메일</div>
-      <input type="email" v-model="state.userinfo.email" class="name-input" />
-      <img
-        src="@/assets/아이콘/[아이콘]정기권_상단.png"
-        alt="아이콘"
-        class="ticket-img"
-      />
-    </div>
-    <div class="birth-wrap">
-      <div class="name-box">생년월일</div>
-      <input class="year-box" v-model="state.date.year" />
-      <div class="year-name">년</div>
-      <input class="month-box" v-model="state.date.month" />
-      <div class="year-name">월</div>
-      <input class="day-box" v-model="state.date.day" />
-      <div class="year-name">일</div>
-    </div>
-    <div class="submit-wrap">
-      <button class="button-next" @click="submit()">발 급</button>
+    <div class="button-wrap">
+      <div class="button-metro" @click="submit()" style="float: right">
+        발 급
+      </div>
     </div>
   </div>
 </template>
@@ -46,7 +74,7 @@ export default {
   setup() {
     const router = useRouter();
     const store = useStore();
-    const state = reactive({
+    const form = reactive({
       userinfo: {
         email: "",
         name: "",
@@ -64,19 +92,18 @@ export default {
     */
     const urlParams = new URL(location.href).searchParams;
     const social = urlParams.get("social");
-    const oauthId = urlParams.get("oauthId");
 
     var submit = () => {
+      alert(form.userinfo.oauthId);
       // 회원가입 요청에 필요한 birth, oauthId를 형식에 맞게 준비한다.
-      state.userinfo.birth.setFullYear(state.date.year);
-      state.userinfo.birth.setMonth(state.date.month);
-      state.userinfo.birth.setDate(state.date.day);
-      state.userinfo.oauthId = oauthId;
-
+      form.userinfo.birth.setFullYear(form.date.year);
+      form.userinfo.birth.setMonth(form.date.month);
+      form.userinfo.birth.setDate(form.date.day);
+      form.userinfo.oauthId = store.state.userStore.oauthId;
       // 회원가입 요청을 보낸다.
       signup(
         social,
-        state.userinfo,
+        form.userinfo,
         (response) => {
           console.log("회원가입 요청 : 성공!");
           // vuex에 회원 정보 업데이트
@@ -100,7 +127,7 @@ export default {
     }
     */
     return {
-      state,
+      form,
       submit,
     };
   },
@@ -108,104 +135,39 @@ export default {
 </script>
 
 <style>
-.text-box {
-  width: 55vw;
-  height: 55vh;
-}
-.text-wrap {
-  /* background-color: red; */
+.button-wrap {
   height: 15%;
-  color: #989898;
+  padding-right: 30px;
 }
-
-.name-wrap {
-  /* background-color: yellow; */
-  height: 25%;
-}
-
-.email-wrap {
-  /* background-color: pink; */
-  height: 25%;
-  display: flex;
-  align-items: center;
-}
-
-.birth-wrap {
-  /* background-color: aqua; */
-  height: 25%;
-  display: flex;
-  align-items: center;
-}
-.submit-wrap {
-  /* background-color: chartreuse; */
-  height: 15%;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-.name-box {
-  width: 10%;
-  height: 40%;
-  background: #d1d8df;
-  border-radius: 15px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.name-input {
-  width: 40%;
-  height: 40%;
-  border-radius: 15px;
-
-  position: relative;
-  left: 2%;
-}
-
-.ticket-title {
-  position: relative;
-  left: 23%;
-}
-
-.year-box {
-  width: 9%;
-  height: 40%;
-  border-radius: 15px;
-  position: relative;
-  left: 2%;
-}
-
-.month-box {
-  width: 6%;
-  height: 40%;
-  border-radius: 15px;
-  position: relative;
-  left: 2%;
-}
-
-.day-box {
-  width: 6%;
-  height: 40%;
-  border-radius: 15px;
-  position: relative;
-  left: 2%;
-}
-
-.year-name {
-  position: relative;
-  left: 2%;
-}
-
-.button-next {
-  background: #72ab46;
-  color: #ffffff;
-}
-
 .ticket-img {
   width: 30%;
   height: auto;
   position: relative;
   top: 8%;
   left: 12%;
+}
+.signup-input {
+  border: solid 2px #d1d8df;
+  border-radius: 10px;
+  width: 200px;
+  height: 50px;
+  font-size: 30px;
+  font-family: "retro";
+}
+.signup-form {
+  width: 90%;
+  text-align: left;
+  font-size: 30px;
+}
+.signup-form tr {
+  padding-bottom: 20px;
+}
+.signup-form th {
+  width: 150px;
+  padding-right: 20px;
+  text-align: right;
+}
+.signup-form .signup-input {
+  width: 100%;
 }
 </style>
