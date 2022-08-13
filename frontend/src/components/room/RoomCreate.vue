@@ -10,15 +10,19 @@
           <img
             src="@/assets/아이콘/icon_lock.png"
             class="icon-lock"
-            @click="show = !show"
-            v-if="show"
+            @click="roomInfo.isOpen = !roomInfoisOpen"
+            v-if="!roomInfo.isOpen"
           />
-          <input type="password" class="room-create-input" v-show="show" />
+          <input
+            type="password"
+            class="room-create-input"
+            v-show="roomInfo.isOpen"
+          />
           <img
             src="@/assets/아이콘/[아이콘]방_공개.png"
             class="icon-lock"
-            @click="show = !show"
-            v-if="!show"
+            @click="roomInfo.isOpen = !roomInfo.isOpen"
+            v-if="roomInfo.isOpen"
           />
         </div>
       </div>
@@ -37,13 +41,18 @@
           <tr>
             <th>규칙 :</th>
             <td>
-              <textarea class="room-create-input" style="height: 180px" />
+              <textarea
+                v-model="roomInfo.rule"
+                class="room-create-input"
+                style="height: 180px"
+              />
             </td>
           </tr>
           <tr>
             <th>인원 :</th>
             <td>
               <input
+                v-model="roomInfo.maxNum"
                 type="number"
                 class="room-create-input"
                 style="width: 30%"
@@ -87,28 +96,22 @@ export default {
       title: "",
       rule: "",
       maxNum: 0,
-      isOpen: false,
+      isOpen: true,
       pw: "1234",
     });
     roomInfo.categoryId = dest.toUpperCase();
     const imageFile = ref("");
-    var show = ref(false);
     var icon = ref(null);
     const fileInput = (event) => {
       imageFile.value = event.target.files[0];
     };
     const create = () => {
       console.log("방 생성 절차를 시작합니다.");
-      const data = new FormData();
-      data.append(
-        "form",
-        new Blob([JSON.stringify(roomInfo)], { type: "application/json" })
-      );
-      data.append("file", imageFile.value);
 
       createRoom(
         store.state.userStore.token,
-        data,
+        roomInfo,
+        imageFile.value,
         (response) => {
           alert("방을 생성했습니다!");
           store.commit("roomStore/SET_ROOM_ID", response.data.roomId);
@@ -136,7 +139,6 @@ export default {
     });
     return {
       roomInfo,
-      show,
       iconPath,
       icon,
       type,

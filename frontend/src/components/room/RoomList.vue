@@ -10,7 +10,7 @@
           src="@/assets/아이콘/[아이콘]방생성.png"
           class="icon-create"
           alt="방생성"
-          @click="create_room()"
+          @click="createRoom()"
         />
       </div>
       <div class="box-list">
@@ -29,7 +29,7 @@
                 ● {{ item.curNum }} / {{ item.maxNum }}
               </div>
               <div ref="button" class="room-card-button">
-                <div class="button-next" @click="enterRoom()">입장</div>
+                <div class="button-next" @click="enterRoom(item)">입장</div>
               </div>
             </div>
           </div>
@@ -43,9 +43,9 @@
 import { useRouter } from "vue-router";
 import { onMounted, ref } from "vue";
 import { names, icons, indexes } from "@/const/const.js";
-import axios from "axios";
 import { useStore } from "vuex";
-// import { getRoomList } from "@/api/webrtc.js";
+import { getRoomList } from "@/api/webrtc.js";
+import { joinRoom } from "../../api/webrtc";
 
 export default {
   setup() {
@@ -57,59 +57,46 @@ export default {
     const index = indexes[dest];
     const title = names[index];
     const iconPath = require(`@/assets/아이콘/${icons[index]}`);
-    // const items = getRoomList(dest, 0);
-    const items = [
-      {
-        roomId: 1,
-        imageId: 1,
-        title: "방1입니다.",
-        maxNum: 6,
-        curNum: 1,
-        isOpen: false,
-      },
-      {
-        roomId: 2,
-        imageId: 2,
-        title: "방2입니다.",
-        maxNum: 6,
-        curNum: 2,
-        isOpen: true,
-      },
-      {
-        roomId: 3,
-        imageId: 3,
-        title: "방3입니다.",
-        maxNum: 6,
-        curNum: 2,
-        isOpen: true,
-      },
-    ];
-    const enterRoom = () => {
-      axios({
-        method: "post",
-        url: `https://i7a406.p.ssafy.io/api/rooms/57`,
-        headers: {
-          Authorization: store.state.userStore.token,
-        },
-        data: {
-          pw: "1234",
-        },
-      }).then((response) => {
-        alert("방을 생성했습니다!");
-        store.commit(
-          "roomStore/SET_PARTICIPANT_ID",
-          response.data.participantId
-        );
-        store.commit("roomStore/SET_OPENVIDU_TOKEN", response.data.token);
-        store.commit("roomStore/SET_CONNECTION_ID", response.data.connectionId);
-        router.push({
-          name: "festival-room",
-          query: { dest: dest },
-        });
-      });
+
+    const getToken = () => {
+      const token = store.state.userStore.token;
+      if (token == "") {
+        console.log(`토큰 정보가 없습니다!(${token})`);
+        return null;
+      }
+      return token;
     };
-    const create_room = () => {
-      console.log("Let's go!");
+    const items = ref(null);
+    const enterRoom = (item) => {
+      let inputPassword = "";
+      if (!item.isOpen) {
+        inputPassword = prompt("비밀번호를 입력해주세요.");
+      }
+      joinRoom(
+        getToken(),
+        item.roomId,
+        inputPassword,
+        (response) => {
+          store.commit(
+            "roomStore/SET_PARTICIPANT_ID",
+            response.data.participantId
+          );
+          store.commit("roomStore/SET_OPENVIDU_TOKEN", response.data.token);
+          store.commit(
+            "roomStore/SET_CONNECTION_ID",
+            response.data.connectionId
+          );
+          router.push({
+            name: "festival-room",
+            query: { dest: dest },
+          });
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    };
+    const createRoom = () => {
       router.push({
         name: "room-create",
         query: { dest: dest },
@@ -129,6 +116,17 @@ export default {
     const button = ref(null);
     onMounted(() => {
       icon.value.src = iconPath;
+      getRoomList(
+        getToken(),
+        dest.toUpperCase(),
+        0,
+        (response) => {
+          items.value = response.data.content;
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
     });
     return {
       title,
@@ -137,7 +135,7 @@ export default {
       icon,
       capacity,
       button,
-      create_room,
+      createRoom,
       enterRoom,
     };
   },
