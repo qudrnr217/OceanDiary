@@ -87,7 +87,8 @@ export default {
     const enterRoom = () => {
       axios({
         method: "post",
-        url: `https://i7a406.p.ssafy.io/api/rooms/57`,
+        // url: `https://i7a406.p.ssafy.io/api/rooms/57`,
+        url: `/api/rooms/127`,
         headers: {
           Authorization: store.state.userStore.token,
         },

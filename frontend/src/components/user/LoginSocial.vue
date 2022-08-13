@@ -50,7 +50,7 @@ export default {
       location.href = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=2cf03b4e3f6b70ea1253b492a2047118&redirect_uri=https://i7a406.p.ssafy.io/oauth2/kakao`;
     },
     sendNaverUrl() {
-      location.href = `https://nid.naver.com/oauth2.0/authorize?&state=${this.naverState}&client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=https://i7a406.p.ssafy.io/oauth2/naver`;
+      location.href = `https://nid.naver.com/oauth2.0/authorize?&state=${this.naverState}&client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=http://localhost:8080/oauth2/naver`;
     },
   },
 };
