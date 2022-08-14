@@ -147,6 +147,19 @@ const routes = [
   //   name: "ocean",
   //   component: () => import("@/views/OceanView.vue"),
   // },
+  // 다이어리 관련,
+  {
+    path: "/diary",
+    name: "diary",
+    component: () => import("@/views/DiaryView.vue"),
+    children: [
+      {
+        path: "contents",
+        name: "diary-contents",
+        component: () => import("@/components/diary/DiaryContents.vue"),
+      },
+    ],
+  },
 ];
 
 const router = createRouter({

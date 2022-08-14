@@ -41,31 +41,31 @@
 </template>
 
 <script>
-import { getDiaryContents } from "@/api/diary.js";
+//import { getDiaryContents } from "@/api/diary.js";
 export default {
-  setup() {
-    const getToken = () => {
-      const token = store.state.userStore.token;
-      if (token == "") {
-        console.log(`토큰 정보가 없습니다!(${token})`);
-        return null;
-      }
-      return token;
-    };
-    onMounted(() => {
-      getDiaryContents(
-        getToken(),
-        userId,
-        (response) => {},
-        (error) => {
-          console.log(error);
-        }
-      );
-    });
-    return {
-      userInfo,
-    };
-  },
+  // setup() {
+  //   const getToken = () => {
+  //     const token = store.state.userStore.token;
+  //     if (token == "") {
+  //       console.log(`토큰 정보가 없습니다!(${token})`);
+  //       return null;
+  //     }
+  //     return token;
+  //   };
+  //   onMounted(() => {
+  //     getDiaryContents(
+  //       getToken(),
+  //       userId,
+  //       (response) => {},
+  //       (error) => {
+  //         console.log(error);
+  //       }
+  //     );
+  //   });
+  //   return {
+  //     userInfo,
+  //   };
+  // },
 };
 </script>
 
