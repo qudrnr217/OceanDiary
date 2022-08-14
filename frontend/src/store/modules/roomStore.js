@@ -7,6 +7,8 @@ const roomStore = {
     openvidu_token: "",
     connectionId: "",
     sessionId: "",
+    openvidu_token2: "",
+    isScreen: false,
   }),
   mutations: {
     SET_ROOM_ID(state, roomId) {
@@ -23,6 +25,12 @@ const roomStore = {
     },
     SET_SESSION_ID(state, sessionId) {
       state.sessionId = sessionId;
+    },
+    SET_OPENVIDU_TOKEN2(state, openvidu_token2) {
+      state.openvidu_token2 = openvidu_token2;
+    },
+    SET_IS_SCREEN(state, isScreen) {
+      state.isScreen = isScreen;
     },
   },
 };

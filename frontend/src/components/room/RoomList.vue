@@ -72,6 +72,7 @@ export default {
       if (!item.isOpen) {
         inputPassword = prompt("비밀번호를 입력해주세요.");
       }
+      store.commit("roomStore/SET_ROOM_ID", item.roomId);
       joinRoom(
         getToken(),
         item.roomId,
