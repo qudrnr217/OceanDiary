@@ -235,7 +235,8 @@ export default {
 
                   store.commit("roomStore/SET_IS_SCREEN", false);
                   // leave_screen();
-
+                  state.sessionScreen.disconnect();
+                  state.publisher2 = undefined;
                   // axios({
                   //   method: "delete",
                   //   url: `${OPENVIDU_SERVER_URL}/openvidu/api/sessions/${state.mySessionId}/connection/${state.screen_connection_id}`,
@@ -290,34 +291,9 @@ export default {
           state.screen_connection_id = stream.connection.connectionId;
           state.publisher2 = state.session.subscribe(stream);
 
-          state.publisher2.once("accessAllowed", (event) => {
-            console.log(event);
-            state.publisher2.stream
-              .getMediaStream()
-              .getVideoTracks()[0]
-              .addEventListener("ended", () => {
-                console.log('User pressed the "Stop sharing" button');
-                // state.sessionScreen.unsubscribe(state.publisher2);
-                // state.sessionScreen.unpublish(state.publisher2);
-
-                store.commit("roomStore/SET_IS_SCREEN", false);
-                // leave_screen();
-                console.log("취소취소취소취소!!!!");
-                // axios({
-                //   method: "delete",
-                //   url: `${OPENVIDU_SERVER_URL}/openvidu/api/sessions/${state.mySessionId}/connection/${state.screen_connection_id}`,
-                //   headers: {
-                //     Authorization:
-                //       "Basic " +
-                //       btoa(`OPENVIDUAPP:${OPENVIDU_SERVER_SECRET}`),
-                //   },
-                // }).then((data) => {
-                //   console.log(data);
-                //   state.publisher2 = undefined;
-                //   state.sessionScreen.disconnect();
-                // });
-              });
-          });
+          // if (!state.sessionScreen) {
+          //   state.publisher2 = undefined;
+          // }
         } else {
           const subscriber = state.session.subscribe(stream);
           state.subscribers.push(subscriber);
