@@ -236,20 +236,20 @@ export default {
                   store.commit("roomStore/SET_IS_SCREEN", false);
                   // leave_screen();
                   state.sessionScreen.disconnect();
-                  state.publisher2 = undefined;
-                  // axios({
-                  //   method: "delete",
-                  //   url: `${OPENVIDU_SERVER_URL}/openvidu/api/sessions/${state.mySessionId}/connection/${state.screen_connection_id}`,
-                  //   headers: {
-                  //     Authorization:
-                  //       "Basic " +
-                  //       btoa(`OPENVIDUAPP:${OPENVIDU_SERVER_SECRET}`),
-                  //   },
-                  // }).then((data) => {
-                  //   console.log(data);
-                  //   state.publisher2 = undefined;
-                  //   state.sessionScreen.disconnect();
-                  // });
+                  // state.publisher2 = undefined;
+                  axios({
+                    method: "delete",
+                    url: `${OPENVIDU_SERVER_URL}/openvidu/api/sessions/${state.mySessionId}/connection/${state.screen_connection_id}`,
+                    headers: {
+                      Authorization:
+                        "Basic " +
+                        btoa(`OPENVIDUAPP:${OPENVIDU_SERVER_SECRET}`),
+                    },
+                  }).then((data) => {
+                    console.log(data);
+                    state.publisher2 = undefined;
+                    state.sessionScreen.disconnect();
+                  });
                 });
             });
 
@@ -284,16 +284,17 @@ export default {
         console.log("stream: ", stream);
         console.log("stream: ", stream.typeOfVideo);
         if (stream.typeOfVideo === "SCREEN") {
+          if (state.sessionScreen === undefined) {
+            console.log(state.sessionScreen);
+            state.publisher2 = undefined;
+          }
           // const subscriber = state.session.subscribe(stream);
           store.commit("roomStore/SET_IS_SCREEN", true);
           console.log("화면공유 시작!!!");
           console.log("커넥션아이디!:" + stream.connection.connectionId);
           state.screen_connection_id = stream.connection.connectionId;
           state.publisher2 = state.session.subscribe(stream);
-
-          // if (!state.sessionScreen) {
-          //   state.publisher2 = undefined;
-          // }
+          console.log("sessionScreen: ", state.sessionScreen);
         } else {
           const subscriber = state.session.subscribe(stream);
           state.subscribers.push(subscriber);
@@ -306,13 +307,17 @@ export default {
       });
 
       //사람 나갔을 때
-      state.session.on("streamDestoryed", ({ stream }) => {
+      state.session.on("connectionDestroyed", ({ stream }) => {
         console.log("subscriber가 나갔습니다 ㅠㅠ!");
 
-        const index = state.subscribers.indexOf(stream.streamManager, 0);
-        if (index >= 0) {
-          state.subscribers.splice(index, 1);
-        }
+        console.log(stream);
+
+        state.publisher2 = undefined;
+
+        // const index = state.subscribers.indexOf(stream.streamManager, 0);
+        // if (index >= 0) {
+        //   state.subscribers.splice(index, 1);
+        // }
       });
 
       state.session.on("exception", ({ exception }) => {
