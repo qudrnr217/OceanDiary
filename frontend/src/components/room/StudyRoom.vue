@@ -125,6 +125,7 @@ export default {
       openvidu_token2: undefined,
       isScreen: false,
       screen_connection_id: undefined,
+      connectionId: store.state.roomStore.connectionId,
     });
 
     onMounted(() => {
@@ -298,26 +299,43 @@ export default {
         } else {
           const subscriber = state.session.subscribe(stream);
           state.subscribers.push(subscriber);
+          console.log(
+            "subscribers: ",
+            state.subscribers[0].stream.connection.connectionId
+          );
         }
 
-        // const subscriber = state.session.subscribe(stream);
-        // state.subscribers.push(subscriber);
-
-        console.log("subscriber: ", state.subscriber);
+        // console.log("subscriber: ", state.subscriber);
+        // console.log("participantId", state.participantId);
       });
 
       //사람 나갔을 때
       state.session.on("connectionDestroyed", ({ stream }) => {
         console.log("subscriber가 나갔습니다 ㅠㅠ!");
-
-        console.log(stream);
-
         state.publisher2 = undefined;
 
-        // const index = state.subscribers.indexOf(stream.streamManager, 0);
-        // if (index >= 0) {
-        //   state.subscribers.splice(index, 1);
-        // }
+        console.log("connectionDestroyed: " + stream);
+
+        var length = state.subscribers.length;
+        console.log(state.subscribers[0].stream.connection.connectionId);
+        console.log(store.state.roomStore.connectionId);
+
+        console.log(state.connectionId);
+
+        for (var i = 0; i < length; i++) {
+          console.log("hi");
+          if (
+            state.subscribers[i].stream.connection.connectionId ===
+            store.state.roomStore.connectionId
+          ) {
+            const index = state.subscribers.indexOf(i);
+            console.log("iiiiiiiiiiiiiiiiiiiii: " + i);
+            state.subscribers[i] = undefined;
+            if (index >= 0) {
+              state.subscribers.splice(index, 1);
+            }
+          }
+        }
       });
 
       state.session.on("exception", ({ exception }) => {
@@ -404,10 +422,11 @@ export default {
 
     var LeaveSession = () => {
       state.session.disconnect();
-
+      store.commit("roomStore/SET_CONNECTION_ID", state.connectionId);
       LeaveRoom(state.roomId, state.participantId, (response) => {
         console.log(response);
         console.log("세션 나가기 성공!");
+        console.log("subscribers count : ", state.subscribers);
 
         router.push({
           name: "room-list",
