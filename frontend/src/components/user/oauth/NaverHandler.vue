@@ -24,6 +24,8 @@ export default {
             console.log("서버에 로그인 요청 : 성공");
             console.log("발급된 토큰 : " + data.data.accessToken);
             store.commit("userStore/SET_TOKEN", data.data.accessToken);
+            store.commit("userStore/SET_USERID", data.data.userId);
+            console.log(data.data.userId);
             router.push({
               name: "station-chat",
               params: { nextLink: "map", speech: "어디로 가시나요?" },
