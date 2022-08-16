@@ -1,25 +1,27 @@
 <template>
-  <div class="text-box">
-    <div class="station-info-wrap">
-      <station-info
-        v-if="show"
-        :name="names[key]"
-        :explain="explains[key]"
-        :image="images[key]"
-        :link="links[key]"
-      ></station-info>
-    </div>
-    <div class="station-select">
-      <div class="station-wrap">
-        <img src="@/assets/일자노선도.png" alt="노선도" />
+  <div class="background">
+    <div class="text-box">
+      <div class="station-info-wrap">
+        <station-info
+          v-if="show"
+          :name="names[key]"
+          :explain="explains[key]"
+          :image="images[key]"
+          :link="links[key]"
+        ></station-info>
       </div>
-      <div class="circle-wrap">
-        <div class="ssafy-station"></div>
-        <div class="ocean-station" @mouseover="setKey(0)"></div>
-        <div class="library-station" @mouseover="setKey(1)"></div>
-        <div class="cafe-station" @mouseover="setKey(2)"></div>
-        <div class="festival-station" @mouseover="setKey(3)"></div>
-        <div class="home-station" @mouseover="setKey(4)"></div>
+      <div class="station-select">
+        <div class="station-wrap">
+          <img src="@/assets/일자노선도.png" alt="노선도" />
+        </div>
+        <div class="circle-wrap">
+          <div class="ssafy-station"></div>
+          <div class="ocean-station" @mouseover="setKey(0)"></div>
+          <div class="library-station" @mouseover="setKey(1)"></div>
+          <div class="cafe-station" @mouseover="setKey(2)"></div>
+          <div class="festival-station" @mouseover="setKey(3)"></div>
+          <div class="home-station" @mouseover="setKey(4)"></div>
+        </div>
       </div>
     </div>
   </div>

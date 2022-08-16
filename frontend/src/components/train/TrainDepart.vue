@@ -33,7 +33,6 @@ import { useStore } from "vuex";
 export default {
   setup() {
     var store = useStore();
-
     console.log(store.state.locationStore.location_url);
   },
 };
@@ -41,6 +40,6 @@ export default {
 
 <style scoped>
 .background {
-  background-image: url("~@/assets/[04_역출발]에노덴(기존이미지).png");
+  background-image: url("~@/assets/[04_역출발]에노덴_해달.png");
 }
 </style>

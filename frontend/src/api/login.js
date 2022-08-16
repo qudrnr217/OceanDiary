@@ -1,10 +1,15 @@
 import { apiInstance } from "@/api/index.js";
+import qs from "qs";
 
 const api = apiInstance();
 
 async function kakaoLogin(code, success, fail) {
   await api
-    .post(`/api/kakao/login`, JSON.stringify(code))
+    .post(`/api/kakao/login`, qs.stringify(code), {
+      headers: {
+        "Content-type": "application/x-www-form-urlencoded",
+      },
+    })
     .then(success)
     .catch(fail);
 }
