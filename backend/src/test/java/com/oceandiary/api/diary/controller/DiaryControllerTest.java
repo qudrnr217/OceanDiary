@@ -122,14 +122,14 @@ public class DiaryControllerTest extends MvcTest {
 
     @Test
     @DisplayName("나의_다이어리_조회")
-    void getDiary() throws Exception{
+    void getDiaryContents() throws Exception{
         DiaryResponse.GetDiaryContents response = DiaryResponse.GetDiaryContents.build(user, stampList);
         given(diaryService.getDiaryContents(any())).willReturn(response);
         ResultActions results = mvc.perform(RestDocumentationRequestBuilders.get("/api/diary/user/{userId}", 1L));
 
         results.andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("get-diary",
+                .andDo(document("diary-contents",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         pathParameters(
