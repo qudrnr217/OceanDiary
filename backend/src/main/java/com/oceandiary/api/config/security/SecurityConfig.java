@@ -43,6 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/*/login", "/api/naver/**", "/api/kakao/**").permitAll() // 가입 및 인증 주소는 누구나 접근 가능
                 .antMatchers("/api/user/login/**").permitAll() // 테스트는 누구나 접근 가능 (TODO: 삭제 필요)
                 .antMatchers("/api/diary/user/**").permitAll()// TODO: 비로그인 관련 처리 필수
+                .antMatchers("/api/image/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/rooms").authenticated()
                 .antMatchers(HttpMethod.PATCH, "/api/rooms/*/info").authenticated()
                 .antMatchers(HttpMethod.POST, "/api/rooms/*/participants/*").authenticated()
