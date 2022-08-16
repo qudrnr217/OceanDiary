@@ -44,7 +44,19 @@
             />
           </div>
         </div>
-        <div class="right">스탬프 목록 : {{ userInfo.stamps }}</div>
+        <div class="right">
+          <div v-for="stamp of stamps" :key="stamp.id" class="stamp">
+            <img
+              src="@/assets/아이콘/[아이콘]조개_도서관_KAWAII.png"
+              class="stamp-img"
+            />
+            <div class="stamp-detail">
+              <div class="stamp-date"></div>
+              <div class="stamp-time">{{ stamp.totalTime }}</div>
+              <div class="stamp-type">AT {{ stamp.category }}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -54,7 +66,7 @@
 import { getDiaryContents } from "@/api/diary.js";
 // import { useRouter } from "vue-router";
 import { reactive } from "@vue/reactivity";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useStore } from "vuex";
 export default {
   setup() {
@@ -64,8 +76,8 @@ export default {
       birth: "",
       email: "",
       visitedAt: "",
-      stamps: [],
     });
+    const stamps = ref(null);
     const getToken = () => {
       const token = store.state.userStore.token;
       if (token == "") {
@@ -79,26 +91,39 @@ export default {
       console.log(userId);
       return userId;
     };
+    getDiaryContents(
+      getToken(),
+      getUserId(),
+      (response) => {
+        console.log(response);
+        userInfo.name = response.data.userInfo.name;
+        userInfo.email = response.data.userInfo.email;
+        userInfo.birth = response.data.userInfo.birth;
+        userInfo.visitedAt = response.data.userInfo.visitedAt;
+        //stamps.value = response.data.stamps;
+        stamps.value = [
+          {
+            id: 1,
+            category: "CAFE",
+            totalTime: "01:31:19",
+          },
+          {
+            id: 2,
+            category: "OCEAN",
+            totalTime: "01:31:19",
+          },
+        ];
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
     onMounted(() => {
       console.log(getUserId());
-      getDiaryContents(
-        getToken(),
-        getUserId(),
-        (response) => {
-          console.log(response);
-          userInfo.name = response.data.userInfo.name;
-          userInfo.email = response.data.userInfo.email;
-          userInfo.birth = response.data.userInfo.birth;
-          userInfo.visitedAt = response.data.userInfo.visitedAt;
-          userInfo.stamps = response.data.stamps;
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
     });
     return {
       userInfo,
+      stamps,
     };
   },
 };
@@ -126,9 +151,11 @@ export default {
 }
 .right {
   width: 40%;
+  height: 90%;
   top: 5%;
   right: 5%;
   position: absolute;
+  display: flex;
 }
 .icon-symbol {
   width: 50px;
@@ -168,5 +195,15 @@ export default {
 }
 .btn {
   height: 15%;
+}
+.stamp {
+  width: 50%;
+  height: 50%;
+  /* transform: rotate(10deg); */
+}
+.stamp-img {
+  width: 80%;
+  height: 80%;
+  display: flex;
 }
 </style>
