@@ -8,8 +8,7 @@ spring:
       prod :
         - aws
         - oauth
-        - mysql
-        - redis
+        - db
   jpa:
     hibernate:
       naming:
