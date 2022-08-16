@@ -23,9 +23,6 @@ spring:
     web:
       pageable:
         one-indexed-parameters: true
-  redis:
-    host: 127.0.0.1
-    port: '6379'
   devtools:
     livereload:
       enabled: 'true'
@@ -93,4 +90,7 @@ spring:
       password: oceandiary
       username: oceandiary
     url: jdbc:mysql://localhost:3306/ssafy_web_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Seoul&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true
-
+  redis:
+    host: localhost
+    port: 6379
+    password: root
