@@ -52,6 +52,7 @@ export default {
     },
     sendNaverUrl() {
       location.href = `https://nid.naver.com/oauth2.0/authorize?&state=${this.naverState}&client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=${REDIRECT_URL}/oauth2/naver`;
+      // location.href = `https://nid.naver.com/oauth2.0/authorize?&state=${this.naverState}&client_id=vQpyQoy56bjYmRbrlq5L&response_type=code&redirect_uri=http://localhost:8080/oauth2/naver`;
     },
   },
 };

@@ -9,6 +9,7 @@ const roomStore = {
     sessionId: "",
     openvidu_token2: "",
     isScreen: false,
+    chat: [],
   }),
   mutations: {
     SET_ROOM_ID(state, roomId) {
@@ -31,6 +32,12 @@ const roomStore = {
     },
     SET_IS_SCREEN(state, isScreen) {
       state.isScreen = isScreen;
+    },
+    SET_CHAT(state, chat) {
+      state.chat.push(chat);
+    },
+    SET_INIT_CHAT(state) {
+      state.chat = [];
     },
   },
 };
