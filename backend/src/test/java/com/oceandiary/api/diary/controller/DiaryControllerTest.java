@@ -129,7 +129,7 @@ public class DiaryControllerTest extends MvcTest {
 
         results.andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("get-diary",
+                .andDo(document("diary-contents",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         pathParameters(
