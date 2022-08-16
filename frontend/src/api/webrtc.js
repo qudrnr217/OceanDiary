@@ -24,4 +24,9 @@ async function joinRoom(token, roomId, password, success, fail) {
     .then(success)
     .catch(fail);
 }
-export { getRoomList, createRoom, joinRoom };
+
+async function getRoomDetails(token, roomId, success, fail) {
+  const authApi = authApiInstance(token);
+  await authApi.get(`/api/rooms/${roomId}/detail`).then(success).catch(fail);
+}
+export { getRoomList, createRoom, joinRoom, getRoomDetails };

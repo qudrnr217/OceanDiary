@@ -77,6 +77,7 @@ export default {
         item.roomId,
         inputPassword,
         (response) => {
+          store.commit("roomStore/SET_ROOM_ID", item.roomId);
           store.commit(
             "roomStore/SET_PARTICIPANT_ID",
             response.data.participantId

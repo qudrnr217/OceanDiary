@@ -77,6 +77,25 @@
         </div>
       </div>
     </div>
+    <!-- 룰렛 컴포넌트 및 라이어 게임 컴포넌트 시작 -->
+    <RouletteComponent></RouletteComponent>
+    <button id="show-liargame-modal" @click="startLiarGame">
+      라이어 게임 시작
+    </button>
+    <transition name="modal">
+      <LiarGame
+        v-if="state.showModal"
+        @close="endLiarGame"
+        v-bind:categoryChosen="state.categoryChosen"
+        @decideCategory="decideKeyword"
+      >
+        <template v-slot:header>
+          <h3>라이어 게임 제시어는</h3>
+        </template>
+        <template v-slot:body> {{ state.liargameKeyword }}입니다.</template>
+      </LiarGame>
+    </transition>
+    <!-- 끝 -->
   </div>
 </template>
 
@@ -86,8 +105,17 @@ import { OpenVidu } from "openvidu-browser";
 import UserVideo from "./video/UserVideo";
 import { ref, reactive } from "@vue/reactivity";
 import { useStore } from "vuex";
-import { watch } from "@vue/runtime-core";
+import { onMounted, watch } from "@vue/runtime-core";
 // import { reactive, ref } from "@vue/reactivity";/
+import { getRoomDetails } from "@/api/webrtc.js";
+
+// 라이어 게임 및 룰렛 관련 import 시작
+import { liarGameKeywords } from "@/const/const";
+import SockJS from "sockjs-client";
+import Stomp from "stompjs";
+import RouletteComponent from "./RouletteComponent.vue";
+import LiarGame from "./LiarGame";
+// 끝
 
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
@@ -98,6 +126,8 @@ export default {
 
   components: {
     UserVideo,
+    RouletteComponent,
+    LiarGame,
   },
 
   setup() {
@@ -116,10 +146,127 @@ export default {
       openvidu_token: store.state.roomStore.openvidu_token,
       sessionScreen: undefined,
       publisher2: undefined,
-
+      // 게임 관련 state 시작
+      showModal: false,
+      liargameCategory: "",
+      liargameKeyword: "",
+      stompClient: null,
+      categoryChosen: false,
+      // 게임 관련 state 끝
       mySessionId: 123,
       myUserName: "Participant" + Math.floor(Math.random() * 100),
     });
+
+    // 게임 관련 methods 시작
+    function connect() {
+      var socket = new SockJS("/api/ws");
+      state.stompClient = Stomp.over(socket);
+      console.log(state.stompClient);
+      state.stompClient.connect({}, onConnected, onError);
+    }
+
+    function onConnected() {
+      // Subscribe to the Public Topic
+      state.stompClient.subscribe(
+        `/sub/rooms/${store.state.roomStore.roomId}`,
+        onMessageReceived
+      );
+      // Tell your username to the server
+      state.stompClient.send(
+        `/pub/rooms/${store.state.roomStore.roomId}`,
+        {},
+        JSON.stringify({
+          roomId: store.state.roomStore.roomId,
+          participantId: store.state.roomStore.participantId,
+          name: store.state.userStore.name,
+          message: `Hello it's me ${store.state.userStore.name}`,
+        })
+      );
+    }
+
+    function onError(error) {
+      console.log(
+        "Could not connect to WebSocket server. Please refresh this page to try again!",
+        error
+      );
+    }
+
+    function sendMessage(event, keyword, liar) {
+      if (keyword && state.stompClient) {
+        var chatMessage = {
+          roomId: store.state.roomStore.roomId,
+          participantId: store.state.roomStore.participantId,
+          name: store.state.userStore.name,
+          message: `keyword=${keyword}&liar=${liar}`,
+        };
+        state.stompClient.send(
+          `/pub/rooms/${store.state.roomStore.roomId}/messages`,
+          {},
+          JSON.stringify(chatMessage)
+        );
+      }
+      event.preventDefault();
+    }
+
+    function onMessageReceived(payload) {
+      var message = JSON.parse(payload.body).message;
+      if (message.includes("keyword")) {
+        let words = message.split("&");
+        let liar = words[1].substr(5);
+        state.categoryChosen = true;
+        state.showModal = true;
+        console.log(liar);
+        if (store.state.roomStore.participantId == liar) {
+          state.liargameKeyword = "당신은 라이어";
+        } else {
+          state.liargameKeyword = words[0].substr(8);
+        }
+      }
+    }
+
+    onMounted(() => {
+      connect();
+    });
+
+    // 라이어 게임 시작
+    let startLiarGame = () => {
+      state.showModal = true;
+    };
+
+    let decideKeyword = (category) => {
+      state.liargameCategory = category;
+      state.categoryChosen = true;
+      getRoomDetails(
+        store.state.userStore.token,
+        store.state.roomStore.roomId,
+        ({ data }) => {
+          // 카테고리에 대한 키워드 선정 및 라이어 선정
+          let participantList = data.participantList;
+          let liar =
+            participantList[Math.floor(Math.random() * participantList.length)]
+              .participantId;
+          state.liargameKeyword =
+            liarGameKeywords["keywords"][state.liargameCategory][
+              Math.floor(
+                Math.random() *
+                  liarGameKeywords["keywords"][state.liargameCategory].length
+              )
+            ];
+          sendMessage(event, state.liargameKeyword, liar);
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    };
+
+    let endLiarGame = () => {
+      state.liargameKeyword = "";
+      state.liargmaeCategory = "";
+      state.showModal = false;
+      state.categoryChosen = false;
+    };
+    // 게임 관련 methods 끝
 
     //카메라 On/Off
     var v_toggle = true;
@@ -388,7 +535,9 @@ export default {
     return {
       state,
       message,
-
+      startLiarGame,
+      decideKeyword,
+      endLiarGame,
       joinSession,
       updateMainVideoStreamManager,
       camera_toggle,
@@ -633,5 +782,11 @@ export default {
   width: 23%;
   height: 90%;
   left: 77%;
+}
+
+#show-liargame-modal {
+  position: absolute;
+  left: 60%;
+  top: 30%;
 }
 </style>
