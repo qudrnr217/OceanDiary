@@ -8,11 +8,11 @@ import com.oceandiary.api.file.entity.Image;
 import com.oceandiary.api.file.repository.ImageRepository;
 import com.oceandiary.api.file.service.ImageService;
 import com.oceandiary.api.file.service.S3Service;
+import com.oceandiary.api.room.dto.RoomRequest;
+import com.oceandiary.api.room.dto.RoomResponse;
 import com.oceandiary.api.room.entity.*;
 import com.oceandiary.api.room.exception.PasswordNotValidException;
 import com.oceandiary.api.room.repository.*;
-import com.oceandiary.api.room.dto.RoomRequest;
-import com.oceandiary.api.room.dto.RoomResponse;
 import com.oceandiary.api.user.entity.User;
 import io.openvidu.java.client.*;
 import lombok.extern.slf4j.Slf4j;
@@ -223,7 +223,6 @@ public class RoomService {
             ParticipantOnRedis participantOnRedis = participantOnRedisRepository.findById(roomId).orElseThrow();
 
             Session session = getSession(roomOnRedis.getSessionId());
-
             Room room = roomRepository.findById(roomId).orElseThrow();
 
             if (user != null && user.getId() == roomOnRedis.getCreatedBy()) {  // 방장이 나갈경우
@@ -280,7 +279,7 @@ public class RoomService {
             if (room.getDeletedAt() != null) {
                 isInConsistent = true;
                 roomOnRedisRepository.deleteById(room.getId());
-                participantRepository.deleteById(room.getId());
+                participantOnRedisRepository.deleteById(room.getId());
             }
         }
 
