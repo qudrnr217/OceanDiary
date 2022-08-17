@@ -3,6 +3,7 @@ import { apiInstance } from "@/api/index.js";
 
 async function getRoomList(token, category, lastRoomId, success, fail) {
   const authApi = authApiInstance(token);
+
   await authApi
     .get(`/api/rooms?category=${category}&lastRoomId=${lastRoomId}`)
     .then(success)
@@ -39,8 +40,29 @@ async function leaveRoom(roomId, participantId, success, fail) {
 }
 
 async function GetUserInfo(roomId, success, fail) {
-  const authApi = apiInstance();
-  await authApi.get(`/api/rooms/${roomId}/detail`).then(success).catch(fail);
+  const api = apiInstance();
+  await api.get(`/api/rooms/${roomId}/detail`).then(success).catch(fail);
 }
 
-export { getRoomList, createRoom, joinRoom, LeaveRoom, GetUserInfo };
+async function GetStamp(token, enterTime, exitTime, category, success, fail) {
+  const api = authApiInstance(token);
+  const data = {
+    enterTime: enterTime,
+    exitTime: exitTime,
+    category: category,
+  };
+  await api
+    .post(`/api/diary/stamp`, JSON.stringify(data))
+    .then(success)
+    .catch(fail);
+}
+
+export {
+  getRoomList,
+  createRoom,
+  joinRoom,
+  leaveRoom,
+  GetUserInfo,
+  getImageFile,
+  GetStamp,
+};
