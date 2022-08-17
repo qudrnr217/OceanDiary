@@ -125,7 +125,7 @@ public class LoginService {
                 .path("/oauth/token")
                 .queryParam("grant_type", "authorization_code")
                 .queryParam("client_id", kakaoClientId)
-                .queryParam("redirect_uri", "http://localhost:8080/oauth2/kakao")
+                .queryParam("redirect_uri", "https://i7a406.p.ssafy.io/oauth2/kakao")
                 .queryParam("code", request.getCode())
                 .encode()
                 .build()
