@@ -35,12 +35,14 @@ public class DiaryResponse {
         private Long id;
         private Category category;
         private String totalTime;
+        private LocalDateTime exitTime;
 
         public static GetStamp build(Stamp stamp) {
             return GetStamp.builder()
                     .id(stamp.getId())
                     .category(stamp.getCategory())
                     .totalTime(stamp.getTotalTime())
+                    .exitTime(stamp.getExitTime())
                     .build();
         }
     }
