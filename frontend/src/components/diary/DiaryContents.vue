@@ -45,15 +45,87 @@
           </div>
         </div>
         <div class="right">
-          <div v-for="stamp of stamps" :key="stamp.id" class="stamp">
-            <img
-              src="@/assets/아이콘/[아이콘]조개_도서관_KAWAII.png"
-              class="stamp-img"
-            />
+          <!-- <div v-for="stamp of stamps" :key="stamp.id" class="stamp">
+            <img class="stamp-img" :src="stamp.stampPath" />
             <div class="stamp-detail">
-              <div class="stamp-date"></div>
+              <div class="stamp-date">{{ stamp.date }}</div>
               <div class="stamp-time">{{ stamp.totalTime }}</div>
-              <div class="stamp-type">AT {{ stamp.category }}</div>
+              <div class="stamp-type">{{ stamp.title }}에서</div>
+            </div>
+          </div> -->
+          <div class="top">
+            <div class="first">
+              <div class="stamp">
+                <div class="stamp-detail">
+                  <div class="stamp-date">{{ stamps[0].date }}</div>
+                  <div class="stamp-time">
+                    {{ stamps[pageIndex + 0].totalTime }}
+                  </div>
+                  <div class="stamp-type">
+                    {{ stamps[pageIndex + 0].title }}에서
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="second">
+              <div class="stamp">
+                <img class="stamp-img" :src="stamps[pageIndex + 1].stampPath" />
+                <div class="stamp-detail">
+                  <div class="stamp-date">{{ stamps[pageIndex + 1].date }}</div>
+                  <div class="stamp-time">
+                    {{ stamps[pageIndex + 1].totalTime }}
+                  </div>
+                  <div class="stamp-type">
+                    {{ stamps[pageIndex + 1].title }}에서
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="middle">
+            <div class="middle-center">
+              <div class="stamp">
+                <img class="stamp-img" :src="stamps[pageIndex + 2].stampPath" />
+                <div class="stamp-detail">
+                  <div class="stamp-date">{{ stamps[pageIndex + 2].date }}</div>
+                  <div class="stamp-time">
+                    {{ stamps[pageIndex + 2].totalTime }}
+                  </div>
+                  <div class="stamp-type">
+                    {{ stamps[pageIndex + 2].title }}에서
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bottom">
+            <div class="first">
+              <div class="stamp">
+                <img class="stamp-img" :src="stamps[pageIndex + 3].stampPath" />
+                <div class="stamp-detail">
+                  <div class="stamp-date">{{ stamps[pageIndex + 3].date }}</div>
+                  <div class="stamp-time">
+                    {{ stamps[pageIndex + 3].totalTime }}
+                  </div>
+                  <div class="stamp-type">
+                    {{ stamps[pageIndex + 3].title }}에서
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="second">
+              <div class="stamp">
+                <img class="stamp-img" :src="stamps[pageIndex + 4].stampPath" />
+                <div class="stamp-detail">
+                  <div class="stamp-date">{{ stamps[pageIndex + 4].date }}</div>
+                  <div class="stamp-time">
+                    {{ stamps[pageIndex + 4].totalTime }}
+                  </div>
+                  <div class="stamp-type">
+                    {{ stamps[pageIndex + 4].title }}에서
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -65,8 +137,9 @@
 <script>
 import { getDiaryContents } from "@/api/diary.js";
 // import { useRouter } from "vue-router";
+import { names, indexes, stampImages } from "@/const/const.js";
 import { reactive } from "@vue/reactivity";
-import { onMounted, ref } from "vue";
+import { onMounted } from "vue";
 import { useStore } from "vuex";
 export default {
   setup() {
@@ -77,7 +150,10 @@ export default {
       email: "",
       visitedAt: "",
     });
-    const stamps = ref(null);
+    // id, title, totalTime, stampPath
+    const stamps = reactive([]);
+    const pageIndex = 0;
+
     const getToken = () => {
       const token = store.state.userStore.token;
       if (token == "") {
@@ -101,18 +177,73 @@ export default {
         userInfo.birth = response.data.userInfo.birth;
         userInfo.visitedAt = response.data.userInfo.visitedAt;
         //stamps.value = response.data.stamps;
-        stamps.value = [
+        const fakeData = [
           {
             id: 1,
             category: "CAFE",
-            totalTime: "01:31:19",
+            exitTime: "2022-08-17 11:11:11",
+            totalTime: "11:31:19",
           },
           {
             id: 2,
             category: "OCEAN",
-            totalTime: "01:31:19",
+            exitTime: "2022-08-17 11:11:11",
+            totalTime: "02:31:19",
+          },
+          {
+            id: 3,
+            category: "CAFE",
+            exitTime: "2022-08-17 11:11:11",
+            totalTime: "11:31:19",
+          },
+          {
+            id: 4,
+            category: "OCEAN",
+            exitTime: "2022-08-17 11:11:11",
+            totalTime: "02:31:19",
+          },
+          {
+            id: 5,
+            category: "CAFE",
+            exitTime: "2022-08-17 11:11:11",
+            totalTime: "11:31:19",
+          },
+          {
+            id: 6,
+            category: "OCEAN",
+            exitTime: "2022-08-17 11:11:11",
+            totalTime: "02:31:19",
+          },
+          {
+            id: 7,
+            category: "CAFE",
+            exitTime: "2022-08-17 11:11:11",
+            totalTime: "11:31:19",
           },
         ];
+        for (var item of fakeData) {
+          const id = item.id;
+          const category = item.category;
+          const totalTime = item.totalTime;
+          const date = item.exitTime.split(" ")[0];
+          let size = 0;
+          const hour = Number(totalTime.split(":")[0]);
+          if (hour >= 10) size = 3;
+          else if (hour >= 6 && hour < 10) size = 2;
+          else if (hour >= 2 && hour < 6) size = 1;
+          else size = 0;
+          const index = indexes[category.toLowerCase()];
+          const data = {};
+          data.id = id;
+          data.title = names[index];
+          data.totalTime = totalTime;
+          data.date = date;
+          console.log(index + "," + size);
+          console.log(stampImages[index][size]);
+          data.stampPath = require(`@/assets/아이콘/${stampImages[index][size]}`);
+          console.log(data.stampPath);
+          stamps.push(data);
+        }
       },
       (error) => {
         console.log(error);
@@ -120,10 +251,13 @@ export default {
     );
     onMounted(() => {
       console.log(getUserId());
+      console.log("테스트 : " + stamps[0].stampPath);
+      console.log(stamps[0].date);
     });
     return {
       userInfo,
       stamps,
+      pageIndex,
     };
   },
 };
@@ -150,12 +284,11 @@ export default {
   position: absolute;
 }
 .right {
-  width: 40%;
+  width: 48%;
   height: 90%;
   top: 5%;
-  right: 5%;
+  right: 1%;
   position: absolute;
-  display: flex;
 }
 .icon-symbol {
   width: 50px;
@@ -202,8 +335,36 @@ export default {
   /* transform: rotate(10deg); */
 }
 .stamp-img {
-  width: 80%;
-  height: 80%;
   display: flex;
+}
+.top {
+  height: 33%;
+  position: relative;
+  display: flex;
+}
+.middle {
+  height: 33%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.bottom {
+  height: 33%;
+  position: relative;
+  display: flex;
+}
+.first {
+  width: 50%;
+  height: 100%;
+}
+.second {
+  width: 50%;
+  height: 100%;
+}
+.middle-center {
+  width: 50%;
+  height: 100%;
+  position: absolute;
 }
 </style>

@@ -60,7 +60,7 @@
   .background {
     width: 100vw;
     height: 100vh;
-    min-height: 768px;
+    min-height: 600px;
     min-width: 1024px;
     overflow: hidden;
     margin: 0;
