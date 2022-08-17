@@ -503,6 +503,9 @@ export default {
 
       state.session.on("signal", (event) => {
         state.screen_msg = event.data;
+        message.value = "";
+        let chat = document.querySelector(".chat-content");
+        chat.scrollTop = chat.scrollHeight;
         // state.chat.push({
         //   data: event.data,
         //   from: event.from,
@@ -902,6 +905,10 @@ export default {
 .chat-content {
   width: 100%;
   height: 86%;
+  /* overflow-y: auto; */
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .chat-input {

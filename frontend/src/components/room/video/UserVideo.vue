@@ -10,7 +10,7 @@
     </div>
   </div>
   <div v-else>
-    <img src="@/assets/x표시.png" alt="" class="empty" />
+    <img src="@/assets/물음표2.png" alt="" class="empty" />
   </div>
 </template>
 
@@ -77,7 +77,7 @@ export default {
 }
 
 .empty {
-  width: 100%;
+  width: 90%;
   height: auto;
   border-radius: 10px;
 }
