@@ -94,7 +94,6 @@ export default {
     const social = urlParams.get("social");
 
     var submit = () => {
-      alert(form.userinfo.oauthId);
       // 회원가입 요청에 필요한 birth, oauthId를 형식에 맞게 준비한다.
       form.userinfo.birth.setFullYear(form.date.year);
       form.userinfo.birth.setMonth(form.date.month);

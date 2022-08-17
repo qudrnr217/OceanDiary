@@ -8,7 +8,7 @@
             <div class="button-name">역무원</div>
           </div>
           <div class="text-wrap">
-            <vue-writer :array="[speech]" :typeSpeed="70" :iterations="1" />
+            <vue-writer :array="[speech]" :typeSpeed="50" :iterations="1" />
           </div>
           <div class="button-wrap">
             <router-link :to="nextLink" class="button-next">다음</router-link>

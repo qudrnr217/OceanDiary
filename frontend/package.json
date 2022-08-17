@@ -14,6 +14,7 @@
     "dotenv": "^16.0.1",
     "openvidu-browser": "^2.22.0",
     "vue": "^3.2.13",
+    "vue-cookies": "^1.8.1",
     "vue-router": "^4.0.3",
     "vue-writer": "^1.2.0",
     "vue3-cookies": "^1.0.6",

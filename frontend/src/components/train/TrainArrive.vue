@@ -11,14 +11,14 @@
             :array="[
               `이번 역은 ${stations[index]} 역입니다. 즐거운 시간 보내시길 바랍니다.`,
             ]"
-            :typeSpeed="70"
+            :typeSpeed="50"
             :iterations="1"
           />
         </div>
         <div class="button-wrap">
           <router-link
             :to="{
-              name: 'room-list',
+              name: 'room-arrive',
               query: { dest: this.$route.query.dest },
             }"
             class="button-next"
@@ -32,7 +32,7 @@
 
 <script>
 import { onMounted, ref } from "vue";
-import { images, stations, indexes } from "@/const/const.js";
+import { arriveOtterImages, stations, indexes } from "@/const/const.js";
 export default {
   name: "train-arrive",
   setup() {
@@ -42,12 +42,11 @@ export default {
 
     const bg = ref(null);
     onMounted(() => {
-      const url = require(`@/assets/${images[index]}`);
+      const url = require(`@/assets/${arriveOtterImages[index]}`);
       bg.value.style = `background-image: url(${url});`;
     });
     return {
       index,
-      images,
       stations,
       bg,
     };

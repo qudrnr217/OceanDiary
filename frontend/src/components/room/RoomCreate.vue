@@ -16,7 +16,7 @@
           <input
             type="password"
             class="room-create-input"
-            v-show="roomInfo.isOpen"
+            v-show="!roomInfo.isOpen"
           />
           <img
             src="@/assets/아이콘/[아이콘]방_공개.png"
@@ -149,7 +149,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .main-box {
   width: 800px;

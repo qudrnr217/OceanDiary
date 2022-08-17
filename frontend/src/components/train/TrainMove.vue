@@ -1,5 +1,12 @@
 <template>
-  <div class="background"></div>
+  <div class="background">
+    <div
+      style="padding: 20px; float: right; font-size: 30px; color: white"
+      @click="skip"
+    >
+      건너뛰기
+    </div>
+  </div>
 </template>
 
 <script>
@@ -11,6 +18,12 @@ export default {
     const router = useRouter();
     const urlParams = new URL(location.href).searchParams;
     const dest = urlParams.get("dest");
+    const skip = () => {
+      router.push({
+        name: "train-arrive",
+        query: { dest: dest },
+      });
+    };
     onMounted(() => {
       var audio_0 = new Audio(require("@/assets/Train2.wav"));
       audio_0.play();
@@ -25,7 +38,7 @@ export default {
         });
       }, 5000);
     });
-    return {};
+    return { skip };
   },
 };
 </script>

@@ -18,7 +18,11 @@ async function naverState(success, fail) {
 }
 async function naverLogin(code, success, fail) {
   await api
-    .post(`/api/naver/login`, JSON.stringify(code))
+    .post(`/api/naver/login`, JSON.stringify(code), {
+      headers: {
+        withCredentials: true,
+      },
+    })
     .then(success)
     .catch(fail);
 }

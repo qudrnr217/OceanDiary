@@ -10,6 +10,7 @@
           src="@/assets/아이콘/[아이콘]방생성.png"
           class="icon-create"
           alt="방생성"
+          v-if="isMember"
           @click="createRoom()"
         />
       </div>
@@ -17,7 +18,10 @@
         <div v-for="item of items" :key="item.roomId">
           <div class="room-card">
             <div class="room-card-thumbnail-wrap">
-              <div class="room-card-thumbnail"></div>
+              <img
+                class="room-card-thumbnail"
+                :src="imageFiles[item.imageId]"
+              />
             </div>
             <div class="room-card-text-wrap">
               <div class="room-card-title">
@@ -41,11 +45,10 @@
 
 <script>
 import { useRouter } from "vue-router";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, reactive } from "vue";
 import { names, icons, indexes } from "@/const/const.js";
 import { useStore } from "vuex";
-import { getRoomList } from "@/api/webrtc.js";
-import { joinRoom } from "../../api/webrtc";
+import { getRoomList, joinRoom, getImageFile } from "@/api/webrtc.js";
 
 export default {
   setup() {
@@ -66,6 +69,7 @@ export default {
       }
       return token;
     };
+    const isMember = getToken() != null;
     const items = ref(null);
     const enterRoom = (item) => {
       let inputPassword = "";
@@ -115,19 +119,32 @@ export default {
     const icon = ref(null);
     const capacity = ref(null);
     const button = ref(null);
+    const imageFiles = reactive({});
+    getRoomList(
+      getToken(),
+      dest.toUpperCase(),
+      0,
+      (response) => {
+        items.value = response.data.content;
+        for (var con of response.data.content) {
+          getImageFile(
+            getToken(),
+            con.imageId,
+            (response) => {
+              imageFiles[response.data.id] = response.data.base64Str;
+            },
+            (error) => {
+              console.log(error);
+            }
+          );
+        }
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
     onMounted(() => {
       icon.value.src = iconPath;
-      getRoomList(
-        getToken(),
-        dest.toUpperCase(),
-        0,
-        (response) => {
-          items.value = response.data.content;
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
     });
     return {
       title,
@@ -138,6 +155,8 @@ export default {
       button,
       createRoom,
       enterRoom,
+      imageFiles,
+      isMember,
     };
   },
 };
@@ -189,7 +208,6 @@ export default {
 .room-card-thumbnail {
   width: 80%;
   height: 80%;
-  background-color: blue;
   border-radius: 20px;
 }
 .room-card-title {

@@ -6,7 +6,7 @@
 
 <script>
 import { onMounted, ref } from "vue";
-import { images, stations, indexes } from "@/const/const.js";
+import { roomImages, stations, indexes } from "@/const/const.js";
 export default {
   setup() {
     const urlParams = new URL(location.href).searchParams;
@@ -16,12 +16,11 @@ export default {
     // index로 배경화면을 바꿔준다.
     const bg = ref(null);
     onMounted(() => {
-      const url = require(`@/assets/${images[index]}`);
+      const url = require(`@/assets/${roomImages[index]}`);
       bg.value.style = `background-image: url(${url});`;
     });
     return {
       index,
-      images,
       stations,
       bg,
     };

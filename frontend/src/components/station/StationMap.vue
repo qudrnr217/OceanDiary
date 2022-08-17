@@ -6,7 +6,7 @@
           v-if="show"
           :name="names[key]"
           :explain="explains[key]"
-          :image="images[key]"
+          :image="roomImages[key]"
           :link="links[key]"
         ></station-info>
       </div>
@@ -29,7 +29,7 @@
 
 <script>
 import StationInfo from "@/components/station/StationInfo.vue";
-import { names, explains, images, links } from "@/const/const.js";
+import { names, explains, roomImages, links } from "@/const/const.js";
 import { ref } from "vue";
 export default {
   components: {
@@ -47,7 +47,7 @@ export default {
     return {
       names,
       explains,
-      images,
+      roomImages,
       links,
       show,
       key,

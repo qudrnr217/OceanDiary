@@ -91,9 +91,9 @@ const routes = [
         component: () => import("@/components/train/TrainArrive.vue"),
       },
       {
-        path: "room",
-        name: "library_study",
-        component: () => import("@/components/room/StudyRoom.vue"),
+        path: "greeting",
+        name: "room-arrive",
+        component: () => import("@/components/train/RoomArrive.vue"),
       },
     ],
   },
@@ -126,6 +126,11 @@ const routes = [
         component: () => import("@/components/room/StudyRoom.vue"),
       },
     ],
+  },
+  {
+    path: "/end",
+    name: "end",
+    component: () => import("@/views/EndView.vue"),
   },
   // {
   //   path: "/cafe",
