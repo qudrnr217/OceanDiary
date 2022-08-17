@@ -18,18 +18,22 @@ export default {
     const router = useRouter();
     const urlParams = new URL(location.href).searchParams;
     const dest = urlParams.get("dest");
-    var isSkipped = true;
+    var isSkipped = false;
+    var audio_0 = null;
+    var audio_1 = null;
     const skip = () => {
       isSkipped = true;
+      audio_0.pause();
+      audio_1.pause();
       router.push({
         name: "train-arrive",
         query: { dest: dest },
       });
     };
     onMounted(() => {
-      var audio_0 = new Audio(require("@/assets/Train2.wav"));
+      audio_0 = new Audio(require("@/assets/Train2.wav"));
       audio_0.play();
-      var audio_1 = new Audio(require("@/assets/Train1.wav"));
+      audio_1 = new Audio(require("@/assets/Train1.wav"));
       audio_1.play();
 
       setTimeout(() => {

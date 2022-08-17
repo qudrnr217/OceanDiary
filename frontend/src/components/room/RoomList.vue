@@ -126,14 +126,12 @@ export default {
     const button = ref(null);
     const imageFiles = reactive({});
     getRoomList(
-      getToken(),
       dest.toUpperCase(),
       0,
       (response) => {
         items.value = response.data.content;
         for (var con of response.data.content) {
           getImageFile(
-            getToken(),
             con.imageId,
             (response) => {
               imageFiles[response.data.id] = response.data.base64Str;
