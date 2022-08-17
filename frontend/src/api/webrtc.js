@@ -43,4 +43,11 @@ async function GetUserInfo(roomId, success, fail) {
   await authApi.get(`/api/rooms/${roomId}/detail`).then(success).catch(fail);
 }
 
-export { getRoomList, createRoom, joinRoom, LeaveRoom, GetUserInfo };
+export {
+  getRoomList,
+  createRoom,
+  joinRoom,
+  getImageFile,
+  leaveRoom,
+  GetUserInfo,
+};
