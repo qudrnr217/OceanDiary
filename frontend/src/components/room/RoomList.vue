@@ -55,6 +55,7 @@ export default {
     const router = useRouter();
     const store = useStore();
 
+    console.log(store.state.userStore);
     const urlParams = new URL(location.href).searchParams;
     const dest = urlParams.get("dest");
     const index = indexes[dest];
@@ -82,7 +83,6 @@ export default {
       }
 
       joinRoom(
-        getToken(),
         item.roomId,
         inputPassword,
         (response) => {
@@ -126,14 +126,12 @@ export default {
     const button = ref(null);
     const imageFiles = reactive({});
     getRoomList(
-      getToken(),
       dest.toUpperCase(),
       0,
       (response) => {
         items.value = response.data.content;
         for (var con of response.data.content) {
           getImageFile(
-            getToken(),
             con.imageId,
             (response) => {
               imageFiles[response.data.id] = response.data.base64Str;

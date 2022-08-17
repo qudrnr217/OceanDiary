@@ -108,7 +108,6 @@ export default {
           // vuex에 회원 정보 업데이트
           store.commit("userStore/SET_NAME", response.data.name);
           store.commit("userStore/SET_TOKEN", response.data.accessToken);
-          console.log(response.data.accessToken);
           store.commit("userStore/SET_USERID", response.data.userId);
           router.push({
             name: "station-chat",

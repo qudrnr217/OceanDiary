@@ -36,6 +36,7 @@ export default {
         alert("이름을 입력하세요!");
         return;
       } else {
+        store.commit("userStore/SET_SOCIAL", "NONE");
         store.commit("userStore/SET_NAME", userName.value);
       }
       router.push({
