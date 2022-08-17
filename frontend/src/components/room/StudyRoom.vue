@@ -16,21 +16,20 @@
               :participantId="state.participantId"
               :name="state.pub_name"
             />
-            <user-video
+            <!-- <user-video
               v-for="sub in state.subscribers"
               :key="sub.stream.connection.connectionId"
               :streamManager="sub"
-            />
+            /> -->
           </div>
 
-          <!-- <div class="user2"></div> -->
-          <!-- <div class="user2">
+          <div class="user2">
             <user-video
               :streamManager="state.subscribers[0]"
               :name="state.sub_name[0]"
             />
-          </div> -->
-          <!-- <div class="user3">
+          </div>
+          <div class="user3">
             <user-video
               :streamManager="state.subscribers[1]"
               :name="state.sub_name[1]"
@@ -53,7 +52,7 @@
               :streamManager="state.subscribers[4]"
               :name="state.sub_name[4]"
             />
-          </div> -->
+          </div>
         </div>
         <div class="chat-wrap">
           <div class="share">
@@ -636,7 +635,7 @@ export default {
 .title-wrap {
   width: 100%;
   height: 7%;
-  background-color: red;
+  /* background-color: red; */
 
   display: flex;
   justify-content: flex-start;
@@ -662,7 +661,7 @@ export default {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  background-color: blueviolet;
+  /* background-color: blueviolet; */
 
   position: relative;
   right: 3%;
@@ -681,6 +680,7 @@ export default {
   height: 97%;
   background-color: burlywood;
   padding: 1rem;
+  min-width: 90%;
 
   background: rgba(255, 255, 255, 0.5);
   border-radius: 6px;
@@ -710,19 +710,19 @@ export default {
 }
 
 .user1 {
-  width: 200px;
+  width: 15.4%;
   height: 95%;
   /* background-color: brown; */
   border-radius: 10px;
   position: relative;
   display: flex;
-  border: solid 2px;
+  /* border: solid 2px; */
   /* border: 2px; */
 }
 .user2 {
   width: 15.4%;
   height: 95%;
-  background-color: brown;
+  /* background-color: brown; */
   position: relative;
   left: 1.5%;
   border-radius: 10px;
