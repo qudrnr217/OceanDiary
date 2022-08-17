@@ -18,7 +18,7 @@ export default {
 
 <style scoped>
 .video-size {
-  width: 88%;
+  width: 100%;
   height: auto;
   border-radius: 15px;
   /* background-color: black; */

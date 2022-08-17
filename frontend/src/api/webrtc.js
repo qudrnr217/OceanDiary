@@ -30,23 +30,30 @@ async function getUserInfo(roomId, success, fail) {
   await api.get(`/api/rooms/${roomId}/detail`).then(success).catch(fail);
 }
 
-/* With auth header */
-async function createRoom(token, roomInfo, imageFile, success, fail) {
-  const authApi = authApiInstance(token);
-  const data = new FormData();
-  data.append(
-    "form",
-    new Blob([JSON.stringify(roomInfo)], { type: "application/json" })
-  );
-  data.append("file", imageFile);
-  await authApi.post(`/api/rooms`, data).then(success).catch(fail);
+async function GetUserInfo(roomId, success, fail) {
+  const api = apiInstance();
+  await api.get(`/api/rooms/${roomId}/detail`).then(success).catch(fail);
+}
+
+async function GetStamp(token, enterTime, exitTime, category, success, fail) {
+  const api = authApiInstance(token);
+  const data = {
+    enterTime: enterTime,
+    exitTime: exitTime,
+    category: category,
+  };
+  await api
+    .post(`/api/diary/stamp`, JSON.stringify(data))
+    .then(success)
+    .catch(fail);
 }
 
 export {
   getRoomList,
   createRoom,
-  getImageFile,
   joinRoom,
   leaveRoom,
-  getUserInfo,
+  GetUserInfo,
+  getImageFile,
+  GetStamp,
 };
