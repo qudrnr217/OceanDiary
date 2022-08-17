@@ -11,28 +11,52 @@
       <div class="user-wrap">
         <div class="camera-wrap">
           <div class="user1">
-            <user-video :streamManager="state.publisher" />
+            <user-video
+              :streamManager="state.publisher"
+              :participantId="state.participantId"
+              :name="state.pub_name"
+            />
           </div>
+
           <div class="user2">
-            <user-video :streamManager="state.subscribers[0]" />
+            <user-video
+              :streamManager="state.subscribers[0]"
+              :name="state.sub_name[0]"
+            />
           </div>
           <div class="user3">
-            <user-video :streamManager="state.subscribers[1]" />
+            <user-video
+              :streamManager="state.subscribers[1]"
+              :name="state.sub_name[1]"
+            />
           </div>
           <div class="user4">
-            <user-video :streamManager="state.subscribers[2]" />
+            <user-video
+              :streamManager="state.subscribers[2]"
+              :name="state.sub_name[2]"
+            />
           </div>
           <div class="user5">
-            <user-video :streamManager="state.subscribers[3]" />
+            <user-video
+              :streamManager="state.subscribers[3]"
+              :name="state.sub_name[3]"
+            />
           </div>
           <div class="user6">
-            <user-video :streamManager="state.subscribers[4]" />
+            <user-video
+              :streamManager="state.subscribers[4]"
+              :name="state.sub_name[4]"
+            />
           </div>
         </div>
         <div class="chat-wrap">
           <div class="share">
             <div class="share-screen">
-              <user-video :streamManager="state.publisher2" />
+              <user-video
+                :streamManager="state.publisher2"
+                v-if="state.publisher2"
+              />
+              <time-view class="time" v-else :key="state.reload" />
             </div>
 
             <div class="share-icons">
@@ -67,11 +91,27 @@
             </div>
           </div>
           <div class="chat">
-            <div class="chat-header"></div>
-            <div class="chat-box">{{ state.screen_msg }}</div>
-            <div class="chat-footer">
-              <input type="text" class="chat-input" v-model="message" />
-              <button class="submit-btn" @click="submit_msg()">전송</button>
+            <div class="chat-header">
+              <div
+                class="participant"
+                @click="state.current_title = 'participant'"
+              >
+                참가자
+              </div>
+              <div class="chat-title" @click="state.current_title = 'chat'">
+                채팅
+              </div>
+            </div>
+            <div class="chat-box" v-if="state.current_title === 'chat'">
+              <chat-view v-for="ch in state.chat" :key="ch.name" :data="ch" />
+
+              <div class="chat-footer">
+                <input type="text" class="chat-input" v-model="message" />
+                <button class="submit-btn" @click="submit_msg()">전송</button>
+              </div>
+            </div>
+            <div class="user-list" v-if="state.current_title === 'participant'">
+              <user-list :roomId="state.roomId" :key="state.reload" />
             </div>
           </div>
         </div>
@@ -90,8 +130,10 @@ import { onMounted, watch, watchEffect } from "@vue/runtime-core";
 // import { reactive, ref } from "@vue/reactivity";/
 import { LeaveRoom } from "@/api/webrtc.js";
 import { useRouter } from "vue-router";
+import UserList from "./component/UserList.vue";
+import ChatView from "./component/ChatView.vue";
+import TimeView from "./component/TimeView.vue";
 axios.defaults.headers.post["Content-Type"] = "application/json";
-
 const OPENVIDU_SERVER_URL = "https://" + "i7a406.p.ssafy.io" + ":5443";
 const OPENVIDU_SERVER_SECRET = "A406";
 export default {
@@ -99,6 +141,9 @@ export default {
 
   components: {
     UserVideo,
+    UserList,
+    TimeView,
+    ChatView,
   },
 
   setup() {
@@ -125,6 +170,13 @@ export default {
       openvidu_token2: undefined,
       isScreen: false,
       screen_connection_id: undefined,
+      connectionId: undefined,
+      reload: 0,
+      current_title: "participant",
+      sub_name: [],
+      pub_name: undefined,
+      chat: [],
+      leave_connectionId: store.state.roomStore.leave_connectionId,
     });
 
     onMounted(() => {
@@ -134,6 +186,7 @@ export default {
       var test3 = test2[0].split("sessionId=");
       var test4 = test3[1].split("&token=");
       state.mySessionId = test4[0];
+
       joinSession();
     });
 
@@ -178,7 +231,7 @@ export default {
         });
 
       state.session.on("connectionCreated", (event) => {
-        console.log("Connection@@@: " + event.connection);
+        console.log("Connection@@@: ", event.connection);
       });
     };
 
@@ -271,18 +324,23 @@ export default {
     //세션에 들어갈 때
 
     var joinSession = () => {
+      state.reload += 1;
       console.log("JoinSession!!");
       console.log(state.openvidu_token);
       // --- Get an OpenVidu object ---
       state.OV = new OpenVidu();
 
+      //대화창 초기화
+      store.commit("roomStore/SET_INIT_CHAT");
+
       // --- Init a session ---
       state.session = state.OV.initSession();
 
       state.session.on("streamCreated", ({ stream }) => {
+        state.reload += 1;
         console.log("subscriber 환영~~~~");
-        console.log("stream: ", stream);
-        console.log("stream: ", stream.typeOfVideo);
+        // console.log("stream: ", stream);
+        // console.log("stream: ", stream.typeOfVideo);
         if (stream.typeOfVideo === "SCREEN") {
           if (state.sessionScreen === undefined) {
             console.log(state.sessionScreen);
@@ -294,30 +352,57 @@ export default {
           console.log("커넥션아이디!:" + stream.connection.connectionId);
           state.screen_connection_id = stream.connection.connectionId;
           state.publisher2 = state.session.subscribe(stream);
-          console.log("sessionScreen: ", state.sessionScreen);
         } else {
           const subscriber = state.session.subscribe(stream);
           state.subscribers.push(subscriber);
+
+          console.log(
+            "subscribers: ",
+            state.subscribers[0].stream.connection.data.split('"')[11]
+          );
+          console.log("subscriber: ", subscriber);
+          state.sub_name.push(subscriber.stream.connection.data.split('"')[11]);
+          console.log("name: " + state.sub_name);
+          // console.log("chat : " + store.state.roomStore.chat);
         }
 
-        // const subscriber = state.session.subscribe(stream);
-        // state.subscribers.push(subscriber);
-
-        console.log("subscriber: ", state.subscriber);
+        // console.log("subscriber: ", state.subscriber);
+        // console.log("participantId", state.participantId);
       });
 
       //사람 나갔을 때
       state.session.on("connectionDestroyed", ({ stream }) => {
+        state.reload += 1;
+
         console.log("subscriber가 나갔습니다 ㅠㅠ!");
-
-        console.log(stream);
-
         state.publisher2 = undefined;
 
-        // const index = state.subscribers.indexOf(stream.streamManager, 0);
-        // if (index >= 0) {
-        //   state.subscribers.splice(index, 1);
-        // }
+        console.log("stream: " + stream);
+        // console.log(stream);
+
+        var length = state.subscribers.length;
+        console.log(state.publisher);
+        for (var i = 0; i < length; i++) {
+          console.log(length);
+          console.log(i);
+          console.log(state.subscribers[i].stream.connection.connectionId);
+          // console.log(state.subscribers[i]);
+          console.log("나간 커넥션 아이디: " + state.leave_connectionId);
+          // state.subscribers[0] = undefined;
+          if (
+            state.subscribers[i].stream.connection.connectionId ===
+            store.state.roomStore.leave_connectionId
+          ) {
+            // const index = state.subscribers.indexOf(i);
+            // console.log("iiiiiiiiiiiiiiiiiiiii: " + i);
+            // state.subscribers[i] = undefined;
+            // if (index >= 0) {
+            //   state.subscribers.splice(index, 1);
+            // }
+            console.log("안녕하세요!");
+            state.subscribers[i] = undefined;
+          }
+        }
       });
 
       state.session.on("exception", ({ exception }) => {
@@ -336,7 +421,7 @@ export default {
           let publisher = state.OV.initPublisher(undefined, {
             audioSource: undefined, // The source of audio. If undefined default microphone
             videoSource: undefined, // The source of video. If undefined default webcam
-            publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
+            publishAudio: false, // Whether you want to start publishing with your audio unmuted or not
             publishVideo: true, // Whether you want to start publishing with your video enabled or not
             resolution: "640x480", // The resolution of your video
             frameRate: 30, // The frame rate of your video
@@ -349,6 +434,8 @@ export default {
 
           state.session.publish(state.publisher);
           console.log("publisher: ", state.publisher);
+          state.pub_name =
+            state.publisher.stream.connection.data.split('"')[11];
           // console.log(JSON.stringify(state.publisher));
         })
         .catch((error) => {
@@ -361,6 +448,19 @@ export default {
 
       state.session.on("signal", (event) => {
         state.screen_msg = event.data;
+        // state.chat.push({
+        //   data: event.data,
+        //   from: event.from,
+        // });
+
+        store.commit("roomStore/SET_CHAT", {
+          data: event.data,
+          from: event.from.connectionId,
+          name: event.from.data.split('"')[11],
+        });
+        console.log(store.state.roomStore.chat);
+        state.chat = store.state.roomStore.chat;
+
         console.log(event.data); // Message
         console.log(event.from); // Connection object of the sender
         console.log(event.type); // The type of message ("my-chat")
@@ -403,11 +503,40 @@ export default {
     }; //end of join Session
 
     var LeaveSession = () => {
-      state.session.disconnect();
+      console.log(event);
+      store.commit(
+        "roomStore/SET_LEAVE_CONNECTION_ID",
+        store.state.roomStore.connectionId
+      );
+      console.log(
+        "퍼블리셔 커넥션 아이디: " + store.state.roomStore.connectionId
+      );
 
+      console.log(store.state.roomStore.leave_connectionId);
+
+      // state.reload += 1;
+      // var length = state.subscribers.length;
+      // for (var i = 0; i < length; i++) {
+      //   if (
+      //     state.subscribers[i].stream.connection.connectionId ==
+      //     store.state.roomStore.connectionId
+      //   ) {
+      //     console.log("안녕하세요~");
+      //   }
+      // }
+
+      if (state.session) {
+        state.publisher = undefined;
+        // state.subscribers = [];
+        state.session.disconnect();
+        state.OV = undefined;
+        state.session = undefined;
+        store.commit("roomStore/SET_INIT_CHAT");
+      }
       LeaveRoom(state.roomId, state.participantId, (response) => {
         console.log(response);
         console.log("세션 나가기 성공!");
+        console.log("subscribers count : ", state.subscribers);
 
         router.push({
           name: "room-list",
@@ -625,7 +754,7 @@ export default {
 .share-screen {
   width: 100%;
   height: 88%;
-  background-color: blue;
+  /* background-color: blue; */
 }
 
 .chat {
@@ -641,12 +770,14 @@ export default {
   width: 100%;
   height: 10%;
   background-color: coral;
+  display: flex;
 }
 
 .chat-box {
   width: 100%;
-  height: 78%;
+  height: 90%;
   background-color: beige;
+  position: relative;
 }
 
 .chat-footer {
@@ -656,7 +787,8 @@ export default {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  position: relative;
+  position: absolute;
+  top: 88%;
 }
 
 .chat-input {
@@ -670,5 +802,23 @@ export default {
   width: 23%;
   height: 90%;
   left: 77%;
+}
+
+.participant {
+  width: 50%;
+  height: auto;
+  background-color: #f7d794;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chat-title {
+  width: 50%;
+  height: auto;
+  background-color: cadetblue;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

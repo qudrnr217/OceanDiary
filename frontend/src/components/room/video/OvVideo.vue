@@ -21,5 +21,6 @@ export default {
   width: 88%;
   height: auto;
   border-radius: 15px;
+  /* background-color: black; */
 }
 </style>

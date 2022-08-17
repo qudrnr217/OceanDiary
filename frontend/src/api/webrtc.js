@@ -38,4 +38,9 @@ async function leaveRoom(roomId, participantId, success, fail) {
     .catch(fail);
 }
 
-export { getRoomList, createRoom, joinRoom, leaveRoom, getImageFile };
+async function GetUserInfo(roomId, success, fail) {
+  const authApi = apiInstance();
+  await authApi.get(`/api/rooms/${roomId}/detail`).then(success).catch(fail);
+}
+
+export { getRoomList, createRoom, joinRoom, LeaveRoom, GetUserInfo };
