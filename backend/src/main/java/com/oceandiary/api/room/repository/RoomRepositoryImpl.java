@@ -1,8 +1,8 @@
 package com.oceandiary.api.room.repository;
 
-import com.oceandiary.api.room.entity.Room;
 import com.oceandiary.api.room.dto.RoomRequest;
 import com.oceandiary.api.room.dto.RoomResponse;
+import com.oceandiary.api.room.entity.Room;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -77,14 +77,5 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
                 )
                 .fetch();
     }
-
-//    @Override
-//    public void updateUndeletedRoomToDeletedRoom(Long roomId) {
-//        queryFactory
-//                .update(room)
-//                .set(room.deletedAt, LocalDateTime.now())
-//                .where(room.id.eq(roomId))
-//                .execute();
-//    }
 
 }
