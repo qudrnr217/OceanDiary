@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
@@ -79,7 +80,7 @@ public class S3Service {
     }
 
     private Optional<File> convert(MultipartFile file) throws IOException {
-        File convertFile = new File(fileNamePrefix + file.getOriginalFilename());
+        File convertFile = new File(fileNamePrefix + file.getOriginalFilename().getBytes(StandardCharsets.UTF_8).toString());
         if (convertFile.createNewFile()) {
             try (FileOutputStream fos = new FileOutputStream(convertFile)) {
                 fos.write(file.getBytes());
