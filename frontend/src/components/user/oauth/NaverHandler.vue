@@ -18,12 +18,16 @@ export default {
       console.log("네이버 인가코드 발급완료 : " + code);
       naverLogin(
         { code: code },
-        (data) => {
-          if (data.data.isExist) {
+        (response) => {
+          store.commit("userStore/SET_SOCIAL", "NAVER");
+          if (response.data.isExist) {
             //아이디가 있을 경우
             console.log("서버에 로그인 요청 : 성공");
-            console.log("발급된 토큰 : " + data.data.accessToken);
-            store.commit("userStore/SET_TOKEN", data.data.accessToken);
+            console.log("발급된 토큰 : " + response.data.accessToken);
+            store.commit("userStore/SET_IS_LOGIN", true);
+            store.commit("userStore/SET_TOKEN", response.data.accessToken);
+            store.commit("userStore/SET_USERID", response.data.userId);
+            store.commit("userStore/SET_NAME", response.data.name);
             router.push({
               name: "station-chat",
               params: { nextLink: "map", speech: "어디로 가시나요?" },
@@ -31,8 +35,8 @@ export default {
           } else {
             //아이디가 없을 경우
             console.log("서버에 로그인 요청 : 실패 (-> 회원가입)");
-            console.log("임시 oauthId : " + data.data.oauthId);
-            store.commit("userStore/SET_OAUTH_ID", data.data.oauthId);
+            console.log("임시 oauthId : " + response.data.oauthId);
+            store.commit("userStore/SET_OAUTH_ID", response.data.oauthId);
             router.push({ name: "login-signup", query: { social: "naver" } });
           }
         },
