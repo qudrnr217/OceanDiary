@@ -16,15 +16,21 @@
               :participantId="state.participantId"
               :name="state.pub_name"
             />
+            <user-video
+              v-for="sub in state.subscribers"
+              :key="sub.stream.connection.connectionId"
+              :streamManager="sub"
+            />
           </div>
 
-          <div class="user2">
+          <!-- <div class="user2"></div> -->
+          <!-- <div class="user2">
             <user-video
               :streamManager="state.subscribers[0]"
               :name="state.sub_name[0]"
             />
-          </div>
-          <div class="user3">
+          </div> -->
+          <!-- <div class="user3">
             <user-video
               :streamManager="state.subscribers[1]"
               :name="state.sub_name[1]"
@@ -47,7 +53,7 @@
               :streamManager="state.subscribers[4]"
               :name="state.sub_name[4]"
             />
-          </div>
+          </div> -->
         </div>
         <div class="chat-wrap">
           <div class="share">
@@ -128,11 +134,13 @@ import { ref, reactive } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { onMounted, watch, watchEffect } from "@vue/runtime-core";
 // import { reactive, ref } from "@vue/reactivity";/
-import { LeaveRoom } from "@/api/webrtc.js";
+import { leaveRoom } from "@/api/webrtc.js";
 import { useRouter } from "vue-router";
+import { GetUserInfo, GetStamp } from "@/api/webrtc.js";
 import UserList from "./component/UserList.vue";
 import ChatView from "./component/ChatView.vue";
 import TimeView from "./component/TimeView.vue";
+import moment from "moment";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 const OPENVIDU_SERVER_URL = "https://" + "i7a406.p.ssafy.io" + ":5443";
 const OPENVIDU_SERVER_SECRET = "A406";
@@ -370,39 +378,58 @@ export default {
         // console.log("participantId", state.participantId);
       });
 
+      state.session.on("streamDestroyed", ({ stream }) => {
+        console.log("스트림이다~~~~: ", stream);
+        const index = state.subscribers.indexOf(stream.streamManager, 0);
+        if (index >= 0) {
+          state.subscribers.splice(index, 1);
+        }
+      });
+
       //사람 나갔을 때
-      state.session.on("connectionDestroyed", ({ stream }) => {
+      state.session.on("connectionDestroyed", (stream) => {
         state.reload += 1;
 
         console.log("subscriber가 나갔습니다 ㅠㅠ!");
         state.publisher2 = undefined;
 
-        console.log("stream: " + stream);
+        console.log("stream: ", stream);
         // console.log(stream);
 
-        var length = state.subscribers.length;
-        console.log(state.publisher);
-        for (var i = 0; i < length; i++) {
-          console.log(length);
-          console.log(i);
-          console.log(state.subscribers[i].stream.connection.connectionId);
-          // console.log(state.subscribers[i]);
-          console.log("나간 커넥션 아이디: " + state.leave_connectionId);
-          // state.subscribers[0] = undefined;
-          if (
-            state.subscribers[i].stream.connection.connectionId ===
-            store.state.roomStore.leave_connectionId
-          ) {
-            // const index = state.subscribers.indexOf(i);
-            // console.log("iiiiiiiiiiiiiiiiiiiii: " + i);
-            // state.subscribers[i] = undefined;
-            // if (index >= 0) {
-            //   state.subscribers.splice(index, 1);
-            // }
-            console.log("안녕하세요!");
-            state.subscribers[i] = undefined;
-          }
+        const index = state.subscribers.indexOf(
+          stream.connection.stream.StreamManager,
+          0
+        );
+
+        console.log("인덱스 : " + index);
+        if (index > -1) {
+          state.subscribers.splice(index, 1);
+          state.subscribers([...state.subscribers]);
         }
+
+        // var length = state.subscribers.length;
+        // console.log(state.publisher);
+        // for (var i = 0; i < length; i++) {
+        //   console.log(length);
+        //   console.log(i);
+        //   console.log(state.subscribers[i].stream.connection.connectionId);
+        //   // console.log(state.subscribers[i]);
+        //   console.log("나간 커넥션 아이디: " + state.leave_connectionId);
+        //   // state.subscribers[0] = undefined;
+        //   if (
+        //     state.subscribers[i].stream.connection.connectionId ===
+        //     store.state.roomStore.leave_connectionId
+        //   ) {
+        //     // const index = state.subscribers.indexOf(i);
+        //     // console.log("iiiiiiiiiiiiiiiiiiiii: " + i);
+        //     // state.subscribers[i] = undefined;
+        //     // if (index >= 0) {
+        //     //   state.subscribers.splice(index, 1);
+        //     // }
+        //     console.log("안녕하세요!");
+        //     state.subscribers[i] = undefined;
+        //   }
+        // }
       });
 
       state.session.on("exception", ({ exception }) => {
@@ -524,6 +551,39 @@ export default {
       //     console.log("안녕하세요~");
       //   }
       // }
+      console.log(state.roomId);
+      GetUserInfo(state.roomId, (response) => {
+        var category = response.data.roomInfo.categoryId;
+        console.log("카테고리: " + category);
+        var participant = response.data.participantList;
+        var length = participant.length;
+        for (var i = 0; i < length; i++) {
+          console.log("participant :", participant[i]);
+          if (participant[i].participantId === state.participantId) {
+            var enterTime = participant[i].enterTime;
+            enterTime = moment(enterTime);
+            enterTime = enterTime.format("YYYY-MM-DD HH:mm:ss");
+            // console.log(date);
+            // console.log(enterTime);
+          }
+        }
+        var exitTime = Date.now();
+        exitTime = moment(exitTime);
+        exitTime = exitTime.format("YYYY-MM-DD HH:mm:ss");
+        // console.log("exit_date: " + exit_date);
+        GetStamp(
+          store.state.userStore.token,
+          enterTime,
+          exitTime,
+          category,
+          (response) => {
+            console.log("response: ", response);
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
+      });
 
       if (state.session) {
         state.publisher = undefined;
@@ -533,7 +593,8 @@ export default {
         state.session = undefined;
         store.commit("roomStore/SET_INIT_CHAT");
       }
-      LeaveRoom(state.roomId, state.participantId, (response) => {
+
+      leaveRoom(state.roomId, state.participantId, (response) => {
         console.log(response);
         console.log("세션 나가기 성공!");
         console.log("subscribers count : ", state.subscribers);
@@ -638,7 +699,7 @@ export default {
   height: 22%;
   position: relative;
   left: 0%;
-  background-color: aquamarine;
+  /* background-color: aquamarine; */
 
   display: flex;
   justify-content: flex-start;
@@ -649,11 +710,14 @@ export default {
 }
 
 .user1 {
-  width: 15.4%;
+  width: 200px;
   height: 95%;
-  background-color: brown;
+  /* background-color: brown; */
   border-radius: 10px;
   position: relative;
+  display: flex;
+  border: solid 2px;
+  /* border: 2px; */
 }
 .user2 {
   width: 15.4%;
