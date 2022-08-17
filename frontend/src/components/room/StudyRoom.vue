@@ -163,7 +163,7 @@ import { onMounted, watch, watchEffect } from "@vue/runtime-core";
 // import { reactive, ref } from "@vue/reactivity";/
 import { leaveRoom } from "@/api/webrtc.js";
 import { useRouter } from "vue-router";
-import { GetUserInfo, GetStamp } from "@/api/webrtc.js";
+import { getUserInfo, createLog } from "@/api/webrtc.js";
 import UserList from "./component/UserList.vue";
 import ChatView from "./component/ChatView.vue";
 import TimeView from "./component/TimeView.vue";
@@ -583,7 +583,7 @@ export default {
       //   }
       // }
       console.log(state.roomId);
-      GetUserInfo(state.roomId, (response) => {
+      getUserInfo(state.roomId, (response) => {
         var category = response.data.roomInfo.categoryId;
         console.log("카테고리: " + category);
         var participant = response.data.participantList;
@@ -602,7 +602,7 @@ export default {
         exitTime = moment(exitTime);
         exitTime = exitTime.format("YYYY-MM-DD HH:mm:ss");
         // console.log("exit_date: " + exit_date);
-        GetStamp(
+        createLog(
           store.state.userStore.token,
           enterTime,
           exitTime,

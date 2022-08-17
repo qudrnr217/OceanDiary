@@ -141,6 +141,8 @@ export default {
     const create = () => {
       console.log("방 생성 절차를 시작합니다.");
       if (!isFormDataValid()) return;
+      console.log(roomInfo);
+      console.log(imageFile.value);
       createRoom(
         store.state.userStore.token,
         roomInfo,

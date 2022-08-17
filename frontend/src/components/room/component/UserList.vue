@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { GetUserInfo } from "@/api/webrtc.js";
+import { getUserInfo } from "@/api/webrtc.js";
 import { onMounted } from "@vue/runtime-core";
 import { reactive } from "@vue/reactivity";
 export default {
@@ -22,7 +22,7 @@ export default {
 
     onMounted(() => {
       //   console.log("방정보: " + props.roomId);
-      GetUserInfo(props.roomId, (response) => {
+      getUserInfo(props.roomId, (response) => {
         // console.log(response);
         user_info.curNum = response.data.roomInfo.curNum;
         // console.log(response.data.participantList);
