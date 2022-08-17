@@ -10,6 +10,7 @@ const roomStore = {
     openvidu_token2: "",
     isScreen: false,
     chat: [],
+    leave_connectionId: "",
   }),
   mutations: {
     SET_ROOM_ID(state, roomId) {
@@ -38,6 +39,9 @@ const roomStore = {
     },
     SET_INIT_CHAT(state) {
       state.chat = [];
+    },
+    SET_LEAVE_CONNECTION_ID(state, leave_connectionId) {
+      state.leave_connectionId = leave_connectionId;
     },
   },
 };

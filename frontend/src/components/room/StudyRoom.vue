@@ -176,6 +176,7 @@ export default {
       sub_name: [],
       pub_name: undefined,
       chat: [],
+      leave_connectionId: store.state.roomStore.leave_connectionId,
     });
 
     onMounted(() => {
@@ -376,28 +377,32 @@ export default {
         console.log("subscriber가 나갔습니다 ㅠㅠ!");
         state.publisher2 = undefined;
 
-        stream;
+        console.log("stream: " + stream);
         // console.log(stream);
 
-        // var length = state.subscribers.length;
-        // for (var i = 0; i < length; i++) {
-        //   console.log(i);
-        //   console.log(state.subscribers[i].stream.connection.connectionId);
-        //   state.subscribers[0] = undefined;
-        //   if (
-        //     state.subscribers[i].stream.connection.connectionId ===
-        //     store.state.roomStore.connectionId
-        //   ) {
-        //     // const index = state.subscribers.indexOf(i);
-        //     // console.log("iiiiiiiiiiiiiiiiiiiii: " + i);
-        //     // state.subscribers[i] = undefined;
-        //     // if (index >= 0) {
-        //     //   state.subscribers.splice(index, 1);
-        //     // }
-        //     console.log("안녕하세요!");
-        //     state.subscribers[i] = undefined;
-        //   }
-        // }
+        var length = state.subscribers.length;
+        console.log(state.publisher);
+        for (var i = 0; i < length; i++) {
+          console.log(length);
+          console.log(i);
+          console.log(state.subscribers[i].stream.connection.connectionId);
+          // console.log(state.subscribers[i]);
+          console.log("나간 커넥션 아이디: " + state.leave_connectionId);
+          // state.subscribers[0] = undefined;
+          if (
+            state.subscribers[i].stream.connection.connectionId ===
+            store.state.roomStore.leave_connectionId
+          ) {
+            // const index = state.subscribers.indexOf(i);
+            // console.log("iiiiiiiiiiiiiiiiiiiii: " + i);
+            // state.subscribers[i] = undefined;
+            // if (index >= 0) {
+            //   state.subscribers.splice(index, 1);
+            // }
+            console.log("안녕하세요!");
+            state.subscribers[i] = undefined;
+          }
+        }
       });
 
       state.session.on("exception", ({ exception }) => {
@@ -499,8 +504,17 @@ export default {
 
     var LeaveSession = () => {
       console.log(event);
-      store.commit("roomStore/SET_CONNECTION_ID", state.connectionId);
-      state.reload += 1;
+      store.commit(
+        "roomStore/SET_LEAVE_CONNECTION_ID",
+        store.state.roomStore.connectionId
+      );
+      console.log(
+        "퍼블리셔 커넥션 아이디: " + store.state.roomStore.connectionId
+      );
+
+      console.log(store.state.roomStore.leave_connectionId);
+
+      // state.reload += 1;
       // var length = state.subscribers.length;
       // for (var i = 0; i < length; i++) {
       //   if (
@@ -513,7 +527,7 @@ export default {
 
       if (state.session) {
         state.publisher = undefined;
-        state.subscribers = [];
+        // state.subscribers = [];
         state.session.disconnect();
         state.OV = undefined;
         state.session = undefined;
