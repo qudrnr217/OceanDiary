@@ -30,7 +30,7 @@ async function getImageFile(token, imageId, success, fail) {
   await authApi.get(`/api/image/${imageId}`).then(success).catch(fail);
 }
 
-async function leaveRoom(roomId, participantId, success, fail) {
+async function LeaveRoom(roomId, participantId, success, fail) {
   const authApi = apiInstance();
   await authApi
     .delete(`/api/rooms/${roomId}/participants/${participantId}`)
@@ -43,4 +43,11 @@ async function GetUserInfo(roomId, success, fail) {
   await authApi.get(`/api/rooms/${roomId}/detail`).then(success).catch(fail);
 }
 
-export { getRoomList, createRoom, joinRoom, LeaveRoom, GetUserInfo };
+export {
+  getRoomList,
+  createRoom,
+  getImageFile,
+  joinRoom,
+  LeaveRoom,
+  GetUserInfo,
+};

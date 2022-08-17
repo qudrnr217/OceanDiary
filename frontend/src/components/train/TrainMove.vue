@@ -18,7 +18,9 @@ export default {
     const router = useRouter();
     const urlParams = new URL(location.href).searchParams;
     const dest = urlParams.get("dest");
+    var isSkipped = true;
     const skip = () => {
+      isSkipped = true;
       router.push({
         name: "train-arrive",
         query: { dest: dest },
@@ -31,11 +33,12 @@ export default {
       audio_1.play();
 
       setTimeout(() => {
-        console.log("hi");
-        router.push({
-          name: "train-arrive",
-          query: { dest: dest },
-        });
+        if (isSkipped == false) {
+          router.push({
+            name: "train-arrive",
+            query: { dest: dest },
+          });
+        }
       }, 5000);
     });
     return { skip };
