@@ -25,7 +25,7 @@ public class RoomController {
     private final RoomService roomService;
 
     @PostMapping("")
-    public RoomResponse.CreateRoom createRoom(@RequestPart(value = "form") RoomRequest.CreateRoom request, @RequestPart(value = "file") MultipartFile file, @CurrentUser CustomUserDetails user) {
+    public RoomResponse.CreateRoom createRoom(@RequestPart(value = "form") RoomRequest.CreateRoom request, @RequestPart(value = "file", required = false) MultipartFile file, @CurrentUser CustomUserDetails user) {
         return roomService.createRoom(request, file, user.getUser());
     }
 

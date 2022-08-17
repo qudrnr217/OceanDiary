@@ -92,10 +92,9 @@ public class RoomService {
         }
 
         try {
-
             Image newImage = null;
             // AWS S3 image upload
-            if (!file.isEmpty()) {
+            if (file != null && !file.isEmpty()) {
                 Long imageId = imageService.save(file).getId();
                 newImage = imageRepository.findById(imageId).orElseThrow();
             }
@@ -162,9 +161,14 @@ public class RoomService {
         String serverData = "{\"userId\": \"" + (user != null ? "" + user.getId().toString() : "null") + "\"," + "\"name\": \"" + (user != null ? user.getName() : name) + "\"}";
         ConnectionProperties connectionProperties =
                 new ConnectionProperties.Builder().type(ConnectionType.WEBRTC).data(serverData).role(OpenViduRole.PUBLISHER).build();
+        Room room = roomRepository.findById(roomId).orElseThrow();
 
         if (user != null && dropoutRepository.findByUser_idAndRoom_id(user.getId(), roomId).isPresent()) {
             throw new BusinessException("이미 강퇴당한 사용자는 입장할 수 없습니다.");
+        }
+
+        if (participantOnRedisRepository.findById(roomId).orElseThrow().getParticipantTokenMap().size() >= room.getMaxNum()) {
+            throw new BusinessException("입장 제한 인원 수를 초과하였습니다.");
         }
 
         try {
@@ -173,7 +177,6 @@ public class RoomService {
 
             Connection connection = session.createConnection(connectionProperties);
             String token = connection.getToken();
-            Room room = roomRepository.findById(roomId).orElseThrow();
 
             // 비밀번호 설정된 방인데 비밀번호가 틀린경우
             if (!room.getIsOpen() && !room.getPw().equals(request.getPw())) {
@@ -231,9 +234,8 @@ public class RoomService {
                 participantOnRedis.getParticipantConnectionMap().clear();
             } else {
                 addStampAndUpdateVisitedAtBeforeExit(room, participantId);
+                participantOnRedis.removeParticipant(participantId);
             }
-
-            participantOnRedis.removeParticipant(participantId);
 
             if (participantOnRedis.getParticipantTokenMap().isEmpty()) {  // 방에 더이상 참가자가 없을경우
                 // 세션 종료
@@ -264,9 +266,25 @@ public class RoomService {
      * 조건: Redis안에 룸이 존재하는 방들만 가져온다.
      */
     public Page<RoomResponse.SearchRooms> search(RoomRequest.RoomSearchCondition condition, Pageable pageable) {
+
         Page<RoomResponse.SearchRooms> page = roomRepository.search(condition, pageable);
         Iterator<RoomResponse.SearchRooms> searchedRoomsIterator = page.getContent().iterator();
         boolean isInConsistent = false;
+
+        // 데이터 부정합성 케이스 1. MySQL에는 deletedAt이 기록되어 끝난 세션으로 기록되었지만 Redis에는 아직 진행중인 세션일 경우
+        Iterable<RoomOnRedis> allRooms = roomOnRedisRepository.findAll();
+        Iterator<RoomOnRedis> allRoomsIterator = allRooms.iterator();
+        while (allRoomsIterator.hasNext()) {
+            RoomOnRedis roomOnRedis = allRoomsIterator.next();
+            Room room = roomRepository.findById(roomOnRedis.getId()).orElseThrow();
+            if (room.getDeletedAt() != null) {
+                isInConsistent = true;
+                roomOnRedisRepository.deleteById(room.getId());
+                participantRepository.deleteById(room.getId());
+            }
+        }
+
+        // 데이터 부정합성 케이스 2. Redis에는 끝난 세션이지만 MySQL에는 아직 진행중인 세션인 경우
         while (searchedRoomsIterator.hasNext()) {
             RoomResponse.SearchRooms searchedRoom = searchedRoomsIterator.next();
             Optional<ParticipantOnRedis> participantOrNull = participantOnRedisRepository.findById(searchedRoom.getRoomId());
@@ -394,13 +412,12 @@ public class RoomService {
 
         try {
             Session session = getSession(roomOnRedisRepository.findById(roomId).orElseThrow().getSessionId());
-            ParticipantOnRedis participants = participantOnRedisRepository.findById(roomId).orElseThrow();
-            String connectionId = participants.getParticipantConnectionMap().get(participantId);
+            ParticipantOnRedis participantOnRedis = participantOnRedisRepository.findById(roomId).orElseThrow();
+            String connectionId = participantOnRedis.getParticipantConnectionMap().get(participantId);
             // OpenVidu API: force disconnect participant
             session.forceDisconnect(connectionId);
-            participants.getParticipantTokenMap().remove(participantId);
-            participants.getParticipantConnectionMap().remove(participantId);
-            participants = participantOnRedisRepository.save(participants);
+            participantOnRedis.removeParticipant(participantId);
+            participantOnRedis = participantOnRedisRepository.save(participantOnRedis);
             Participant participant = participantRepository.findById(participantId).orElseThrow();
             participant.addExitDate();
             Dropout dropout = Dropout.builder()
@@ -409,7 +426,7 @@ public class RoomService {
                     .name(participant.getName())
                     .build();
             dropoutRepository.save(dropout);
-            if (participants.getParticipantTokenMap().isEmpty()) {  // 방에 더이상 참가자가 없을경우
+            if (participantOnRedis.getParticipantTokenMap().isEmpty()) {  // 방에 더이상 참가자가 없을경우
                 // 세션 종료
                 session.close();
                 participantOnRedisRepository.deleteById(roomId);
