@@ -93,7 +93,7 @@ const routes = [
       {
         path: "room",
         name: "library_study",
-        component: () => import("@/components/room/StudyRoom.vue"),
+        component: () => import("@/components/room/FestivalRoom.vue"),
       },
     ],
   },
@@ -123,7 +123,7 @@ const routes = [
       {
         path: "study",
         name: "festival-room",
-        component: () => import("@/components/room/StudyRoom.vue"),
+        component: () => import("@/components/room/FestivalRoom.vue"),
       },
     ],
   },
