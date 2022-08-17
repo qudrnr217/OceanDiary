@@ -10,20 +10,10 @@
           />
         </div>
         <div class="text-wrap">
-          <input type="text" id="name-input" />
+          <input type="text" v-model="userName" id="name-input" />
         </div>
         <div class="button-wrap">
-          <router-link
-            :to="{
-              name: 'station-chat',
-              params: {
-                nextLink: '/station/map',
-                speech: '어디로 가시나요?',
-              },
-            }"
-            class="button-next"
-            >다음</router-link
-          >
+          <div class="button-next" @click="move">다음</div>
         </div>
       </div>
     </div>
@@ -31,7 +21,34 @@
 </template>
 
 <script>
-export default {};
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+import { ref } from "vue";
+
+export default {
+  setup() {
+    const router = useRouter();
+    const store = useStore();
+
+    const userName = ref("");
+    const move = () => {
+      if (userName.value == "") {
+        alert("이름을 입력하세요!");
+        return;
+      } else {
+        store.commit("userStore/SET_NAME", userName.value);
+      }
+      router.push({
+        name: "station-chat",
+        params: {
+          nextLink: "/station/map",
+          speech: "어디로 가시나요?",
+        },
+      });
+    };
+    return { move, userName };
+  },
+};
 </script>
 
 <style scoped>

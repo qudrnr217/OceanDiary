@@ -73,6 +73,10 @@ export default {
     const items = ref(null);
     const enterRoom = (item) => {
       let inputPassword = "";
+      if (item.curNum >= item.maxNum) {
+        alert("방이 꽉 차있어요!");
+        return;
+      }
       if (!item.isOpen) {
         inputPassword = prompt("비밀번호를 입력해주세요.");
       }
