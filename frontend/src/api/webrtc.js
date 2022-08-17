@@ -25,8 +25,12 @@ async function joinRoom(token, roomId, password, success, fail) {
     .then(success)
     .catch(fail);
 }
+async function getImageFile(token, imageId, success, fail) {
+  const authApi = authApiInstance(token);
+  await authApi.get(`/api/image/${imageId}`).then(success).catch(fail);
+}
 
-async function LeaveRoom(roomId, participantId, success, fail) {
+async function leaveRoom(roomId, participantId, success, fail) {
   const authApi = apiInstance();
   await authApi
     .delete(`/api/rooms/${roomId}/participants/${participantId}`)

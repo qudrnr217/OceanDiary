@@ -8,9 +8,6 @@
       ></vue-writer>
     </div>
     <div class="content-wrap">
-      <div class="content" @click="sendGoogleUrl()">
-        <img src="~@/assets/이미지/[이미지]구글.png" class="social-logo" />
-      </div>
       <div class="content" @click="sendKakaoUrl()">
         <img src="~@/assets/이미지/[이미지]카카오톡.png" class="social-logo" />
       </div>
@@ -60,8 +57,8 @@ export default {
 
 <style scoped>
 .content {
-  height: 100%;
   width: 50%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-content: center;
@@ -71,7 +68,7 @@ export default {
   box-shadow: 0px 10px 0px #72ab45;
 }
 .social-logo {
-  width: 100%;
+  width: 280px;
   border-radius: 25%;
 }
 #left {

@@ -10,13 +10,15 @@
           <img
             src="@/assets/아이콘/icon_lock.png"
             class="icon-lock"
-            @click="roomInfo.isOpen = !roomInfoisOpen"
+            @click="roomInfo.isOpen = !roomInfo.isOpen"
             v-if="!roomInfo.isOpen"
           />
           <input
             type="password"
             class="room-create-input"
-            v-show="roomInfo.isOpen"
+            placeholder="비밀번호 4자리"
+            v-model="roomInfo.pw"
+            v-show="!roomInfo.isOpen"
           />
           <img
             src="@/assets/아이콘/[아이콘]방_공개.png"
@@ -34,6 +36,7 @@
               <input
                 v-model="roomInfo.title"
                 type="text"
+                placeholder="제목을 입력하세요"
                 class="room-create-input"
               />
             </td>
@@ -43,6 +46,7 @@
             <td>
               <textarea
                 v-model="roomInfo.rule"
+                placeholder="규칙을 입력하세요"
                 class="room-create-input"
                 style="height: 180px"
               />
@@ -51,12 +55,16 @@
           <tr>
             <th>인원 :</th>
             <td>
-              <input
+              <select
                 v-model="roomInfo.maxNum"
                 type="number"
                 class="room-create-input"
                 style="width: 30%"
-              />
+              >
+                <option v-for="n in 5" :value="n + 1" :key="n + 1">
+                  {{ n + 1 }}
+                </option>
+              </select>
             </td>
           </tr>
           <tr>
@@ -89,6 +97,7 @@ export default {
     const dest = urlParams.get("dest");
     const index = indexes[dest];
     const type = types[dest];
+    const numSelect = [2, 3, 4, 5, 6];
     const iconPath = require(`@/assets/아이콘/${icons[index]}`);
 
     const roomInfo = reactive({
@@ -97,7 +106,7 @@ export default {
       rule: "",
       maxNum: 0,
       isOpen: true,
-      pw: "1234",
+      pw: "",
     });
     roomInfo.categoryId = dest.toUpperCase();
     const imageFile = ref("");
@@ -105,9 +114,33 @@ export default {
     const fileInput = (event) => {
       imageFile.value = event.target.files[0];
     };
+    const isFormDataValid = () => {
+      // 비밀번호 4자리
+      if (!roomInfo.isOpen && roomInfo.pw.length != 4) {
+        alert("비밀번호는 4자리입니다.");
+        return false;
+      }
+      // 빈 제목
+      if (roomInfo.title == "") {
+        alert("제목을 입력해주세요.");
+        return false;
+      }
+      // 인원 선택 여부
+      if (roomInfo.maxNum == "") {
+        alert("최대 인원을 선택해주세요.");
+        return false;
+      }
+      // 이미지 파일 첨부 여부
+      if (imageFile.value == "") {
+        alert("대표 이미지를 첨부해주세요.");
+        return false;
+      }
+
+      return true;
+    };
     const create = () => {
       console.log("방 생성 절차를 시작합니다.");
-
+      if (!isFormDataValid()) return;
       createRoom(
         store.state.userStore.token,
         roomInfo,
@@ -144,12 +177,12 @@ export default {
       type,
       create,
       fileInput,
+      numSelect,
     };
   },
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .main-box {
   width: 800px;

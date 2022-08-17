@@ -17,7 +17,7 @@
               </tr>
               <tr>
                 <th>발급일</th>
-                <td>2022.08.03</td>
+                <td>{{ year }}.{{ month }}.{{ date }}</td>
               </tr>
               <tr>
                 <th>사용처</th>
@@ -57,7 +57,15 @@
 </template>
 
 <script>
-export default {};
+export default {
+  setup() {
+    const day = new Date();
+    const year = day.getFullYear();
+    const month = day.getMonth() + 1;
+    const date = day.getDate();
+    return { year, month, date };
+  },
+};
 </script>
 
 <style scoped>
