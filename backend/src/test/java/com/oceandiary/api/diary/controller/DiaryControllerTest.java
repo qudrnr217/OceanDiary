@@ -143,8 +143,8 @@ public class DiaryControllerTest extends MvcTest {
                                 fieldWithPath("userInfo.visitedAt").type(JsonFieldType.STRING).description("마지막 방문 일자"),
                                 fieldWithPath("stamps[].id").type(JsonFieldType.NUMBER).description("스탬프 식별자"),
                                 fieldWithPath("stamps[].category").type(JsonFieldType.STRING).description("카테고리 식별자 - {OCEAN, LIBRARY, CAFE, FESTIVAL, HOME}"),
-                                fieldWithPath("stamps[].totalTime").type(JsonFieldType.STRING).description("총 시간")
-
+                                fieldWithPath("stamps[].totalTime").type(JsonFieldType.STRING).description("총 시간"),
+                                fieldWithPath("stamps[].exitTime").type(JsonFieldType.STRING).description("스탬프 생성 일시")
                         )
                 ));
         verify(diaryService).getDiaryContents(any());
