@@ -1,8 +1,12 @@
 <template>
   <div v-if="streamManager">
-    <ov-video :stream-manager="streamManager" />
-    <div>
-      <!-- <p>{{ clientData }}</p> -->
+    <div class="cam">
+      <ov-video :stream-manager="streamManager" class="camera" />
+      <div id="explain">
+        <!-- <p>{{ clientData }}</p> -->
+        {{ name }}
+        <!-- {{participant}} -->
+      </div>
     </div>
   </div>
 </template>
@@ -20,6 +24,8 @@ export default {
   props: {
     streamManager: Object,
     camera: Boolean,
+    participantId: String,
+    name: String,
   },
 
   computed: {
@@ -43,3 +49,27 @@ export default {
   },
 };
 </script>
+
+<style>
+.cam {
+  /* background-color: black; */
+  display: flex;
+  position: relative;
+}
+#explain {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  opacity: 0;
+  color: white;
+  top: 45%;
+  left: 20%;
+}
+.cam:hover #explain {
+  opacity: 1;
+}
+
+.cam:hover .camera {
+  opacity: 0.3;
+}
+</style>

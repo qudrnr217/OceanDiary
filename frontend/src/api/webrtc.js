@@ -1,4 +1,5 @@
 import { authApiInstance } from "@/api/index.js";
+import { apiInstance } from "@/api/index.js";
 
 async function getRoomList(token, category, lastRoomId, success, fail) {
   const authApi = authApiInstance(token);
@@ -24,4 +25,18 @@ async function joinRoom(token, roomId, password, success, fail) {
     .then(success)
     .catch(fail);
 }
-export { getRoomList, createRoom, joinRoom };
+
+async function LeaveRoom(roomId, participantId, success, fail) {
+  const authApi = apiInstance();
+  await authApi
+    .delete(`/api/rooms/${roomId}/participants/${participantId}`)
+    .then(success)
+    .catch(fail);
+}
+
+async function GetUserInfo(roomId, success, fail) {
+  const authApi = apiInstance();
+  await authApi.get(`/api/rooms/${roomId}/detail`).then(success).catch(fail);
+}
+
+export { getRoomList, createRoom, joinRoom, LeaveRoom, GetUserInfo };
