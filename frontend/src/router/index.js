@@ -154,7 +154,12 @@ const routes = [
     component: () => import("@/views/DiaryView.vue"),
     children: [
       {
-        path: "contents",
+        path: "auth/contents",
+        name: "auth-diary-contents",
+        component: () => import("@/components/diary/AuthDiaryContents.vue"),
+      },
+      {
+        path: "/contents",
         name: "diary-contents",
         component: () => import("@/components/diary/DiaryContents.vue"),
       },
