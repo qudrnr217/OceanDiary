@@ -63,61 +63,89 @@
               />
               <time-view class="time" v-else :key="state.reload" />
             </div>
-
-            <div class="share-icons">
-              <img
-                src="@/assets/아이콘/[아이콘]배경음악_ON.png"
-                alt=""
-                class="bgm-icon"
-              />
-              <img
-                src="@/assets/아이콘/[아이콘]마이크_ON.png"
-                alt=""
-                class="mic-icon"
-                @click="mic_toggle()"
-              />
-              <img
-                src="@/assets/아이콘/[아이콘]카메라_ON.png"
-                alt=""
-                class="camera-icon"
-                @click="camera_toggle()"
-              />
-              <img
-                src="@/assets/아이콘/[아이콘]화면공유.png"
-                alt=""
-                class="share-icon"
-                @click="screen_share()"
-              />
-              <img
-                src="@/assets/아이콘/[아이콘]설정.png"
-                alt=""
-                class="config-icon"
-              />
+            <div class="empty"></div>
+            <div class="chat">
+              <div class="chat-header">
+                <div
+                  class="participant"
+                  @click="state.current_title = 'participant'"
+                >
+                  <img src="@/assets/아이콘/참가자.png" alt="" />
+                  참가자
+                </div>
+                <div class="chat-title" @click="state.current_title = 'chat'">
+                  <img src="@/assets/아이콘/채팅.png" alt="" />
+                  채팅
+                </div>
+              </div>
+              <div class="chat-box" v-if="state.current_title === 'chat'">
+                <div class="chat-content">
+                  <chat-view
+                    v-for="ch in state.chat"
+                    :key="ch.name"
+                    :data="ch"
+                    :connectionId="state.connectionId"
+                  />
+                </div>
+                <div class="chat-footer">
+                  <div class="line"></div>
+                  <input
+                    type="text"
+                    class="chat-input"
+                    v-model="message"
+                    @keyup.enter="submit_msg()"
+                  />
+                  <img
+                    src="@/assets/아이콘/메세지보내기.png"
+                    alt=""
+                    class="submit-btn"
+                    @click="submit_msg()"
+                  />
+                  <!-- <button class="submit-btn" @click="submit_msg()">전송</button> -->
+                </div>
+              </div>
+              <div
+                class="participant-box"
+                v-if="state.current_title === 'participant'"
+              >
+                <div
+                  class="user-list"
+                  v-if="state.current_title === 'participant'"
+                >
+                  <user-list :roomId="state.roomId" :key="state.reload" />
+                </div>
+              </div>
             </div>
           </div>
-          <div class="chat">
-            <div class="chat-header">
-              <div
-                class="participant"
-                @click="state.current_title = 'participant'"
-              >
-                참가자
-              </div>
-              <div class="chat-title" @click="state.current_title = 'chat'">
-                채팅
-              </div>
-            </div>
-            <div class="chat-box" v-if="state.current_title === 'chat'">
-              <chat-view v-for="ch in state.chat" :key="ch.name" :data="ch" />
-
-              <div class="chat-footer">
-                <input type="text" class="chat-input" v-model="message" />
-                <button class="submit-btn" @click="submit_msg()">전송</button>
-              </div>
-            </div>
-            <div class="user-list" v-if="state.current_title === 'participant'">
-              <user-list :roomId="state.roomId" :key="state.reload" />
-            </div>
+          <div class="share-icons">
+            <img
+              src="@/assets/아이콘/[아이콘]배경음악_ON.png"
+              alt=""
+              class="bgm-icon"
+            />
+            <img
+              src="@/assets/아이콘/[아이콘]마이크_ON.png"
+              alt=""
+              class="mic-icon"
+              @click="mic_toggle()"
+            />
+            <img
+              src="@/assets/아이콘/[아이콘]카메라_ON.png"
+              alt=""
+              class="camera-icon"
+              @click="camera_toggle()"
+            />
+            <img
+              src="@/assets/아이콘/[아이콘]화면공유.png"
+              alt=""
+              class="share-icon"
+              @click="screen_share()"
+            />
+            <img
+              src="@/assets/아이콘/[아이콘]설정.png"
+              alt=""
+              class="config-icon"
+            />
           </div>
         </div>
       </div>
@@ -177,7 +205,7 @@ export default {
       openvidu_token2: undefined,
       isScreen: false,
       screen_connection_id: undefined,
-      connectionId: undefined,
+      connectionId: store.state.roomStore.connectionId,
       reload: 0,
       current_title: "participant",
       sub_name: [],
@@ -316,6 +344,7 @@ export default {
             publisher2.once("accessDenied", (event) => {
               console.log(event);
               console.warn("ScreenShare: Access Denied");
+              state.publisher2 = undefined;
             });
           })
           .catch((error) => {
@@ -627,6 +656,10 @@ export default {
 </script>
 
 <style scoped>
+.background {
+  width: 100vw;
+  height: 100vh;
+}
 .total-wrap {
   width: 100vw;
   height: 100vh;
@@ -673,6 +706,8 @@ export default {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  position: relative;
+  bottom: 1.5%;
 }
 
 .user-wrap {
@@ -680,7 +715,7 @@ export default {
   height: 97%;
   background-color: burlywood;
   padding: 1rem;
-  min-width: 90%;
+  min-width: 1280px;
 
   background: rgba(255, 255, 255, 0.5);
   border-radius: 6px;
@@ -699,6 +734,7 @@ export default {
   height: 22%;
   position: relative;
   left: 0%;
+  bottom: 1.5%;
   /* background-color: aquamarine; */
 
   display: flex;
@@ -730,7 +766,7 @@ export default {
 .user3 {
   width: 15.4%;
   height: 95%;
-  background-color: brown;
+  /* background-color: brown; */
   position: relative;
   left: 3%;
   border-radius: 10px;
@@ -738,7 +774,7 @@ export default {
 .user4 {
   width: 15.4%;
   height: 95%;
-  background-color: brown;
+  /* background-color: brown; */
   position: relative;
   left: 4.5%;
   border-radius: 10px;
@@ -746,7 +782,7 @@ export default {
 .user5 {
   width: 15.4%;
   height: 95%;
-  background-color: brown;
+  /* background-color: brown; */
   position: relative;
   left: 6%;
   border-radius: 10px;
@@ -754,7 +790,7 @@ export default {
 .user6 {
   width: 15.4%;
   height: 95%;
-  background-color: brown;
+  /* background-color: brown; */
   position: relative;
   left: 7.5%;
   border-radius: 10px;
@@ -763,51 +799,68 @@ export default {
 .chat-wrap {
   width: 100%;
   height: 78%;
-  background-color: chartreuse;
+  /* background-color: chartreuse; */
   position: relative;
 }
+
 .share {
-  width: 66.5%;
-  height: 100%;
-  background-color: blueviolet;
-  position: relative;
-}
-.share-icons {
   width: 100%;
-  height: 12%;
-  background-color: red;
+  height: 92%;
   position: relative;
-  top: 88%;
+  /* top: 3.5%; */
+  top: 20px;
+  /* background-color: #f7d794; */
 
   display: flex;
-  justify-content: flex-start;
+}
+
+.empty {
+  width: 2%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0);
+}
+
+.chat {
+  width: 32%;
+  height: 100%;
+  /* background-color: black; */
+}
+.share-icons {
+  width: 66.5%;
+  height: 8%;
+  /* background-color: red; */
+  /* position: relative; */
+  position: absolute;
+  top: 95%;
+  display: flex;
+  /* justify-content: center; */
   align-items: center;
 }
 
 .bgm-icon {
-  width: 5%;
+  width: 3%;
   position: relative;
-  left: 25%;
+  left: 32.5%;
 }
 .mic-icon {
-  width: 5%;
+  width: 3%;
   position: relative;
-  left: 30%;
+  left: 37.5%;
 }
 .camera-icon {
-  width: 5%;
+  width: 3%;
   position: relative;
-  left: 35%;
+  left: 42.5%;
 }
 .share-icon {
-  width: 5%;
+  width: 3%;
   position: relative;
-  left: 40%;
+  left: 47.5%;
 }
 .config-icon {
-  width: 5%;
+  width: 3%;
   position: relative;
-  left: 45%;
+  left: 52.5%;
 }
 
 .share-icons {
@@ -816,73 +869,105 @@ export default {
 }
 
 .share-screen {
-  width: 100%;
-  height: 88%;
-  /* background-color: blue; */
-}
-
-.chat {
-  width: 33.5%;
+  width: 66%;
   height: 100%;
-  background-color: darkkhaki;
-  position: absolute;
-  left: 66.5%;
-  bottom: 0%;
+  background-color: white;
 }
 
 .chat-header {
   width: 100%;
   height: 10%;
-  background-color: coral;
+  /* background-color: white; */
   display: flex;
+  position: relative;
 }
 
 .chat-box {
   width: 100%;
   height: 90%;
-  background-color: beige;
+  background-color: white;
   position: relative;
 }
 
 .chat-footer {
   width: 100%;
   height: 12%;
-  background-color: cornflowerblue;
+  /* background-color: cornflowerblue; */
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   position: absolute;
   top: 88%;
 }
+.chat-content {
+  width: 100%;
+  height: 86%;
+}
 
 .chat-input {
   position: absolute;
-  width: 75%;
-  height: 85%;
+  width: 70%;
+  height: 50%;
+  border: 1px solid #d1d8df;
+  border-radius: 30px;
 }
 
 .submit-btn {
   position: absolute;
-  width: 23%;
-  height: 90%;
-  left: 77%;
+  width: 7%;
+  height: auto;
+  left: 88%;
+  /* top: 1px; */
 }
 
 .participant {
   width: 50%;
   height: auto;
-  background-color: #f7d794;
+  background: white;
   display: flex;
   justify-content: center;
   align-items: center;
+  /* padding-left: 1%; */
+
+  background: #f7d794;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+.participant:hover {
+  border: 2px solid #3b81ee;
 }
 
 .chat-title {
   width: 50%;
   height: auto;
-  background-color: cadetblue;
+  background-color: white;
   display: flex;
   justify-content: center;
   align-items: center;
+
+  /* background: #f7d794; */
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+.chat-title:hover {
+  border: 2px solid #3b81ee;
+}
+
+.participant-box {
+  width: 100%;
+  height: 90%;
+  background: beige;
+}
+
+.line {
+  width: 100%;
+  height: 1%;
+  background-color: #d1d8df;
+  position: absolute;
+  bottom: 110%;
+  /* border: solid #d1d8df; */
+  /* color: #d1d8df; */
 }
 </style>
