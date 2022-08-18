@@ -9,7 +9,10 @@
       />
     </div>
     <div class="button">
-      <router-link :to="{ name: 'login-menu' }" class="start-btn"
+      <router-link
+        :to="{ name: 'login-menu' }"
+        class="start-btn"
+        @click="startSound()"
         >시 작</router-link
       >
     </div>
@@ -17,7 +20,16 @@
 </template>
 
 <script>
+import useSound from "vue-use-sound";
+import startSfx from "@/assets/Start.wav";
+
 export default {
+  setup() {
+    const [startSound] = useSound(startSfx);
+    return {
+      startSound,
+    };
+  },
   name: "HelloWorld",
   props: {
     msg: String,

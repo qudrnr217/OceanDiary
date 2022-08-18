@@ -10,10 +10,15 @@
           />
         </div>
         <div class="text-wrap">
-          <input type="text" v-model="userName" id="name-input" />
+          <input
+            type="text"
+            v-model="userName"
+            id="name-input"
+            @keydown="typewriter"
+          />
         </div>
         <div class="button-wrap">
-          <div class="button-next" @click="move">다음</div>
+          <div class="button-next" @click="move(), clickSound()">다음</div>
         </div>
       </div>
     </div>
@@ -24,12 +29,16 @@
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { ref } from "vue";
+import useSound from "vue-use-sound";
+import buttonSfx from "@/assets/Typewriter.wav";
+import clickSfx from "@/assets/Click.wav";
 
 export default {
   setup() {
     const router = useRouter();
     const store = useStore();
-
+    const [typewriter] = useSound(buttonSfx);
+    const [clickSound] = useSound(clickSfx);
     const userName = ref("");
     const move = () => {
       if (userName.value == "") {
@@ -47,7 +56,7 @@ export default {
         },
       });
     };
-    return { move, userName };
+    return { move, userName, typewriter, clickSound };
   },
 };
 </script>

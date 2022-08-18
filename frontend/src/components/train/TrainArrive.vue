@@ -22,6 +22,7 @@
               query: { dest: this.$route.query.dest },
             }"
             class="button-next"
+            @click="clickSound()"
             >다음</router-link
           >
         </div>
@@ -33,12 +34,15 @@
 <script>
 import { onMounted, ref } from "vue";
 import { arriveOtterImages, stations, indexes } from "@/const/const.js";
+import useSound from "vue-use-sound";
+import clickSfx from "@/assets/Click.wav";
 export default {
   name: "train-arrive",
   setup() {
     const urlParams = new URL(location.href).searchParams;
     const dest = urlParams.get("dest");
     var index = indexes[dest];
+    const [clickSound] = useSound(clickSfx);
 
     const bg = ref(null);
     onMounted(() => {
@@ -49,6 +53,7 @@ export default {
       index,
       stations,
       bg,
+      clickSound,
     };
   },
 };

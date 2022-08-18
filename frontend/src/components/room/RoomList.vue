@@ -11,7 +11,7 @@
           class="icon-create"
           alt="방생성"
           v-if="isMember"
-          @click="createRoom()"
+          @click="createRoom(), clickSound()"
         />
       </div>
       <div class="box-list">
@@ -33,7 +33,9 @@
                 ● {{ item.curNum }} / {{ item.maxNum }}
               </div>
               <div ref="button" class="room-card-button">
-                <div class="button-next" @click="enterRoom(item)">입장</div>
+                <div class="button-next" @click="enterRoom(item), clickSound()">
+                  입장
+                </div>
               </div>
             </div>
           </div>
@@ -49,9 +51,11 @@ import { onMounted, ref, reactive } from "vue";
 import { names, icons, indexes } from "@/const/const.js";
 import { useStore } from "vuex";
 import { getRoomList, joinRoom, getImageFile } from "@/api/webrtc.js";
-
+import useSound from "vue-use-sound";
+import clickSfx from "@/assets/Click.wav";
 export default {
   setup() {
+    const [clickSound] = useSound(clickSfx);
     const router = useRouter();
     const store = useStore();
 
@@ -160,6 +164,7 @@ export default {
       enterRoom,
       imageFiles,
       isMember,
+      clickSound,
     };
   },
 };

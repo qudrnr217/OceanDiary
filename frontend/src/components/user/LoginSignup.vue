@@ -27,6 +27,7 @@
                 type="text"
                 v-model="form.userinfo.name"
                 class="signup-input"
+                @keydown="typewriter"
               />
             </td>
           </tr>
@@ -37,6 +38,7 @@
                 type="email"
                 v-model="form.userinfo.email"
                 class="signup-input"
+                @keydown="typewriter"
               />
             </td>
           </tr>
@@ -44,11 +46,23 @@
             <th>생년월일 :</th>
             <td>
               <div style="display: flex; align-items: center">
-                <input class="signup-input" v-model="form.date.year" />
+                <input
+                  class="signup-input"
+                  @keydown="typewriter"
+                  v-model="form.date.year"
+                />
                 년
-                <input class="signup-input" v-model="form.date.month" />
+                <input
+                  class="signup-input"
+                  @keydown="typewriter"
+                  v-model="form.date.month"
+                />
                 월
-                <input class="signup-input" v-model="form.date.day" />
+                <input
+                  class="signup-input"
+                  @keydown="typewriter"
+                  v-model="form.date.day"
+                />
                 일
               </div>
             </td>
@@ -57,7 +71,11 @@
       </div>
     </div>
     <div class="button-wrap">
-      <div class="button-metro" @click="submit()" style="float: right">
+      <div
+        class="button-metro"
+        @click="submit(), selectSound()"
+        style="float: right"
+      >
         발 급
       </div>
     </div>
@@ -69,9 +87,14 @@ import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import { reactive } from "vue";
 import { signup } from "@/api/login.js";
-
+import useSound from "vue-use-sound";
+import selectSfx from "@/assets/Select.wav";
+import buttonSfx from "@/assets/Typewriter.wav";
 export default {
   setup() {
+    const [selectSound] = useSound(selectSfx);
+    const [typewriter] = useSound(buttonSfx);
+
     const router = useRouter();
     const store = useStore();
     const form = reactive({
@@ -127,6 +150,8 @@ export default {
     return {
       form,
       submit,
+      selectSound,
+      typewriter,
     };
   },
 };

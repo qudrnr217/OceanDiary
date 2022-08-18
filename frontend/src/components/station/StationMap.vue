@@ -16,11 +16,17 @@
         </div>
         <div class="circle-wrap">
           <div class="ssafy-station"></div>
-          <div class="ocean-station" @mouseover="setKey(0)"></div>
-          <div class="library-station" @mouseover="setKey(1)"></div>
-          <div class="cafe-station" @mouseover="setKey(2)"></div>
-          <div class="festival-station" @mouseover="setKey(3)"></div>
-          <div class="home-station" @mouseover="setKey(4)"></div>
+          <div class="ocean-station" @mouseover="setKey(0), hoverSound()"></div>
+          <div
+            class="library-station"
+            @mouseover="setKey(1), hoverSound()"
+          ></div>
+          <div class="cafe-station" @mouseover="setKey(2), hoverSound()"></div>
+          <div
+            class="festival-station"
+            @mouseover="setKey(3), hoverSound()"
+          ></div>
+          <div class="home-station" @mouseover="setKey(4), hoverSound()"></div>
         </div>
       </div>
     </div>
@@ -31,6 +37,8 @@
 import StationInfo from "@/components/station/StationInfo.vue";
 import { names, explains, roomImages, links } from "@/const/const.js";
 import { ref } from "vue";
+import useSound from "vue-use-sound";
+import hoverSfx from "@/assets/Hover.wav";
 export default {
   components: {
     StationInfo,
@@ -40,6 +48,8 @@ export default {
     // hover에 따라 station-info의 이미지 변경
     var show = ref(false);
     var key = ref(0);
+    const [hoverSound] = useSound(hoverSfx);
+
     const setKey = (index) => {
       show.value = true;
       key.value = index;
@@ -52,6 +62,7 @@ export default {
       show,
       key,
       setKey,
+      hoverSound,
     };
   },
 };

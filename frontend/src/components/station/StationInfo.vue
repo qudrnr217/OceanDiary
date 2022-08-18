@@ -21,6 +21,7 @@
         <router-link
           :to="{ name: 'train-depart', query: { dest: link } }"
           class="button-next"
+          @click="clickSound()"
           >입장</router-link
         >
       </div>
@@ -29,7 +30,15 @@
 </template>
 
 <script scoped>
+import useSound from "vue-use-sound";
+import clickSfx from "@/assets/Click.wav";
 export default {
+  setup() {
+    const [clickSound] = useSound(clickSfx);
+    return {
+      clickSound,
+    };
+  },
   props: ["name", "explain", "image", "link"],
 };
 </script>

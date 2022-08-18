@@ -9,7 +9,11 @@
     </div>
     <div class="content-wrap">
       <div id="left" class="ticket-wrap">
-        <router-link :to="{ name: 'login-social' }" class="button-ticket">
+        <router-link
+          :to="{ name: 'login-social' }"
+          class="button-ticket"
+          @click="selectSound()"
+        >
           <div class="name">
             <h1><span style="font-size: 50px">정기권</span> 구입</h1>
           </div>
@@ -22,7 +26,11 @@
         </router-link>
       </div>
       <div id="right" class="ticket-wrap">
-        <router-link :to="{ name: 'login-single' }" class="button-ticket">
+        <router-link
+          :to="{ name: 'login-single' }"
+          class="button-ticket"
+          @click="selectSound()"
+        >
           <div class="name">
             <h1><span style="font-size: 50px">1회권</span> 구입</h1>
           </div>
@@ -39,7 +47,16 @@
 </template>
 
 <script>
-export default {};
+import useSound from "vue-use-sound";
+import selectSfx from "@/assets/Select.wav";
+export default {
+  setup() {
+    const [selectSound] = useSound(selectSfx);
+    return {
+      selectSound,
+    };
+  },
+};
 </script>
 
 <style scoped>
