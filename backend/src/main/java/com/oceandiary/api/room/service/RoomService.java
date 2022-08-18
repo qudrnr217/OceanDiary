@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -271,14 +272,24 @@ public class RoomService {
         Iterator<RoomResponse.SearchRooms> searchedRoomsIterator = page.getContent().iterator();
         boolean isInConsistent = false;
 
-        // 데이터 부정합성 케이스 1. MySQL에는 deletedAt이 기록되어 끝난 세션으로 기록되었지만 Redis에는 아직 진행중인 세션일 경우
+        Set<String> activeSessionIds = this.openVidu.getActiveSessions().stream().map(Session::getSessionId).collect(Collectors.toSet());
         Iterable<RoomOnRedis> allRooms = roomOnRedisRepository.findAll();
         Iterator<RoomOnRedis> allRoomsIterator = allRooms.iterator();
         while (allRoomsIterator.hasNext()) {
             RoomOnRedis roomOnRedis = allRoomsIterator.next();
-            Room room = roomRepository.findById(roomOnRedis.getId()).orElseThrow();
-            if (room.getDeletedAt() != null) {
+
+            if (activeSessionIds.contains(roomOnRedis.getSessionId())) {
+                // 데이터 부정합성 케이스 1. MySQL에는 deletedAt이 기록되어 끝난 세션으로 기록되었지만 Redis에는 아직 진행중인 세션일 경우
+                Room room = roomRepository.findById(roomOnRedis.getId()).orElseThrow();
+                if (room.getDeletedAt() != null) {
+                    isInConsistent = true;
+                    roomOnRedisRepository.deleteById(room.getId());
+                    participantOnRedisRepository.deleteById(room.getId());
+                }
+            } else { // 데이터 부정합성 케이스 0. OpenVidu에는 active session이 아니지만 redis와 MySQL에는 active session인 경우
                 isInConsistent = true;
+                Room room = roomRepository.findById(roomOnRedis.getId()).orElseThrow();
+                room.setDeletedAt(LocalDateTime.now());
                 roomOnRedisRepository.deleteById(room.getId());
                 participantOnRedisRepository.deleteById(room.getId());
             }
@@ -372,6 +383,7 @@ public class RoomService {
         foundRoom.updateInfo(request);
         return RoomResponse.OnlyId.builder().roomId(roomId).build();
     }
+
     public RoomResponse.OnlyId updateRoomImage(Long roomId, MultipartFile file, User user) {
 
         if (isValidated(roomId, user)) {
@@ -390,10 +402,11 @@ public class RoomService {
     }
 
     private boolean isValidated(Long roomId, User user) {
-        if(roomRepository.findById(roomId).orElseThrow().getUser().getId() != user.getId())
+        if (roomRepository.findById(roomId).orElseThrow().getUser().getId() != user.getId())
             return false;
         return true;
     }
+
     /**
      * 1. 같퇴하는 주체가 방장인지 확인한다.
      * 2. 강퇴자가 아직 세션에 남아있는지 확인한다.

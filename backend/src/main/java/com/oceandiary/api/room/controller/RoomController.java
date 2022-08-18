@@ -1,6 +1,5 @@
 package com.oceandiary.api.room.controller;
 
-import com.oceandiary.api.common.utils.CookieUtils;
 import com.oceandiary.api.room.dto.RoomRequest;
 import com.oceandiary.api.room.dto.RoomResponse;
 import com.oceandiary.api.room.service.RoomService;
@@ -14,7 +13,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 @RestController
@@ -33,8 +31,8 @@ public class RoomController {
     public RoomResponse.EnterRoom enterRoom(@PathVariable("roomId") Long roomId,
                                             @RequestBody RoomRequest.EnterRoom request,
                                             @CurrentUser CustomUserDetails user,
-                                            @CookieValue(name = "name", defaultValue = "") String name) throws UnsupportedEncodingException {
-        return roomService.enterRoom(request, roomId, Optional.ofNullable(user).map(CustomUserDetails::getUser).orElse(null), CookieUtils.getCookie(name));
+                                            @RequestParam(value = "name", required = false) String name) {
+        return roomService.enterRoom(request, roomId, Optional.ofNullable(user).map(CustomUserDetails::getUser).orElse(null), name);
     }
 
     @DeleteMapping("/{roomId}/participants/{participantId}")
