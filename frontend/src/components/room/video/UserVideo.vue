@@ -9,6 +9,9 @@
       </div>
     </div>
   </div>
+  <div v-else>
+    <img src="@/assets/물음표2.png" alt="" class="empty" />
+  </div>
 </template>
 
 <script>
@@ -71,5 +74,11 @@ export default {
 
 .cam:hover .camera {
   opacity: 0.3;
+}
+
+.empty {
+  width: 90%;
+  height: auto;
+  border-radius: 10px;
 }
 </style>

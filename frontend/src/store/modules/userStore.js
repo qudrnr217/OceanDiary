@@ -6,8 +6,6 @@ const userStore = {
     token: "",
     oauthId: "",
     name: "",
-    email: "",
-    birth: "",
     userId: Number,
   },
   getters: {
@@ -33,12 +31,6 @@ const userStore = {
     },
     SET_NAME: (state, name) => {
       state.name = name;
-    },
-    SET_EMAIL: (state, email) => {
-      state.email = email;
-    },
-    SET_BIRTH: (state, birth) => {
-      state.birth = birth;
     },
   },
   // actions: {
