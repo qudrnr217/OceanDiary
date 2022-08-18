@@ -141,12 +141,7 @@ const routes = [
       {
         path: "festival",
         name: "festival-room",
-        component: () => import("@/components/room/FestivalRoom.vue"),
-      },
-      {
-        path: "festival",
-        name: "festival-room",
-        component: () => import("@/components/room/FestivalRoom.vue"),
+        component: () => import("@/components/room/NewFestivalRoom.vue"),
       },
     ],
   },
