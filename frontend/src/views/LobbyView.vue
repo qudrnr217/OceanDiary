@@ -2,12 +2,18 @@
   <div class="background" ref="bg">
     <router-view></router-view>
   </div>
+  <DiaryNav></DiaryNav>
 </template>
 
 <script>
 import { onMounted, ref } from "vue";
 import { roomImages, stations, indexes } from "@/const/const.js";
+import DiaryNav from "@/components/diary/DiaryIcon.vue";
+
 export default {
+  components: {
+    DiaryNav,
+  },
   setup() {
     const urlParams = new URL(location.href).searchParams;
     const dest = urlParams.get("dest");

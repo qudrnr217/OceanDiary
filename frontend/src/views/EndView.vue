@@ -26,7 +26,17 @@
 </template>
 
 <script>
-export default {};
+import { useStore } from "vuex";
+import { logout } from "@/api/login.js";
+export default {
+  setup() {
+    const store = useStore();
+    logout(store.state.userStore.token, () => {
+      store.commit("userStore/SET_INIT");
+      (error) => console.log(error);
+    });
+  },
+};
 </script>
 
 <style scoped>
