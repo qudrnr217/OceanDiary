@@ -45,6 +45,24 @@ const routes = [
     name: "KakaoHandler",
     component: () => import("@/components/user/oauth/KakaoHandler.vue"),
   },
+  // diary 관련
+  {
+    path: "/diary",
+    name: "diary",
+    component: () => import("@/views/DiaryView.vue"),
+    children: [
+      {
+        path: "member",
+        name: "diary-member",
+        component: () => import("@/components/diary/DiaryMember.vue"),
+      },
+      {
+        path: "single",
+        name: "diary-single",
+        component: () => import("@/components/diary/DiarySingle.vue"),
+      },
+    ],
+  },
   // station 관련
   {
     path: "/station",
