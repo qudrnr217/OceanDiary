@@ -7,6 +7,7 @@
         <button class="button-next" @click="LeaveSession()">나가기</button>
       </div>
     </div>
+
     <div class="user">
       <div class="user-wrap">
         <div class="camera-wrap">
@@ -16,6 +17,11 @@
               :participantId="state.participantId"
               :name="state.pub_name"
             />
+            <!-- <user-video
+              v-for="sub in state.subscribers"
+              :key="sub.stream.connection.connectionId"
+              :streamManager="sub"
+            /> -->
           </div>
 
           <div class="user2">
@@ -58,111 +64,168 @@
               />
               <time-view class="time" v-else :key="state.reload" />
             </div>
+            <div class="empty"></div>
+            <div class="chat">
+              <div class="chat-header">
+                <div
+                  class="participant"
+                  @click="state.current_title = 'participant'"
+                >
+                  <img src="@/assets/아이콘/참가자.png" alt="" />
+                  참가자
+                </div>
+                <div class="chat-title" @click="state.current_title = 'chat'">
+                  <img src="@/assets/아이콘/채팅.png" alt="" />
+                  채팅
+                </div>
+                <div class="game-wrap">
+                  <!-- 라이어 게임 컴포넌트 시작 -->
+                  <button
+                    class="button-metro"
+                    id="show-liargame-modal"
+                    @click="startLiarGame"
+                  >
+                    라이어 게임 GO
+                  </button>
+                  <transition name="modal">
+                    <LiarGame
+                      v-if="state.showLiarGameModal"
+                      @close="endLiarGame"
+                      v-bind:categoryChosen="state.categoryChosen"
+                      @decideCategory="decideKeyword"
+                    >
+                      <template v-slot:header>
+                        <h3>라이어 게임 제시어는</h3>
+                      </template>
+                      <template v-slot:body>
+                        {{ state.liargameKeyword }}</template
+                      >
+                    </LiarGame>
+                  </transition>
+                  <!-- 끝 -->
+                </div>
+                <div class="game-wrap">
+                  <!-- 콜마이네임 게임 컴포넌트 시작 -->
+                  <button
+                    class="button-metro"
+                    id="show-liargame-modal"
+                    @click="setUpCallMyNameGame"
+                  >
+                    콜마이네임 게임 GO
+                  </button>
+                  <transition name="modal">
+                    <CallMyNameGame
+                      v-if="state.showCallMyNameGameModal"
+                      :participants="state.participants"
+                      :showCallMyNameGameModal="state.showCallMyNameGameModal"
+                      @close="state.showCallMyNameGameModal = false"
+                      @startCallMyNameGame="startCallMyNameGame"
+                    >
+                    </CallMyNameGame>
+                  </transition>
+                  <!-- 끝 -->
+                </div>
+              </div>
+              <div class="chat-box" v-if="state.current_title === 'chat'">
+                <div class="chat-content">
+                  <chat-view
+                    v-for="ch in state.chat"
+                    :key="ch.name"
+                    :data="ch"
+                    :connectionId="state.connectionId"
+                  />
+                </div>
 
-            <div class="share-icons">
-              <img
-                src="@/assets/아이콘/[아이콘]배경음악_ON.png"
-                alt=""
-                class="bgm-icon"
-              />
-              <img
-                src="@/assets/아이콘/[아이콘]마이크_ON.png"
-                alt=""
-                class="mic-icon"
-                @click="mic_toggle()"
-              />
-              <img
-                src="@/assets/아이콘/[아이콘]카메라_ON.png"
-                alt=""
-                class="camera-icon"
-                @click="camera_toggle()"
-              />
-              <img
-                src="@/assets/아이콘/[아이콘]화면공유.png"
-                alt=""
-                class="share-icon"
-                @click="screen_share()"
-              />
-              <img
-                src="@/assets/아이콘/[아이콘]설정.png"
-                alt=""
-                class="config-icon"
-              />
+                <div class="chat-footer">
+                  <div class="line"></div>
+                  <input
+                    type="text"
+                    class="chat-input"
+                    v-model="message"
+                    @keyup.enter="submit_msg()"
+                  />
+                  <img
+                    src="@/assets/아이콘/메세지보내기.png"
+                    alt=""
+                    class="submit-btn"
+                    @click="submit_msg()"
+                  />
+                  <!-- <button class="submit-btn" @click="submit_msg()">전송</button> -->
+                </div>
+              </div>
+              <div
+                class="participant-box"
+                v-if="state.current_title === 'participant'"
+              >
+                <div
+                  class="user-list"
+                  v-if="state.current_title === 'participant'"
+                >
+                  <user-list
+                    :roomId="state.roomId"
+                    :key="state.reload"
+                    :callMyName="state.callMyName"
+                  />
+                </div>
+              </div>
             </div>
           </div>
-          <div class="chat">
-            <div class="chat-header">
-              <div
-                class="participant"
-                @click="state.current_title = 'participant'"
-              >
-                참가자
-              </div>
-              <div class="chat-title" @click="state.current_title = 'chat'">
-                채팅
-              </div>
-              <div class="game-wrap">
-                <!-- 라이어 게임 컴포넌트 시작 -->
-                <button
-                  class="button-metro"
-                  id="show-liargame-modal"
-                  @click="startLiarGame"
-                >
-                  라이어 게임 GO
-                </button>
-                <transition name="modal">
-                  <LiarGame
-                    v-if="state.showLiarGameModal"
-                    @close="endLiarGame"
-                    v-bind:categoryChosen="state.categoryChosen"
-                    @decideCategory="decideKeyword"
-                  >
-                    <template v-slot:header>
-                      <h3>라이어 게임 제시어는</h3>
-                    </template>
-                    <template v-slot:body>
-                      {{ state.liargameKeyword }}</template
-                    >
-                  </LiarGame>
-                </transition>
-                <!-- 끝 -->
-              </div>
-              <div class="game-wrap">
-                <!-- 콜마이네임 게임 컴포넌트 시작 -->
-                <button
-                  class="button-metro"
-                  id="show-liargame-modal"
-                  @click="setUpCallMyNameGame"
-                >
-                  콜마이네임 게임 GO
-                </button>
-                <transition name="modal">
-                  <CallMyNameGame
-                    v-if="state.showCallMyNameGameModal"
-                    :participants="state.participants"
-                    :showCallMyNameGameModal="state.showCallMyNameGameModal"
-                    @close="state.showCallMyNameGameModal = false"
-                    @startCallMyNameGame="startCallMyNameGame"
-                  >
-                  </CallMyNameGame>
-                </transition>
-                <!-- 끝 -->
-              </div>
-            </div>
-            <div class="chat-box" v-if="state.current_title === 'chat'">
-              <chat-view v-for="ch in state.chat" :key="ch.name" :data="ch" />
-              <div class="chat-footer">
-                <input type="text" class="chat-input" v-model="message" />
-                <button class="submit-btn" @click="submit_msg()">전송</button>
-              </div>
-            </div>
-            <div class="user-list" v-if="state.current_title === 'participant'">
-              <user-list
-                :roomId="state.roomId"
-                :key="state.reload"
-                :callMyName="state.callMyName"
-              />
-            </div>
+          <div class="share-icons">
+            <img
+              v-if="is_img"
+              src="@/assets/아이콘/[아이콘]배경음악_ON.png"
+              alt=""
+              class="bgm-icon"
+              @click="OnMusic(1)"
+            />
+            <img
+              v-if="!is_img"
+              src="@/assets/아이콘/mute.png"
+              alt=""
+              class="bgm-icon"
+              @click="OnMusic(0)"
+            />
+
+            <img
+              src="@/assets/아이콘/[아이콘]마이크_ON.png"
+              alt=""
+              class="mic-icon"
+              @click="mic_toggle()"
+              v-if="is_mic"
+            />
+            <img
+              src="@/assets/아이콘/[아이콘]마이크_OFF.png"
+              alt=""
+              class="mic-icon"
+              @click="mic_toggle()"
+              v-if="!is_mic"
+            />
+
+            <img
+              src="@/assets/아이콘/[아이콘]카메라_ON.png"
+              alt=""
+              class="camera-icon"
+              @click="camera_toggle()"
+              v-if="is_camera"
+            />
+            <img
+              src="@/assets/아이콘/[아이콘]비디오_OFF.png"
+              alt=""
+              class="camera-icon"
+              @click="camera_toggle()"
+              v-if="!is_camera"
+            />
+            <img
+              src="@/assets/아이콘/[아이콘]화면공유.png"
+              alt=""
+              class="share-icon"
+              @click="screen_share()"
+            />
+            <img
+              src="@/assets/아이콘/[아이콘]설정.png"
+              alt=""
+              class="config-icon"
+            />
           </div>
         </div>
       </div>
@@ -178,19 +241,22 @@ import { ref, reactive } from "@vue/reactivity";
 import { useStore } from "vuex";
 import { onMounted, watch, watchEffect } from "@vue/runtime-core";
 // import { reactive, ref } from "@vue/reactivity";/
-import { LeaveRoom } from "@/api/webrtc.js";
+import { leaveRoom } from "@/api/webrtc.js";
 import { useRouter } from "vue-router";
+import { GetUserInfo, GetStamp } from "@/api/webrtc.js";
 import UserList from "./component/UserList.vue";
 import ChatView from "./component/ChatView.vue";
 import TimeView from "./component/TimeView.vue";
+import moment from "moment";
+
 // 라이어 게임 관련 import 시작
-import { GetUserInfo } from "@/api/webrtc.js";
 import { liarGameKeywords, callMyNameKeywords } from "@/const/const";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import LiarGame from "./component/LiarGame";
 import CallMyNameGame from "./component/CallMyNameGame";
 // 끝
+
 axios.defaults.headers.post["Content-Type"] = "application/json";
 const OPENVIDU_SERVER_URL = "https://" + "i7a406.p.ssafy.io" + ":5443";
 const OPENVIDU_SERVER_SECRET = "A406";
@@ -210,7 +276,9 @@ export default {
     const store = useStore();
     var message = ref("");
     const router = useRouter();
-
+    var is_img = ref(true);
+    var is_mic = ref(true);
+    var is_camera = ref(true);
     const state = reactive({
       screen_msg: undefined,
       OV: undefined,
@@ -230,13 +298,14 @@ export default {
       openvidu_token2: undefined,
       isScreen: false,
       screen_connection_id: undefined,
-      connectionId: undefined,
+      connectionId: store.state.roomStore.connectionId,
       reload: 0,
-      current_title: "participant",
+      current_title: "chat",
       sub_name: [],
       pub_name: undefined,
       chat: [],
       leave_connectionId: store.state.roomStore.leave_connectionId,
+      audio_0: undefined,
       // 게임 관련 state 시작
       showLiarGameModal: false,
       showCallMyNameGameModal: false,
@@ -248,7 +317,6 @@ export default {
       callMyName: {},
       // 게임 관련 state 끝
     });
-
     // 게임 관련 methods 시작
     function connect() {
       var socket = new SockJS("/api/ws");
@@ -412,7 +480,6 @@ export default {
       sendMessage(res.slice(0, res.length - 1));
     };
     // 게임 관련 methods 끝
-
     onMounted(() => {
       // 웹소켓 connect 시작
       connect();
@@ -423,9 +490,22 @@ export default {
       var test3 = test2[0].split("sessionId=");
       var test4 = test3[1].split("&token=");
       state.mySessionId = test4[0];
-
       joinSession();
+      state.audio_0 = new Audio(require("@/assets/배경음악/축제/축제.mp3"));
+      // for (;;) {
+      state.audio_0.play();
+      state.audio_0.loop = true;
+      // }
     });
+
+    var OnMusic = (idx) => {
+      is_img.value = !is_img.value;
+      if (idx === 1) {
+        state.audio_0.pause();
+      } else {
+        state.audio_0.play();
+      }
+    };
 
     watch(store.state.roomStore.isScreen, () => {});
     watchEffect(() => {
@@ -437,7 +517,7 @@ export default {
     var camera_toggle = () => {
       v_toggle = !v_toggle;
       // state.publisher.properties.publishVideo = false;
-
+      is_camera.value = !is_camera.value;
       // state.publisher.properties.publishVideo = false;
       state.publisher.publishVideo(v_toggle);
     };
@@ -447,6 +527,7 @@ export default {
     var mic_toggle = () => {
       console.log("마이크 On/Off!!!");
       m_toggle = !m_toggle;
+      is_mic.value = !is_mic.value;
 
       state.publisher.publishAudio(m_toggle);
     };
@@ -546,6 +627,7 @@ export default {
             publisher2.once("accessDenied", (event) => {
               console.log(event);
               console.warn("ScreenShare: Access Denied");
+              state.publisher2 = undefined;
             });
           })
           .catch((error) => {
@@ -607,39 +689,58 @@ export default {
         // console.log("participantId", state.participantId);
       });
 
+      state.session.on("streamDestroyed", ({ stream }) => {
+        console.log("스트림이다~~~~: ", stream);
+        const index = state.subscribers.indexOf(stream.streamManager, 0);
+        if (index >= 0) {
+          state.subscribers.splice(index, 1);
+        }
+      });
+
       //사람 나갔을 때
-      state.session.on("connectionDestroyed", ({ stream }) => {
+      state.session.on("connectionDestroyed", (stream) => {
         state.reload += 1;
 
         console.log("subscriber가 나갔습니다 ㅠㅠ!");
         state.publisher2 = undefined;
 
-        console.log("stream: " + stream);
+        console.log("stream: ", stream);
         // console.log(stream);
 
-        var length = state.subscribers.length;
-        console.log(state.publisher);
-        for (var i = 0; i < length; i++) {
-          console.log(length);
-          console.log(i);
-          console.log(state.subscribers[i].stream.connection.connectionId);
-          // console.log(state.subscribers[i]);
-          console.log("나간 커넥션 아이디: " + state.leave_connectionId);
-          // state.subscribers[0] = undefined;
-          if (
-            state.subscribers[i].stream.connection.connectionId ===
-            store.state.roomStore.leave_connectionId
-          ) {
-            // const index = state.subscribers.indexOf(i);
-            // console.log("iiiiiiiiiiiiiiiiiiiii: " + i);
-            // state.subscribers[i] = undefined;
-            // if (index >= 0) {
-            //   state.subscribers.splice(index, 1);
-            // }
-            console.log("안녕하세요!");
-            state.subscribers[i] = undefined;
-          }
+        const index = state.subscribers.indexOf(
+          stream.connection.stream.StreamManager,
+          0
+        );
+
+        console.log("인덱스 : " + index);
+        if (index > -1) {
+          state.subscribers.splice(index, 1);
+          state.subscribers([...state.subscribers]);
         }
+
+        // var length = state.subscribers.length;
+        // console.log(state.publisher);
+        // for (var i = 0; i < length; i++) {
+        //   console.log(length);
+        //   console.log(i);
+        //   console.log(state.subscribers[i].stream.connection.connectionId);
+        //   // console.log(state.subscribers[i]);
+        //   console.log("나간 커넥션 아이디: " + state.leave_connectionId);
+        //   // state.subscribers[0] = undefined;
+        //   if (
+        //     state.subscribers[i].stream.connection.connectionId ===
+        //     store.state.roomStore.leave_connectionId
+        //   ) {
+        //     // const index = state.subscribers.indexOf(i);
+        //     // console.log("iiiiiiiiiiiiiiiiiiiii: " + i);
+        //     // state.subscribers[i] = undefined;
+        //     // if (index >= 0) {
+        //     //   state.subscribers.splice(index, 1);
+        //     // }
+        //     console.log("안녕하세요!");
+        //     state.subscribers[i] = undefined;
+        //   }
+        // }
       });
 
       state.session.on("exception", ({ exception }) => {
@@ -658,7 +759,7 @@ export default {
           let publisher = state.OV.initPublisher(undefined, {
             audioSource: undefined, // The source of audio. If undefined default microphone
             videoSource: undefined, // The source of video. If undefined default webcam
-            publishAudio: false, // Whether you want to start publishing with your audio unmuted or not
+            publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
             publishVideo: true, // Whether you want to start publishing with your video enabled or not
             resolution: "640x480", // The resolution of your video
             frameRate: 30, // The frame rate of your video
@@ -685,6 +786,9 @@ export default {
 
       state.session.on("signal", (event) => {
         state.screen_msg = event.data;
+        message.value = "";
+        let chat = document.querySelector(".chat-content");
+        chat.scrollTop = chat.scrollHeight;
         // state.chat.push({
         //   data: event.data,
         //   from: event.from,
@@ -761,6 +865,39 @@ export default {
       //     console.log("안녕하세요~");
       //   }
       // }
+      console.log(state.roomId);
+      GetUserInfo(state.roomId, (response) => {
+        var category = response.data.roomInfo.categoryId;
+        console.log("카테고리: " + category);
+        var participant = response.data.participantList;
+        var length = participant.length;
+        for (var i = 0; i < length; i++) {
+          console.log("participant :", participant[i]);
+          if (participant[i].participantId === state.participantId) {
+            var enterTime = participant[i].enterTime;
+            enterTime = moment(enterTime);
+            enterTime = enterTime.format("YYYY-MM-DD HH:mm:ss");
+            // console.log(date);
+            // console.log(enterTime);
+          }
+        }
+        var exitTime = Date.now();
+        exitTime = moment(exitTime);
+        exitTime = exitTime.format("YYYY-MM-DD HH:mm:ss");
+        // console.log("exit_date: " + exit_date);
+        GetStamp(
+          store.state.userStore.token,
+          enterTime,
+          exitTime,
+          category,
+          (response) => {
+            console.log("response: ", response);
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
+      });
 
       if (state.session) {
         state.publisher = undefined;
@@ -768,18 +905,25 @@ export default {
         state.session.disconnect();
         state.OV = undefined;
         state.session = undefined;
+
         store.commit("roomStore/SET_INIT_CHAT");
       }
-      LeaveRoom(state.roomId, state.participantId, (response) => {
-        console.log(response);
-        console.log("세션 나가기 성공!");
-        console.log("subscribers count : ", state.subscribers);
 
-        router.push({
-          name: "room-list",
-          query: { dest: "cafe" },
-        });
-      });
+      leaveRoom(
+        store.state.userStore.token,
+        state.roomId,
+        state.participantId,
+        (response) => {
+          console.log(response);
+          console.log("세션 나가기 성공!");
+          console.log("subscribers count : ", state.subscribers);
+
+          router.push({
+            name: "room-list",
+            query: { dest: "cafe" },
+          });
+        }
+      );
     };
 
     var updateMainVideoStreamManager = (stream) => {
@@ -790,7 +934,8 @@ export default {
     return {
       state,
       message,
-
+      is_mic,
+      is_camera,
       joinSession,
       updateMainVideoStreamManager,
       camera_toggle,
@@ -798,6 +943,9 @@ export default {
       screen_share,
       submit_msg,
       LeaveSession,
+      is_img,
+      m_toggle,
+      OnMusic,
 
       // 라이어 게임 메소드 return 시작
       startLiarGame,
@@ -812,6 +960,10 @@ export default {
 </script>
 
 <style scoped>
+.background {
+  width: 100vw;
+  height: 100vh;
+}
 .total-wrap {
   width: 100vw;
   height: 100vh;
@@ -820,7 +972,7 @@ export default {
 .title-wrap {
   width: 100%;
   height: 7%;
-  background-color: red;
+  /* background-color: red; */
 
   display: flex;
   justify-content: flex-start;
@@ -846,7 +998,7 @@ export default {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  background-color: blueviolet;
+  /* background-color: blueviolet; */
 
   position: relative;
   right: 3%;
@@ -858,6 +1010,8 @@ export default {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  position: relative;
+  bottom: 1.5%;
 }
 
 .user-wrap {
@@ -865,6 +1019,7 @@ export default {
   height: 97%;
   background-color: burlywood;
   padding: 1rem;
+  min-width: 1280px;
 
   background: rgba(255, 255, 255, 0.5);
   border-radius: 6px;
@@ -883,7 +1038,8 @@ export default {
   height: 22%;
   position: relative;
   left: 0%;
-  background-color: aquamarine;
+  bottom: 1.5%;
+  /* background-color: aquamarine; */
 
   display: flex;
   justify-content: flex-start;
@@ -896,14 +1052,17 @@ export default {
 .user1 {
   width: 15.4%;
   height: 95%;
-  background-color: brown;
+  /* background-color: brown; */
   border-radius: 10px;
   position: relative;
+  display: flex;
+  /* border: solid 2px; */
+  /* border: 2px; */
 }
 .user2 {
   width: 15.4%;
   height: 95%;
-  background-color: brown;
+  /* background-color: brown; */
   position: relative;
   left: 1.5%;
   border-radius: 10px;
@@ -911,7 +1070,7 @@ export default {
 .user3 {
   width: 15.4%;
   height: 95%;
-  background-color: brown;
+  /* background-color: brown; */
   position: relative;
   left: 3%;
   border-radius: 10px;
@@ -919,7 +1078,7 @@ export default {
 .user4 {
   width: 15.4%;
   height: 95%;
-  background-color: brown;
+  /* background-color: brown; */
   position: relative;
   left: 4.5%;
   border-radius: 10px;
@@ -927,7 +1086,7 @@ export default {
 .user5 {
   width: 15.4%;
   height: 95%;
-  background-color: brown;
+  /* background-color: brown; */
   position: relative;
   left: 6%;
   border-radius: 10px;
@@ -935,7 +1094,7 @@ export default {
 .user6 {
   width: 15.4%;
   height: 95%;
-  background-color: brown;
+  /* background-color: brown; */
   position: relative;
   left: 7.5%;
   border-radius: 10px;
@@ -944,51 +1103,68 @@ export default {
 .chat-wrap {
   width: 100%;
   height: 78%;
-  background-color: chartreuse;
+  /* background-color: chartreuse; */
   position: relative;
 }
+
 .share {
-  width: 66.5%;
-  height: 100%;
-  background-color: blueviolet;
-  position: relative;
-}
-.share-icons {
   width: 100%;
-  height: 12%;
-  background-color: red;
+  height: 92%;
   position: relative;
-  top: 88%;
+  /* top: 3.5%; */
+  top: 20px;
+  /* background-color: #f7d794; */
 
   display: flex;
-  justify-content: flex-start;
+}
+
+.empty {
+  width: 2%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0);
+}
+
+.chat {
+  width: 32%;
+  height: 100%;
+  /* background-color: black; */
+}
+.share-icons {
+  width: 66.5%;
+  height: 8%;
+  /* background-color: red; */
+  /* position: relative; */
+  position: absolute;
+  top: 95%;
+  display: flex;
+  /* justify-content: center; */
   align-items: center;
 }
 
 .bgm-icon {
-  width: 5%;
+  width: 3%;
   position: relative;
-  left: 25%;
+  left: 32.5%;
 }
 .mic-icon {
-  width: 5%;
+  width: 3%;
   position: relative;
-  left: 30%;
+  left: 37.5%;
 }
 .camera-icon {
-  width: 5%;
+  width: 3%;
   position: relative;
-  left: 35%;
+  left: 42.5%;
 }
 .share-icon {
-  width: 5%;
+  width: 3%;
   position: relative;
-  left: 40%;
+  left: 47.5%;
 }
 .config-icon {
-  width: 5%;
+  width: 3%;
   position: relative;
-  left: 45%;
+  left: 52.5%;
 }
 
 .share-icons {
@@ -997,77 +1173,109 @@ export default {
 }
 
 .share-screen {
-  width: 100%;
-  height: 88%;
-  /* background-color: blue; */
-}
-
-.chat {
-  width: 33.5%;
+  width: 66%;
   height: 100%;
-  background-color: darkkhaki;
-  position: absolute;
-  left: 66.5%;
-  bottom: 0%;
+  background-color: white;
 }
 
 .chat-header {
   width: 100%;
   height: 10%;
-  background-color: coral;
+  /* background-color: white; */
   display: flex;
+  position: relative;
 }
 
 .chat-box {
   width: 100%;
   height: 90%;
-  background-color: beige;
+  background-color: white;
   position: relative;
 }
 
 .chat-footer {
   width: 100%;
   height: 12%;
-  background-color: cornflowerblue;
+  /* background-color: cornflowerblue; */
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   position: absolute;
   top: 88%;
 }
+.chat-content {
+  width: 100%;
+  height: 86%;
+  /* overflow-y: auto; */
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
 .chat-input {
   position: absolute;
-  width: 75%;
-  height: 85%;
+  width: 70%;
+  height: 50%;
+  border: 1px solid #d1d8df;
+  border-radius: 30px;
 }
 
 .submit-btn {
   position: absolute;
-  width: 23%;
-  height: 90%;
-  left: 77%;
+  width: 7%;
+  height: auto;
+  left: 88%;
+  /* top: 1px; */
 }
 
 .participant {
   width: 50%;
   height: auto;
-  background-color: #f7d794;
+  background: white;
   display: flex;
   justify-content: center;
   align-items: center;
+  /* padding-left: 1%; */
+
+  background: #f7d794;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+}
+
+.participant:hover {
+  border: 2px solid #3b81ee;
 }
 
 .chat-title {
   width: 50%;
   height: auto;
-  background-color: cadetblue;
+  background-color: white;
   display: flex;
   justify-content: center;
   align-items: center;
+
+  /* background: #f7d794; */
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
 }
 
-/* 라이어 게임 css 시작 */
+.chat-title:hover {
+  border: 2px solid #3b81ee;
+}
 
-/* 라이어 게임 css 끝 */
+.participant-box {
+  width: 100%;
+  height: 90%;
+  background: beige;
+}
+
+.line {
+  width: 100%;
+  height: 1%;
+  background-color: #d1d8df;
+  position: absolute;
+  bottom: 110%;
+  /* border: solid #d1d8df; */
+  /* color: #d1d8df; */
+}
 </style>
