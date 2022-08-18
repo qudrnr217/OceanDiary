@@ -222,22 +222,17 @@ public class RoomService {
 
             Session session = getSession(roomOnRedis.getSessionId());
             Room room = roomRepository.findById(roomId).orElseThrow();
-            log.info("방장 시작: {}", user.getId());
             if (user != null && Objects.equals(user.getId(), roomOnRedis.getCreatedBy())) {  // 방장이 나갈경우
-                log.info("방장 맞음: {}", participantId);
                 for (Long pid : participantOnRedis.getParticipantTokenMap().keySet()) {
                     addStampAndUpdateVisitedAtBeforeExit(room, pid);
                 }
                 participantOnRedis.getParticipantTokenMap().clear();
                 participantOnRedis.getParticipantConnectionMap().clear();
             } else {
-                log.info("방장 아님: {}", participantId);
                 addStampAndUpdateVisitedAtBeforeExit(room, participantId);
                 participantOnRedis.removeParticipant(participantId);
             }
-            log.info("방장 participants: {}", participantOnRedis.getParticipantTokenMap().toString());
             if (participantOnRedis.getParticipantTokenMap().isEmpty()) {  // 방에 더이상 참가자가 없을경우
-                log.info("방장 나감, 세션 종료");
                 // 세션 종료
                 session.close();
                 log.info("Session destroyed");
