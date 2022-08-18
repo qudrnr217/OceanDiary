@@ -50,7 +50,7 @@
           },
         }"
         class="button-metro"
-        @click="selectSound"
+        @click="selectSound(), initUserStore()"
         >발 급</router-link
       >
     </div>
@@ -60,15 +60,20 @@
 <script>
 import useSound from "vue-use-sound";
 import selectSfx from "@/assets/Select.wav";
+import { useStore } from "vuex";
 
 export default {
   setup() {
+    const store = useStore();
     const [selectSound] = useSound(selectSfx);
     const day = new Date();
     const year = day.getFullYear();
     const month = day.getMonth() + 1;
     const date = day.getDate();
-    return { year, month, date, selectSound };
+    const initUserStore = () => {
+      store.commit("userStore/SET_INIT");
+    };
+    return { year, month, date, selectSound, initUserStore };
   },
 };
 </script>

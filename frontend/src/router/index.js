@@ -131,6 +131,12 @@ const routes = [
         name: "room-create",
         component: () => import("@/components/room/RoomCreate.vue"),
       },
+      {
+        path: "enter",
+        name: "room-enter",
+        component: () => import("@/components/room/RoomEnter.vue"),
+        props: true,
+      },
     ],
   },
   {
