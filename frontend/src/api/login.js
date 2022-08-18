@@ -1,4 +1,4 @@
-import { apiInstance } from "@/api/index.js";
+import { apiInstance, authApiInstance } from "@/api/index.js";
 import qs from "qs";
 
 const api = apiInstance();
@@ -33,5 +33,9 @@ async function signup(social, info, success, fail) {
     .then(success)
     .catch(fail);
 }
+async function logout(token, success, fail) {
+  const authApi = authApiInstance(token);
+  await authApi.get(`/user/logout`).then(success).catch(fail);
+}
 
-export { kakaoLogin, naverState, naverLogin, signup };
+export { kakaoLogin, naverState, naverLogin, signup, logout };
