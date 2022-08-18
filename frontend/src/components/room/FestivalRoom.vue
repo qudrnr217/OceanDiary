@@ -2,7 +2,7 @@
   <div class="total-wrap">
     <div class="title-wrap">
       <img src="@/assets/아이콘/coffe_icon.png" alt="" class="title-icon" />
-      <div class="title-name">두 시의 도서관 스터디</div>
+      <div class="title-name">Festival</div>
       <div class="exit-btn">
         <button class="button-next" @click="LeaveSession()">나가기</button>
       </div>
@@ -163,7 +163,7 @@
                 >
                   <user-list
                     :roomId="state.roomId"
-                    :key="state.reload"
+                    :key="state.participant_reload"
                     :callMyName="state.callMyName"
                   />
                 </div>
@@ -173,28 +173,28 @@
           <div class="share-icons">
             <img
               v-if="is_img"
-              src="@/assets/아이콘/[아이콘]배경음악_ON.png"
+              src="@/assets/스크린아이콘/[아이콘]소리ON.png"
               alt=""
               class="bgm-icon"
               @click="OnMusic(1)"
             />
             <img
               v-if="!is_img"
-              src="@/assets/아이콘/mute.png"
+              src="@/assets/스크린아이콘/[아이콘]소리OFF.png"
               alt=""
               class="bgm-icon"
               @click="OnMusic(0)"
             />
 
             <img
-              src="@/assets/아이콘/[아이콘]마이크_ON.png"
+              src="@/assets/스크린아이콘/[아이콘]마이크ON.png"
               alt=""
               class="mic-icon"
               @click="mic_toggle()"
               v-if="is_mic"
             />
             <img
-              src="@/assets/아이콘/[아이콘]마이크_OFF.png"
+              src="@/assets/스크린아이콘/[아이콘]마이크OFF.png"
               alt=""
               class="mic-icon"
               @click="mic_toggle()"
@@ -202,29 +202,32 @@
             />
 
             <img
-              src="@/assets/아이콘/[아이콘]카메라_ON.png"
+              src="@/assets/스크린아이콘/[아이콘]영상ON.png"
               alt=""
               class="camera-icon"
               @click="camera_toggle()"
               v-if="is_camera"
             />
             <img
-              src="@/assets/아이콘/[아이콘]비디오_OFF.png"
+              src="@/assets/스크린아이콘/[아이콘]영상OFF.png"
               alt=""
               class="camera-icon"
               @click="camera_toggle()"
               v-if="!is_camera"
             />
             <img
-              src="@/assets/아이콘/[아이콘]화면공유.png"
+              src="@/assets/스크린아이콘/[아이콘]화면공유OFF.png"
               alt=""
               class="share-icon"
               @click="screen_share()"
+              v-if="!is_share"
             />
             <img
-              src="@/assets/아이콘/[아이콘]설정.png"
+              src="@/assets/스크린아이콘/[아이콘]화면공유ON.png"
               alt=""
-              class="config-icon"
+              class="share-icon"
+              @click="screen_share()"
+              v-if="is_share"
             />
           </div>
         </div>
@@ -279,6 +282,7 @@ export default {
     var is_img = ref(true);
     var is_mic = ref(true);
     var is_camera = ref(true);
+    var is_share = ref(false);
     const state = reactive({
       screen_msg: undefined,
       OV: undefined,
@@ -316,6 +320,9 @@ export default {
       participants: [],
       callMyName: {},
       // 게임 관련 state 끝
+
+      //참가자 누적시간 reload
+      participant_reload: 0,
     });
     // 게임 관련 methods 시작
     function connect() {
@@ -496,6 +503,11 @@ export default {
       state.audio_0.play();
       state.audio_0.loop = true;
       // }
+
+      //참가자 누적시간 reload
+      setInterval(() => {
+        state.participant_reload += 1;
+      }, 60000);
     });
 
     var OnMusic = (idx) => {
@@ -564,6 +576,7 @@ export default {
 
     //화면 공유
     var screen_share = () => {
+      is_share.value = true;
       axios({
         method: "post",
         url: `${OPENVIDU_SERVER_URL}/openvidu/api/sessions/${state.mySessionId}/connection`,
@@ -603,7 +616,7 @@ export default {
                   console.log('User pressed the "Stop sharing" button');
                   // state.sessionScreen.unsubscribe(state.publisher2);
                   // state.sessionScreen.unpublish(state.publisher2);
-
+                  is_share.value = false;
                   store.commit("roomStore/SET_IS_SCREEN", false);
                   // leave_screen();
                   state.sessionScreen.disconnect();
@@ -945,6 +958,7 @@ export default {
       is_img,
       m_toggle,
       OnMusic,
+      is_share,
 
       // 라이어 게임 메소드 return 시작
       startLiarGame,
@@ -1277,8 +1291,10 @@ export default {
   /* border: solid #d1d8df; */
   /* color: #d1d8df; */
 }
-.user-list {
-  width: 100%;
-  height: 50px;
+
+.time {
+  background-image: url("@/assets/배경화면/Bonfire.gif");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 </style>

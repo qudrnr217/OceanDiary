@@ -1,5 +1,4 @@
-import { authApiInstance } from "@/api/index.js";
-import { apiInstance } from "@/api/index.js";
+import { apiInstance, authApiInstance } from "@/api/index.js";
 
 /* Without auth header */
 const api = apiInstance();
@@ -9,10 +8,7 @@ async function getRoomList(category, lastRoomId, success, fail) {
     .then(success)
     .catch(fail);
 }
-// GET /api/rooms/{roomId}/info
-async function getRoomInfo(roomId, success, fail) {
-  await api.get(`/api/rooms/${roomId}/info`).then(success).catch(fail);
-}
+
 async function getImageFile(imageId, success, fail) {
   await api.get(`/api/image/${imageId}`).then(success).catch(fail);
 }
@@ -63,13 +59,13 @@ async function createRoom(token, roomInfo, imageFile, success, fail) {
   await authApi.post(`/api/rooms`, data).then(success).catch(fail);
 }
 async function GetStamp(token, enterTime, exitTime, category, success, fail) {
-  const api = authApiInstance(token);
+  const authApi = authApiInstance(token);
   const data = {
     enterTime: enterTime,
     exitTime: exitTime,
     category: category,
   };
-  await api
+  await authApi
     .post(`/api/diary/stamp`, JSON.stringify(data))
     .then(success)
     .catch(fail);
@@ -83,5 +79,4 @@ export {
   GetUserInfo,
   createRoom,
   GetStamp,
-  getRoomInfo,
 };

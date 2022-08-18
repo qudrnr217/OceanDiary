@@ -114,7 +114,7 @@ export default {
             response.data.connectionId
           );
           router.push({
-            name: "festival-room",
+            name: `${item.categoryId.toLowerCase()}-room`,
             query: { dest: item.categoryId },
           });
         },
