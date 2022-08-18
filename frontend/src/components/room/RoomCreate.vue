@@ -10,7 +10,7 @@
           <img
             src="@/assets/아이콘/icon_lock.png"
             class="icon-lock"
-            @click="roomInfo.isOpen = !roomInfo.isOpen"
+            @click="[(roomInfo.isOpen = !roomInfo.isOpen), clickSound()]"
             v-if="!roomInfo.isOpen"
           />
           <input
@@ -19,11 +19,12 @@
             placeholder="비밀번호 4자리"
             v-model="roomInfo.pw"
             v-show="!roomInfo.isOpen"
+            @keydown="typewriter"
           />
           <img
             src="@/assets/아이콘/[아이콘]방_공개.png"
             class="icon-lock"
-            @click="roomInfo.isOpen = !roomInfo.isOpen"
+            @click="[(roomInfo.isOpen = !roomInfo.isOpen), clickSound()]"
             v-if="roomInfo.isOpen"
           />
         </div>
@@ -38,6 +39,7 @@
                 type="text"
                 placeholder="제목을 입력하세요"
                 class="room-create-input"
+                @keydown="typewriter"
               />
             </td>
           </tr>
@@ -49,6 +51,7 @@
                 placeholder="규칙을 입력하세요"
                 class="room-create-input"
                 style="height: 180px"
+                @keydown="typewriter"
               />
             </td>
           </tr>
@@ -75,7 +78,9 @@
           </tr>
         </table>
         <div class="room-create-button">
-          <div class="button-metro" @click="create()">생 성</div>
+          <div class="button-metro" @click="[create(), clickSound()]">
+            생 성
+          </div>
         </div>
       </div>
     </div>
@@ -88,6 +93,9 @@ import { useRouter } from "vue-router";
 import { onMounted, reactive, ref } from "vue";
 import { icons, indexes, types } from "@/const/const.js";
 import { createRoom } from "@/api/webrtc.js";
+import useSound from "vue-use-sound";
+import buttonSfx from "@/assets/Typewriter.wav";
+import clickSfx from "@/assets/Click.wav";
 export default {
   setup() {
     const router = useRouter();
@@ -99,6 +107,8 @@ export default {
     const type = types[dest];
     const numSelect = [2, 3, 4, 5, 6];
     const iconPath = require(`@/assets/아이콘/${icons[index]}`);
+    const [typewriter] = useSound(buttonSfx);
+    const [clickSound] = useSound(clickSfx);
 
     const roomInfo = reactive({
       categoryId: "",
@@ -178,6 +188,8 @@ export default {
       create,
       fileInput,
       numSelect,
+      typewriter,
+      clickSound,
     };
   },
 };

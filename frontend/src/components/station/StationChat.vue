@@ -11,7 +11,12 @@
             <vue-writer :array="[speech]" :typeSpeed="50" :iterations="1" />
           </div>
           <div class="button-wrap">
-            <router-link :to="nextLink" class="button-next">다음</router-link>
+            <router-link
+              :to="nextLink"
+              class="button-next"
+              @click="clickSound()"
+              >다음</router-link
+            >
           </div>
         </div>
       </div>
@@ -20,7 +25,16 @@
 </template>
 
 <script>
+import useSound from "vue-use-sound";
+import clickSfx from "@/assets/Click.wav";
 export default {
+  setup() {
+    const [clickSound] = useSound(clickSfx);
+    return {
+      clickSound,
+    };
+  },
+
   name: "station-chat",
   props: {
     nextLink: String,
