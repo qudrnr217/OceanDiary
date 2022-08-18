@@ -10,7 +10,7 @@
     </div>
   </div>
   <div v-else>
-    <img src="@/assets/물음표2.png" alt="" class="empty" />
+    <img src="@/assets/x표시.png" alt="" class="empty" />
   </div>
 </template>
 

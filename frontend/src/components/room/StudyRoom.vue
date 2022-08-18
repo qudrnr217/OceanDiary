@@ -7,6 +7,7 @@
         <button class="button-next" @click="LeaveSession()">나가기</button>
       </div>
     </div>
+
     <div class="user">
       <div class="user-wrap">
         <div class="camera-wrap">
@@ -87,6 +88,7 @@
                     :connectionId="state.connectionId"
                   />
                 </div>
+
                 <div class="chat-footer">
                   <div class="line"></div>
                   <input
@@ -119,21 +121,48 @@
           </div>
           <div class="share-icons">
             <img
+              v-if="is_img"
               src="@/assets/아이콘/[아이콘]배경음악_ON.png"
               alt=""
               class="bgm-icon"
+              @click="OnMusic(1)"
             />
+            <img
+              v-if="!is_img"
+              src="@/assets/아이콘/mute.png"
+              alt=""
+              class="bgm-icon"
+              @click="OnMusic(0)"
+            />
+
             <img
               src="@/assets/아이콘/[아이콘]마이크_ON.png"
               alt=""
               class="mic-icon"
               @click="mic_toggle()"
+              v-if="is_mic"
             />
+            <img
+              src="@/assets/아이콘/[아이콘]마이크_OFF.png"
+              alt=""
+              class="mic-icon"
+              @click="mic_toggle()"
+              v-if="!is_mic"
+            />
+
             <img
               src="@/assets/아이콘/[아이콘]카메라_ON.png"
               alt=""
               class="camera-icon"
               @click="camera_toggle()"
+              v-if="is_camera"
+            />
+            <img
+              src="@/assets/아이콘/[아이콘]비디오_OFF.png"
+              alt=""
+              class="camera-icon"
+              @click="camera_toggle()"
+              v-if="!is_camera"
             />
             <img
               src="@/assets/아이콘/[아이콘]화면공유.png"
@@ -185,7 +214,9 @@ export default {
     const store = useStore();
     var message = ref("");
     const router = useRouter();
-
+    var is_img = ref(true);
+    var is_mic = ref(true);
+    var is_camera = ref(true);
     const state = reactive({
       screen_msg: undefined,
       OV: undefined,
@@ -207,11 +238,12 @@ export default {
       screen_connection_id: undefined,
       connectionId: store.state.roomStore.connectionId,
       reload: 0,
-      current_title: "participant",
+      current_title: "chat",
       sub_name: [],
       pub_name: undefined,
       chat: [],
       leave_connectionId: store.state.roomStore.leave_connectionId,
+      audio_0: undefined,
     });
 
     onMounted(() => {
@@ -221,9 +253,22 @@ export default {
       var test3 = test2[0].split("sessionId=");
       var test4 = test3[1].split("&token=");
       state.mySessionId = test4[0];
-
       joinSession();
+      state.audio_0 = new Audio(require("@/assets/배경음악/축제/축제.mp3"));
+      // for (;;) {
+      state.audio_0.play();
+      state.audio_0.loop = true;
+      // }
     });
+
+    var OnMusic = (idx) => {
+      is_img.value = !is_img.value;
+      if (idx === 1) {
+        state.audio_0.pause();
+      } else {
+        state.audio_0.play();
+      }
+    };
 
     watch(store.state.roomStore.isScreen, () => {});
     watchEffect(() => {
@@ -235,7 +280,7 @@ export default {
     var camera_toggle = () => {
       v_toggle = !v_toggle;
       // state.publisher.properties.publishVideo = false;
-
+      is_camera.value = !is_camera.value;
       // state.publisher.properties.publishVideo = false;
       state.publisher.publishVideo(v_toggle);
     };
@@ -245,6 +290,7 @@ export default {
     var mic_toggle = () => {
       console.log("마이크 On/Off!!!");
       m_toggle = !m_toggle;
+      is_mic.value = !is_mic.value;
 
       state.publisher.publishAudio(m_toggle);
     };
@@ -476,7 +522,7 @@ export default {
           let publisher = state.OV.initPublisher(undefined, {
             audioSource: undefined, // The source of audio. If undefined default microphone
             videoSource: undefined, // The source of video. If undefined default webcam
-            publishAudio: false, // Whether you want to start publishing with your audio unmuted or not
+            publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
             publishVideo: true, // Whether you want to start publishing with your video enabled or not
             resolution: "640x480", // The resolution of your video
             frameRate: 30, // The frame rate of your video
@@ -622,19 +668,25 @@ export default {
         state.session.disconnect();
         state.OV = undefined;
         state.session = undefined;
+
         store.commit("roomStore/SET_INIT_CHAT");
       }
 
-      leaveRoom(state.roomId, state.participantId, (response) => {
-        console.log(response);
-        console.log("세션 나가기 성공!");
-        console.log("subscribers count : ", state.subscribers);
+      leaveRoom(
+        store.state.userStore.token,
+        state.roomId,
+        state.participantId,
+        (response) => {
+          console.log(response);
+          console.log("세션 나가기 성공!");
+          console.log("subscribers count : ", state.subscribers);
 
-        router.push({
-          name: "room-list",
-          query: { dest: "cafe" },
-        });
-      });
+          router.push({
+            name: "room-list",
+            query: { dest: "cafe" },
+          });
+        }
+      );
     };
 
     var updateMainVideoStreamManager = (stream) => {
@@ -645,7 +697,8 @@ export default {
     return {
       state,
       message,
-
+      is_mic,
+      is_camera,
       joinSession,
       updateMainVideoStreamManager,
       camera_toggle,
@@ -653,6 +706,9 @@ export default {
       screen_share,
       submit_msg,
       LeaveSession,
+      is_img,
+      m_toggle,
+      OnMusic,
     };
   },
 };

@@ -45,11 +45,6 @@ export default {
   border-radius: 30px;
 }
 
-.others-name {
-  background: #e5e5e9;
-  border-radius: 30px;
-}
-
 .my-data {
   width: 40%;
   height: auto;
@@ -60,7 +55,7 @@ export default {
 }
 
 .others-data {
-  width: 30%;
+  width: 40%;
   height: auto;
   background: #e5e5e9;
   border-radius: 30px;
