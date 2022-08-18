@@ -64,6 +64,7 @@ import animalSound from "@/assets/역입구-이름질문.wav";
 
 export default {
   setup() {
+    const store = useStore();
     const [selectSound] = useSound(selectSfx);
     const [animalese] = useSound(animalSound);
     const day = new Date();

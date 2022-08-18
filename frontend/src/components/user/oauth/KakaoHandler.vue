@@ -30,7 +30,10 @@ export default {
             store.commit("userStore/SET_NAME", response.data.name);
             router.push({
               name: "station-chat",
-              params: { nextLink: "map", speech: "어디로 가시나요?" },
+              params: {
+                nextLink: "map",
+                speech: `${response.data.name} 님, 어디로 가시나요?`,
+              },
             });
           } else {
             //아이디가 없을 경우

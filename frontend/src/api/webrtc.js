@@ -9,23 +9,45 @@ async function getRoomList(category, lastRoomId, success, fail) {
     .then(success)
     .catch(fail);
 }
+// GET /api/rooms/{roomId}/info
+async function getRoomInfo(roomId, success, fail) {
+  await api.get(`/api/rooms/${roomId}/info`).then(success).catch(fail);
+}
 async function getImageFile(imageId, success, fail) {
   await api.get(`/api/image/${imageId}`).then(success).catch(fail);
 }
 
-async function joinRoom(roomId, password, success, fail) {
-  await api
-    .post(`/api/rooms/${roomId}`, JSON.stringify({ pw: password }))
-    .then(success)
-    .catch(fail);
+async function joinRoom(token, name, social, roomId, password, success, fail) {
+  if (social != "NONE") {
+    const authApi = authApiInstance(token);
+    await authApi
+      .post(`/api/rooms/${roomId}`, JSON.stringify({ pw: password }))
+      .then(success)
+      .catch(fail);
+  } else {
+    await api
+      .post(
+        `/api/rooms/${roomId}?name=${name}`,
+        JSON.stringify({ pw: password })
+      )
+      .then(success)
+      .catch(fail);
+  }
 }
 
-async function leaveRoom(token, roomId, participantId, success, fail) {
-  const authApi = authApiInstance(token);
-  await authApi
-    .delete(`/api/rooms/${roomId}/participants/${participantId}`)
-    .then(success)
-    .catch(fail);
+async function leaveRoom(token, social, roomId, participantId, success, fail) {
+  if (social != "NONE") {
+    const authApi = authApiInstance(token);
+    await authApi
+      .delete(`/api/rooms/${roomId}/participants/${participantId}`)
+      .then(success)
+      .catch(fail);
+  } else {
+    await api
+      .delete(`/api/rooms/${roomId}/participants/${participantId}`)
+      .then(success)
+      .catch(fail);
+  }
 }
 async function GetUserInfo(roomId, success, fail) {
   await api.get(`/api/rooms/${roomId}/detail`).then(success).catch(fail);
@@ -61,4 +83,5 @@ export {
   GetUserInfo,
   createRoom,
   GetStamp,
+  getRoomInfo,
 };

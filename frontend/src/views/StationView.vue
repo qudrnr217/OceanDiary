@@ -1,9 +1,15 @@
 <template>
   <router-view />
+  <DiaryNav></DiaryNav>
 </template>
 
 <script>
-export default {};
+import DiaryNav from "@/components/diary/DiaryIcon.vue";
+export default {
+  components: {
+    DiaryNav,
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

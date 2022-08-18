@@ -134,7 +134,10 @@ export default {
           store.commit("userStore/SET_USERID", response.data.userId);
           router.push({
             name: "station-chat",
-            params: { nextLink: "map", speech: "어디로 가시나요?" },
+            params: {
+              nextLink: "map",
+              speech: `${response.data.name} 님, 어디로 가시나요?`,
+            },
           });
         },
         (error) => {

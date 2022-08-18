@@ -50,7 +50,7 @@ import { useRouter } from "vue-router";
 import { onMounted, ref, reactive } from "vue";
 import { names, icons, indexes } from "@/const/const.js";
 import { useStore } from "vuex";
-import { getRoomList, joinRoom, getImageFile } from "@/api/webrtc.js";
+import { getRoomList, getImageFile } from "@/api/webrtc.js";
 import useSound from "vue-use-sound";
 import clickSfx from "@/assets/Click.wav";
 export default {
@@ -65,50 +65,18 @@ export default {
     const index = indexes[dest];
     const title = names[index];
     const iconPath = require(`@/assets/아이콘/${icons[index]}`);
-
-    const getToken = () => {
-      const token = store.state.userStore.token;
-      if (token == "") {
-        console.log(`토큰 정보가 없습니다!(${token})`);
-        return null;
-      }
-      return token;
-    };
-    const isMember = getToken() != null;
+    const socialType = store.state.userStore.social;
+    const isMember = socialType == "NAVER" || socialType == "KAKAO";
     const items = ref(null);
     const enterRoom = (item) => {
-      let inputPassword = "";
       if (item.curNum >= item.maxNum) {
         alert("방이 꽉 차있어요!");
         return;
       }
-      if (!item.isOpen) {
-        inputPassword = prompt("비밀번호를 입력해주세요.");
-      }
-
-      joinRoom(
-        item.roomId,
-        inputPassword,
-        (response) => {
-          store.commit("roomStore/SET_ROOM_ID", item.roomId);
-          store.commit(
-            "roomStore/SET_PARTICIPANT_ID",
-            response.data.participantId
-          );
-          store.commit("roomStore/SET_OPENVIDU_TOKEN", response.data.token);
-          store.commit(
-            "roomStore/SET_CONNECTION_ID",
-            response.data.connectionId
-          );
-          router.push({
-            name: "festival-room",
-            query: { dest: dest },
-          });
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
+      router.push({
+        name: "room-enter",
+        query: { roomId: item.roomId },
+      });
     };
     const createRoom = () => {
       router.push({

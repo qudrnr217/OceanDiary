@@ -1,12 +1,23 @@
 <template>
-  <div class="outer">
-    <div class="user-wrap"></div>
-    <div class="user" v-for="user in user_info.users" :key="user.connectionId">
-      <img src="@/assets/아이콘/아바타.png" alt="" class="avatar" />
-      {{ user.name }} [ {{ callMyName[user.participantId] }} ]
+  <div>
+    <div class="user-card">
+      <div
+        class="name-info"
+        v-for="user in user_info.users"
+        :key="user.connectionId"
+      >
+        <img src="@/assets/아이콘/아바타.png" alt="" class="avatar" />
+        {{ user.name }} [ {{ callMyName[user.participantId] }} ]
+      </div>
     </div>
-    <div class="time" v-for="(time, idx) in user_info.total_time" :key="idx">
-      {{ time }}
+    <div class="time-card">
+      <div
+        class="time-info"
+        v-for="(time, idx) in user_info.total_time"
+        :key="idx"
+      >
+        {{ time }}
+      </div>
     </div>
   </div>
 </template>
@@ -54,7 +65,8 @@ export default {
           console.log("분: " + minutes);
           console.log("hours: " + moment(today).diff(moment(time), "hours"));
 
-          user_info.total_time.push(hour + "시" + " " + minutes + "분");
+          // user_info.total_time.push(hour + "시" + " " + minutes + "분");
+          user_info.total_time.push(hour + "시간" + " " + minutes + "분");
           // console.log();
         }
       });
@@ -74,18 +86,31 @@ export default {
 };
 </script>
 
-<style>
-.outer {
+<style scoped>
+.user-time-wrap {
   width: 100%;
   height: 100%;
 }
-.user {
+.user-card {
+  float: left;
+  margin-left: 10px;
+}
+.time-card {
+  float: right;
+  margin-right: 10px;
+}
+.name-info {
+  height: 50px;
   display: flex;
-  justify-content: flex-start;
   align-items: center;
-  padding: 1%;
+}
+.time-info {
+  height: 50px;
+  display: flex;
+  align-items: center;
 }
 .avatar {
-  width: 4%;
+  width: 30px;
+  margin: 5px;
 }
 </style>
