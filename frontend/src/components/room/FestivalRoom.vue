@@ -101,41 +101,71 @@
               <div class="chat-title" @click="state.current_title = 'chat'">
                 채팅
               </div>
+              <div class="game-wrap">
+                <!-- 라이어 게임 컴포넌트 시작 -->
+                <button
+                  class="button-metro"
+                  id="show-liargame-modal"
+                  @click="startLiarGame"
+                >
+                  라이어 게임 GO
+                </button>
+                <transition name="modal">
+                  <LiarGame
+                    v-if="state.showLiarGameModal"
+                    @close="endLiarGame"
+                    v-bind:categoryChosen="state.categoryChosen"
+                    @decideCategory="decideKeyword"
+                  >
+                    <template v-slot:header>
+                      <h3>라이어 게임 제시어는</h3>
+                    </template>
+                    <template v-slot:body>
+                      {{ state.liargameKeyword }}</template
+                    >
+                  </LiarGame>
+                </transition>
+                <!-- 끝 -->
+              </div>
+              <div class="game-wrap">
+                <!-- 콜마이네임 게임 컴포넌트 시작 -->
+                <button
+                  class="button-metro"
+                  id="show-liargame-modal"
+                  @click="setUpCallMyNameGame"
+                >
+                  콜마이네임 게임 GO
+                </button>
+                <transition name="modal">
+                  <CallMyNameGame
+                    v-if="state.showCallMyNameGameModal"
+                    :participants="state.participants"
+                    :showCallMyNameGameModal="state.showCallMyNameGameModal"
+                    @close="state.showCallMyNameGameModal = false"
+                    @startCallMyNameGame="startCallMyNameGame"
+                  >
+                  </CallMyNameGame>
+                </transition>
+                <!-- 끝 -->
+              </div>
             </div>
             <div class="chat-box" v-if="state.current_title === 'chat'">
               <chat-view v-for="ch in state.chat" :key="ch.name" :data="ch" />
-
               <div class="chat-footer">
                 <input type="text" class="chat-input" v-model="message" />
                 <button class="submit-btn" @click="submit_msg()">전송</button>
               </div>
             </div>
             <div class="user-list" v-if="state.current_title === 'participant'">
-              <user-list :roomId="state.roomId" :key="state.reload" />
+              <user-list
+                :roomId="state.roomId"
+                :key="state.reload"
+                :callMyName="state.callMyName"
+              />
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div>
-      <!-- 라이어 게임 컴포넌트 시작 -->
-      <button id="show-liargame-modal" @click="startLiarGame">
-        라이어 게임 시작
-      </button>
-      <transition name="modal">
-        <LiarGame
-          v-if="state.showModal"
-          @close="endLiarGame"
-          v-bind:categoryChosen="state.categoryChosen"
-          @decideCategory="decideKeyword"
-        >
-          <template v-slot:header>
-            <h3>라이어 게임 제시어는</h3>
-          </template>
-          <template v-slot:body> {{ state.liargameKeyword }}</template>
-        </LiarGame>
-      </transition>
-      <!-- 끝 -->
     </div>
   </div>
 </template>
@@ -155,10 +185,11 @@ import ChatView from "./component/ChatView.vue";
 import TimeView from "./component/TimeView.vue";
 // 라이어 게임 관련 import 시작
 import { GetUserInfo } from "@/api/webrtc.js";
-import { liarGameKeywords } from "@/const/const";
+import { liarGameKeywords, callMyNameKeywords } from "@/const/const";
 import SockJS from "sockjs-client";
 import Stomp from "stompjs";
 import LiarGame from "./component/LiarGame";
+import CallMyNameGame from "./component/CallMyNameGame";
 // 끝
 axios.defaults.headers.post["Content-Type"] = "application/json";
 const OPENVIDU_SERVER_URL = "https://" + "i7a406.p.ssafy.io" + ":5443";
@@ -172,6 +203,7 @@ export default {
     TimeView,
     ChatView,
     LiarGame,
+    CallMyNameGame,
   },
 
   setup() {
@@ -206,11 +238,14 @@ export default {
       chat: [],
       leave_connectionId: store.state.roomStore.leave_connectionId,
       // 게임 관련 state 시작
-      showModal: false,
+      showLiarGameModal: false,
+      showCallMyNameGameModal: false,
       liargameCategory: "",
       liargameKeyword: "",
       stompClient: null,
       categoryChosen: false,
+      participants: [],
+      callMyName: {},
       // 게임 관련 state 끝
     });
 
@@ -248,9 +283,9 @@ export default {
       );
     }
 
-    function sendMessage(event, keyword, liar) {
+    function sendMessage(callMyName, keyword, liar) {
       if (keyword && state.stompClient) {
-        var chatMessage = {
+        let chatMessage = {
           roomId: store.state.roomStore.roomId,
           participantId: store.state.roomStore.participantId,
           name: store.state.userStore.name,
@@ -262,13 +297,25 @@ export default {
           JSON.stringify(chatMessage)
         );
       }
-      event.preventDefault();
+      if (callMyName && state.stompClient) {
+        let chatMessage = {
+          roomId: store.state.roomStore.roomId,
+          participantId: store.state.roomStore.participantId,
+          name: store.state.userStore.name,
+          message: `callMyName=${callMyName}`,
+        };
+        state.stompClient.send(
+          `/pub/rooms/${store.state.roomStore.roomId}/messages`,
+          {},
+          JSON.stringify(chatMessage)
+        );
+      }
     }
 
     function onMessageReceived(payload) {
       var message = JSON.parse(payload.body).message;
       if (message.includes("keyword")) {
-        state.showModal = true;
+        state.showLiarGameModal = true;
 
         let words = message.split("&");
         let liar = words[1].substr(5);
@@ -281,16 +328,25 @@ export default {
           state.categoryChosen = true;
         }, 200);
       }
+
+      if (message.includes("callMyName")) {
+        state.callMyName = {};
+        let callMyNameParticipants = message.substr(11).split(",");
+        for (let callMyNameParticipant of callMyNameParticipants) {
+          let callMyName = callMyNameParticipant.split("&");
+          if (store.state.roomStore.participantId == callMyName[0]) continue;
+          state.callMyName[callMyName[0]] = callMyName[1];
+        }
+      }
     }
 
     let startLiarGame = () => {
-      state.showModal = true;
+      state.showLiarGameModal = true;
     };
 
     let decideKeyword = (category) => {
       state.liargameCategory = category;
       GetUserInfo(
-        store.state.userStore.token,
         store.state.roomStore.roomId,
         ({ data }) => {
           // 카테고리에 대한 키워드 선정 및 라이어 선정
@@ -305,7 +361,7 @@ export default {
                   liarGameKeywords["keywords"][state.liargameCategory].length
               )
             ];
-          sendMessage(event, liargameKeyword, liar);
+          sendMessage(null, liargameKeyword, liar);
         },
         (error) => {
           console.log(error);
@@ -316,8 +372,44 @@ export default {
     let endLiarGame = () => {
       state.liargameKeyword = "";
       state.liargmaeCategory = "";
-      state.showModal = false;
+      state.showLiarGameModal = false;
       state.categoryChosen = false;
+    };
+
+    let setUpCallMyNameGame = () => {
+      state.showCallMyNameGameModal = true;
+      GetUserInfo(
+        store.state.roomStore.roomId,
+        ({ data }) => {
+          // 카테고리에 대한 키워드 선정 및 라이어 선정
+          let participantList = data.participantList;
+          state.participants = participantList;
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    };
+
+    let startCallMyNameGame = (checkedParticipants) => {
+      if (checkedParticipants.length == 0) {
+        alert("1명이상의 참가자를 지정해주세요.");
+        return;
+      }
+      state.showCallMyNameGameModal = false;
+      let population = Array.from(callMyNameKeywords);
+      let populationSize = population.length;
+      let i = 0;
+      let res = "";
+      while (population.length > populationSize - checkedParticipants.length) {
+        let sample = population.splice(
+          Math.floor(Math.random() * population.length),
+          1
+        )[0];
+        res += checkedParticipants[i] + "&" + sample + ",";
+        i++;
+      }
+      sendMessage(res.slice(0, res.length - 1));
     };
     // 게임 관련 methods 끝
 
@@ -711,6 +803,8 @@ export default {
       startLiarGame,
       decideKeyword,
       endLiarGame,
+      setUpCallMyNameGame,
+      startCallMyNameGame,
       // 라이어 게임 메소드 return 끝
     };
   },
@@ -974,11 +1068,6 @@ export default {
 }
 
 /* 라이어 게임 css 시작 */
-#show-liargame-modal {
-  z-index: 999;
-  position: absolute;
-  left: 60%;
-  top: 30%;
-}
+
 /* 라이어 게임 css 끝 */
 </style>

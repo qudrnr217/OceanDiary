@@ -1,39 +1,31 @@
 <template>
-  <div class="modal-mask box">
+  <div class="modal-mask box" v-if="showCallMyNameGameModal">
     <div class="modal-wrapper">
-      <div class="modal-container" v-if="!categoryChosen">
-        <div class="modal-header">카테고리를 고르세요</div>
+      <div class="modal-container">
+        <div class="modal-header">참가자들을 고르세요</div>
         <div class="modal-body">
-          <div
-            class="button-metro category-item"
-            v-for="(category, i) in state.liarGameKeywords.categories"
-            :key="i"
-            @click="$emit('decideCategory', category)"
-          >
-            {{ category }}
+          <div id="v-model-multiple-checkboxes">
+            <template v-for="(participant, i) in participants" :key="i">
+              <input
+                type="checkbox"
+                :id="i"
+                :value="participant.participantId"
+                v-model="state.checkedParticipants"
+              />
+              <label :for="i">{{ participant.name }}</label>
+            </template>
           </div>
         </div>
         <div class="modal-footer">
+          <button
+            class="modal-default-button"
+            @click="$emit('startCallMyNameGame', state.checkedParticipants)"
+          >
+            시작하기
+          </button>
           <button class="modal-default-button" @click="$emit('close')">
             닫기
           </button>
-        </div>
-      </div>
-      <div class="modal-container" v-if="categoryChosen">
-        <div class="modal-header">
-          <slot name="header"> default header </slot>
-        </div>
-
-        <div class="modal-body">
-          <slot name="body"> default body </slot>
-        </div>
-
-        <div class="modal-footer">
-          <slot name="footer">
-            <button class="modal-default-button" @click="$emit('close')">
-              닫기
-            </button>
-          </slot>
         </div>
       </div>
     </div>
@@ -41,16 +33,16 @@
 </template>
 
 <script>
-import { liarGameKeywords } from "@/const/const.js";
 import { reactive } from "vue";
 export default {
   props: {
-    categoryChosen: Boolean,
+    participants: Object,
+    showCallMyNameGameModal: Boolean,
   },
-  emits: ["decideCategory", "close"],
+  emits: ["startCallMyNameGame", "close"],
   setup() {
     const state = reactive({
-      liarGameKeywords: liarGameKeywords,
+      checkedParticipants: [],
     });
     return { state };
   },
@@ -104,6 +96,10 @@ export default {
   margin-top: 1rem;
 }
 
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+}
 .modal-enter-active,
 .modal-leave-active {
   transition: opacity 0.5s ease;
