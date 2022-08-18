@@ -243,7 +243,7 @@ import { onMounted, watch, watchEffect } from "@vue/runtime-core";
 // import { reactive, ref } from "@vue/reactivity";/
 import { leaveRoom } from "@/api/webrtc.js";
 import { useRouter } from "vue-router";
-import { GetUserInfo, GetStamp } from "@/api/webrtc.js";
+import { GetUserInfo } from "@/api/webrtc.js";
 import UserList from "./component/UserList.vue";
 import ChatView from "./component/ChatView.vue";
 import TimeView from "./component/TimeView.vue";
@@ -844,7 +844,6 @@ export default {
     }; //end of join Session
 
     var LeaveSession = () => {
-      console.log(event);
       store.commit(
         "roomStore/SET_LEAVE_CONNECTION_ID",
         store.state.roomStore.connectionId
@@ -852,7 +851,7 @@ export default {
       console.log(
         "퍼블리셔 커넥션 아이디: " + store.state.roomStore.connectionId
       );
-
+      state.audio_0.pause();
       console.log(store.state.roomStore.leave_connectionId);
 
       // state.reload += 1;
@@ -881,22 +880,22 @@ export default {
             // console.log(enterTime);
           }
         }
-        var exitTime = Date.now();
-        exitTime = moment(exitTime);
-        exitTime = exitTime.format("YYYY-MM-DD HH:mm:ss");
-        // console.log("exit_date: " + exit_date);
-        GetStamp(
-          store.state.userStore.token,
-          enterTime,
-          exitTime,
-          category,
-          (response) => {
-            console.log("response: ", response);
-          },
-          (error) => {
-            console.log(error);
-          }
-        );
+        // var exitTime = Date.now();
+        // exitTime = moment(exitTime);
+        // exitTime = exitTime.format("YYYY-MM-DD HH:mm:ss");
+        // // console.log("exit_date: " + exit_date);
+        // GetStamp(
+        //   store.state.userStore.token,
+        //   enterTime,
+        //   exitTime,
+        //   category,
+        //   (response) => {
+        //     console.log("response: ", response);
+        //   },
+        //   (error) => {
+        //     console.log(error);
+        //   }
+        // );
       });
 
       if (state.session) {

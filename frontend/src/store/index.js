@@ -26,11 +26,12 @@ import locationStore from "./modules/locationStore";
 import userStore from "./modules/userStore";
 import createPersistedState from "vuex-persistedstate";
 import roomStore from "./modules/roomStore";
+import stampStore from "./modules/stampStore";
 export default createStore({
-  modules: { locationStore, userStore, roomStore },
+  modules: { locationStore, userStore, roomStore, stampStore },
   plugins: [
     createPersistedState({
-      paths: ["userStore", "roomStore"],
+      paths: ["locationStore", "userStore", "roomStore", "stampStore"],
     }),
   ],
 });
