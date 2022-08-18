@@ -10,7 +10,7 @@
           <img
             src="@/assets/아이콘/icon_lock.png"
             class="icon-lock"
-            @click="[(roomInfo.isOpen = !roomInfo.isOpen), clickSound()]"
+            @click="clickSound(), (roomInfo.isOpen = !roomInfo.isOpen)"
             v-if="!roomInfo.isOpen"
           />
           <input
@@ -24,7 +24,7 @@
           <img
             src="@/assets/아이콘/[아이콘]방_공개.png"
             class="icon-lock"
-            @click="[(roomInfo.isOpen = !roomInfo.isOpen), clickSound()]"
+            @click="clickSound(), (roomInfo.isOpen = !roomInfo.isOpen)"
             v-if="roomInfo.isOpen"
           />
         </div>
@@ -78,9 +78,7 @@
           </tr>
         </table>
         <div class="room-create-button">
-          <div class="button-metro" @click="[create(), clickSound()]">
-            생 성
-          </div>
+          <div class="button-metro" @click="clickSound(), create()">생 성</div>
         </div>
       </div>
     </div>

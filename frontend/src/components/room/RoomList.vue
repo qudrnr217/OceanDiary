@@ -11,7 +11,7 @@
           class="icon-create"
           alt="방생성"
           v-if="isMember"
-          @click="createRoom(), clickSound()"
+          @click="clickSound(), createRoom()"
         />
       </div>
       <div class="box-list">
@@ -33,7 +33,7 @@
                 ● {{ item.curNum }} / {{ item.maxNum }}
               </div>
               <div ref="button" class="room-card-button">
-                <div class="button-next" @click="enterRoom(item), clickSound()">
+                <div class="button-next" @click="clickSound(), enterRoom(item)">
                   입장
                 </div>
               </div>

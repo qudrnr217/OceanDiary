@@ -24,7 +24,8 @@
               v-for="sub in state.subscribers"
               :key="sub.stream.connection.connectionId"
               :streamManager="sub"
-            /> -->
+            />
+            -->
           </div>
 
           <div class="user2">
