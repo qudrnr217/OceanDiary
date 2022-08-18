@@ -1277,4 +1277,8 @@ export default {
   /* border: solid #d1d8df; */
   /* color: #d1d8df; */
 }
+.user-list {
+  width: 100%;
+  height: 50px;
+}
 </style>

@@ -35,7 +35,10 @@ export default {
     if (store.state.userStore.isLogin) {
       router.push({
         name: "station-chat",
-        params: { nextLink: "map", speech: "어디로 가시나요?" },
+        params: {
+          nextLink: "map",
+          speech: `${store.state.userStore.name} 님, 어디로 가시나요?`,
+        },
       });
       return;
     }

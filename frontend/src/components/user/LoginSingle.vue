@@ -72,6 +72,7 @@ export default {
     const date = day.getDate();
     const initUserStore = () => {
       store.commit("userStore/SET_INIT");
+      store.commit("userStore/SET_SOCIAL", "NONE");
     };
     return { year, month, date, selectSound, initUserStore };
   },
