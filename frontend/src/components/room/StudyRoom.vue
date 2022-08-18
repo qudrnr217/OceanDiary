@@ -23,7 +23,8 @@
               v-for="sub in state.subscribers"
               :key="sub.stream.connection.connectionId"
               :streamManager="sub"
-            /> -->
+            />
+            -->
           </div>
 
           <div class="user2">
@@ -631,16 +632,21 @@ export default {
         store.commit("roomStore/SET_INIT_CHAT");
       }
 
-      leaveRoom(state.roomId, state.participantId, (response) => {
-        console.log(response);
-        console.log("세션 나가기 성공!");
-        console.log("subscribers count : ", state.subscribers);
+      leaveRoom(
+        store.state.userStore.token,
+        state.roomId,
+        state.participantId,
+        (response) => {
+          console.log(response);
+          console.log("세션 나가기 성공!");
+          console.log("subscribers count : ", state.subscribers);
 
-        router.push({
-          name: "room-list",
-          query: { dest: "cafe" },
-        });
-      });
+          router.push({
+            name: "room-list",
+            query: { dest: "cafe" },
+          });
+        }
+      );
     };
 
     var updateMainVideoStreamManager = (stream) => {
