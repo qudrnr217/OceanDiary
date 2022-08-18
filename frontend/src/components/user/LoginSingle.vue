@@ -50,7 +50,7 @@
           },
         }"
         class="button-metro"
-        @click="selectSound"
+        @click="selectSound(), animalese()"
         >발 급</router-link
       >
     </div>
@@ -60,15 +60,17 @@
 <script>
 import useSound from "vue-use-sound";
 import selectSfx from "@/assets/Select.wav";
+import animalSound from "@/assets/역입구-이름질문.wav";
 
 export default {
   setup() {
     const [selectSound] = useSound(selectSfx);
+    const [animalese] = useSound(animalSound);
     const day = new Date();
     const year = day.getFullYear();
     const month = day.getMonth() + 1;
     const date = day.getDate();
-    return { year, month, date, selectSound };
+    return { year, month, date, selectSound, animalese };
   },
 };
 </script>

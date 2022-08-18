@@ -22,7 +22,7 @@
               query: { dest: this.$route.query.dest },
             }"
             class="button-next"
-            @click="clickSound()"
+            @click="clickSound(), roomOtter()"
             >다음</router-link
           >
         </div>
@@ -36,6 +36,8 @@ import { onMounted, ref } from "vue";
 import { arriveOtterImages, stations, indexes } from "@/const/const.js";
 import useSound from "vue-use-sound";
 import clickSfx from "@/assets/Click.wav";
+import otterSound from "@/assets/바리스타.wav";
+
 export default {
   name: "train-arrive",
   setup() {
@@ -43,8 +45,14 @@ export default {
     const dest = urlParams.get("dest");
     var index = indexes[dest];
     const [clickSound] = useSound(clickSfx);
+    const [roomOtter] = useSound(otterSound);
 
     const bg = ref(null);
+    onMounted(() => {
+      const audio_0 = new Audio(require("@/assets/공통-도착.wav"));
+      audio_0.play();
+    });
+
     onMounted(() => {
       const url = require(`@/assets/${arriveOtterImages[index]}`);
       bg.value.style = `background-image: url(${url});`;
@@ -54,6 +62,7 @@ export default {
       stations,
       bg,
       clickSound,
+      roomOtter,
     };
   },
 };

@@ -32,11 +32,18 @@
 <script>
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { onMounted } from "vue";
 export default {
   name: "HelloWorld",
   setup() {
     const router = useRouter();
     const store = useStore();
+    onMounted(() => {
+      const audio_0 = new Audio(require("@/assets/공통-도착.wav"));
+      audio_0.play();
+    });
+    
+    
     var next_page = () => {
       store.commit("locationStore/SET_LOCATION_NAME", "집");
       router.push("/house_bg/home");

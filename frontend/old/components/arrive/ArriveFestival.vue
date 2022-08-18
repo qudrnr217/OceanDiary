@@ -1,5 +1,5 @@
 <template>
-  <div class="background">
+  <div class="background" @click="roomOtter()">
     <div class="banner">
       <!-- <img
         src="../assets/아이콘/[아이콘]정기권_상단.png"
@@ -7,7 +7,7 @@
         class="ticket"
       /> -->
     </div>
-    <div class="text-box">
+    <div class="text-box" >
       <div class="name-wrap">
         <div class="button-name">역무원</div>
       </div>
@@ -25,7 +25,9 @@
         <!-- <router-link to="/festival_bg/home" class="button-next"
           >다음</router-link
         > -->
-        <button class="button-next" @click="next_page()">다음</button>
+        <button class="button-next" @click="next_page(), roomOtter()">
+          다음
+        </button>
       </div>
     </div>
   </div>
@@ -34,11 +36,21 @@
 <script>
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import { onMounted } from "vue";
+import useSound from "vue-use-sound";
+import otterSound from "@/assets/집달이.wav";
+
 export default {
   name: "HelloWorld",
   setup() {
     const router = useRouter();
     const store = useStore();
+    const [roomOtter] = useSound(otterSound);
+    
+    onMounted(() => {
+      const audio_0 = new Audio(require("@/assets/공통-도착.wav"));
+      audio_0.play();
+    });
     var next_page = () => {
       store.commit("locationStore/SET_LOCATION_NAME", "축제");
       router.push("/festival_bg/home");
@@ -46,6 +58,7 @@ export default {
     };
     return {
       next_page,
+      roomOtter,
     };
   },
 };

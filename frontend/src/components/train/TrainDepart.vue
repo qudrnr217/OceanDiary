@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { onMounted } from "vue";
 import { useStore } from "vuex";
 import useSound from "vue-use-sound";
 import clickSfx from "@/assets/Click.wav";
@@ -38,6 +39,11 @@ export default {
     const [clickSound] = useSound(clickSfx);
     var store = useStore();
     console.log(store.state.locationStore.location_url);
+
+    onMounted(() => {
+      const audio_0 = new Audio(require("@/assets/출발-카드.wav"));
+      audio_0.play();
+    });
     return {
       clickSound,
     };
