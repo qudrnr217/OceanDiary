@@ -139,9 +139,14 @@ const routes = [
     component: () => import("@/views/FestivalView.vue"),
     children: [
       {
-        path: "study",
+        path: "festival",
         name: "festival-room",
-        component: () => import("@/components/room/StudyRoom.vue"),
+        component: () => import("@/components/room/FestivalRoom.vue"),
+      },
+      {
+        path: "festival",
+        name: "festival-room",
+        component: () => import("@/components/room/FestivalRoom.vue"),
       },
     ],
   },

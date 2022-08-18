@@ -53,10 +53,10 @@ async function GetStamp(token, enterTime, exitTime, category, success, fail) {
 
 export {
   getRoomList,
-  createRoom,
+  getImageFile,
   joinRoom,
   leaveRoom,
   GetUserInfo,
-  getImageFile,
+  createRoom,
   GetStamp,
 };

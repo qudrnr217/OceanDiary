@@ -3,7 +3,7 @@
     <div class="user-wrap"></div>
     <div class="user" v-for="user in user_info.users" :key="user.connectionId">
       <img src="@/assets/아이콘/아바타.png" alt="" class="avatar" />
-      {{ user.name }}
+      {{ user.name }} [ {{ callMyName[user.participantId] }} ]
     </div>
   </div>
 </template>
@@ -13,7 +13,7 @@ import { GetUserInfo } from "@/api/webrtc.js";
 import { onMounted } from "@vue/runtime-core";
 import { reactive } from "@vue/reactivity";
 export default {
-  props: ["roomId"],
+  props: ["roomId", "callMyName"],
   setup(props) {
     var user_info = reactive({
       curNum: undefined,
