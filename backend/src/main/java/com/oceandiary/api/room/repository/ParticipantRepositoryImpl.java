@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.oceandiary.api.room.entity.QParticipant.participant;
+import static com.oceandiary.api.user.entity.QUser.user;
 
 public class ParticipantRepositoryImpl implements ParticipantRepositoryCustom {
     private final JPAQueryFactory queryFactory;
@@ -23,11 +24,13 @@ public class ParticipantRepositoryImpl implements ParticipantRepositoryCustom {
         return queryFactory
                 .select(Projections.fields(
                         RoomResponse.RoomDetail.ParticipantInfo.class,
+                        user.id.as("userId"),
                         participant.id.as("participantId"),
                         participant.name,
                         participant.enterDate.as("enterTime")
                 ))
                 .from(participant)
+                .leftJoin(participant.user, user)
                 .where(
                         participant.id.in(activeParticipants),
                         participant.exitDate.isNull()

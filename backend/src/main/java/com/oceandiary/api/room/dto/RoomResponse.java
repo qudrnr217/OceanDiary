@@ -64,6 +64,7 @@ public class RoomResponse {
         @NoArgsConstructor
         @AllArgsConstructor
         public static class ParticipantInfo {
+            private Long userId;
             private Long participantId;
             private String name;
             private LocalDateTime enterTime;
