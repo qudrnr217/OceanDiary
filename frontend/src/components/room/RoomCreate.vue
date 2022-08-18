@@ -166,8 +166,8 @@ export default {
             response.data.connectionId
           );
           router.push({
-            name: "festival-room",
-            query: { dest: dest },
+            name: `${dest}-room`,
+            // query: { dest: dest },
           });
         },
         (error) => {

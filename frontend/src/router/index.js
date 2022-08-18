@@ -152,6 +152,54 @@ const routes = [
     ],
   },
   {
+    path: "/ocean",
+    name: "ocean",
+    component: () => import("@/views/OceanView.vue"),
+    children: [
+      {
+        path: "ocean",
+        name: "ocean-room",
+        component: () => import("@/components/room/OceanRoom.vue"),
+      },
+    ],
+  },
+  {
+    path: "/library",
+    name: "library",
+    component: () => import("@/views/LibraryView.vue"),
+    children: [
+      {
+        path: "ocean",
+        name: "library-room",
+        component: () => import("@/components/room/LibraryRoom.vue"),
+      },
+    ],
+  },
+  {
+    path: "/cafe",
+    name: "cafe",
+    component: () => import("@/views/CafeView.vue"),
+    children: [
+      {
+        path: "cafe",
+        name: "cafe-room",
+        component: () => import("@/components/room/CafeRoom.vue"),
+      },
+    ],
+  },
+  {
+    path: "/house",
+    name: "house",
+    component: () => import("@/views/HouseView.vue"),
+    children: [
+      {
+        path: "house",
+        name: "house-room",
+        component: () => import("@/components/room/HouseRoom.vue"),
+      },
+    ],
+  },
+  {
     path: "/end",
     name: "end",
     component: () => import("@/views/EndView.vue"),

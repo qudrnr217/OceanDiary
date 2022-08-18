@@ -73,7 +73,7 @@ export default {
   padding: 10px;
   /* background-color: black; */
   font-size: 4rem;
-  color: black;
+  color: white;
 }
 
 .date {
