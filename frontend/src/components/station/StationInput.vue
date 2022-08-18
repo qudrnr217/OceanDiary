@@ -18,7 +18,9 @@
           />
         </div>
         <div class="button-wrap">
-          <div class="button-next" @click="move(), clickSound()">다음</div>
+          <div class="button-next" @click="clickSound(), move(), animalese()">
+            다음
+          </div>
         </div>
       </div>
     </div>
@@ -32,13 +34,14 @@ import { ref } from "vue";
 import useSound from "vue-use-sound";
 import buttonSfx from "@/assets/Typewriter.wav";
 import clickSfx from "@/assets/Click.wav";
-
+import animalSound from "@/assets/역입구-장소질문.wav";
 export default {
   setup() {
     const router = useRouter();
     const store = useStore();
     const [typewriter] = useSound(buttonSfx);
     const [clickSound] = useSound(clickSfx);
+    const [animalese] = useSound(animalSound);
     const userName = ref("");
     const move = () => {
       if (userName.value == "") {
@@ -55,7 +58,7 @@ export default {
         },
       });
     };
-    return { move, userName, typewriter, clickSound };
+    return { move, userName, typewriter, clickSound, animalese };
   },
 };
 </script>
