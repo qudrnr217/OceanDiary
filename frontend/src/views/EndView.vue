@@ -16,7 +16,7 @@
           </div>
           <div class="button-wrap">
             <router-link :to="{ name: 'main' }" class="button-next"
-              >다음</router-link
+              >홈으로</router-link
             >
           </div>
         </div>
