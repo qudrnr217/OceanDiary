@@ -303,14 +303,14 @@ export default {
         userInfo.name = response.data.userInfo.name;
         userInfo.email = response.data.userInfo.email;
         userInfo.birth = response.data.userInfo.birth;
-        userInfo.visitedAt = response.data.userInfo.visitedAt;
+        userInfo.visitedAt = response.data.userInfo.visitedAt.split("T")[0];
         // stamps = response.data.stamps;
         // 03. 데이터를 파싱하여, 스탬프의 등급을 포함한 데이터를 저장한다.
         for (var item of response.data.stamps) {
           // 03-00. 데이터 값을 가져온다.
           const id = item.id;
           const totalTime = item.totalTime;
-          const date = item.exitTime.split(" ")[0];
+          const date = item.exitTime.split("T")[0];
           const index = indexes[item.category.toLowerCase()];
 
           // 03-01. 등급(size)을 결정한다.
