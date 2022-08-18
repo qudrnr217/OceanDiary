@@ -20,6 +20,7 @@
               query: { dest: this.$route.query.dest },
             }"
             class="button-next"
+            @click="clickSound()"
             >다음</router-link
           >
         </div>
@@ -30,10 +31,16 @@
 
 <script>
 import { useStore } from "vuex";
+import useSound from "vue-use-sound";
+import clickSfx from "@/assets/Click.wav";
 export default {
   setup() {
+    const [clickSound] = useSound(clickSfx);
     var store = useStore();
     console.log(store.state.locationStore.location_url);
+    return {
+      clickSound,
+    };
   },
 };
 </script>

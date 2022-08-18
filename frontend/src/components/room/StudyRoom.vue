@@ -4,7 +4,9 @@
       <img src="@/assets/아이콘/coffe_icon.png" alt="" class="title-icon" />
       <div class="title-name">두 시의 도서관 스터디</div>
       <div class="exit-btn">
-        <button class="button-next" @click="LeaveSession()">나가기</button>
+        <button class="button-next" @click="LeaveSession(), clickSound()">
+          나가기
+        </button>
       </div>
     </div>
 
@@ -17,7 +19,8 @@
               :participantId="state.participantId"
               :name="state.pub_name"
             />
-            <!-- <user-video
+
+            <user-video
               v-for="sub in state.subscribers"
               :key="sub.stream.connection.connectionId"
               :streamManager="sub"
@@ -197,6 +200,8 @@ import UserList from "./component/UserList.vue";
 import ChatView from "./component/ChatView.vue";
 import TimeView from "./component/TimeView.vue";
 import moment from "moment";
+import useSound from "vue-use-sound";
+import clickSfx from "@/assets/Click.wav";
 axios.defaults.headers.post["Content-Type"] = "application/json";
 const OPENVIDU_SERVER_URL = "https://" + "i7a406.p.ssafy.io" + ":5443";
 const OPENVIDU_SERVER_SECRET = "A406";
@@ -214,9 +219,8 @@ export default {
     const store = useStore();
     var message = ref("");
     const router = useRouter();
-    var is_img = ref(true);
-    var is_mic = ref(true);
-    var is_camera = ref(true);
+    const [clickSound] = useSound(clickSfx);
+
     const state = reactive({
       screen_msg: undefined,
       OV: undefined,
@@ -706,9 +710,7 @@ export default {
       screen_share,
       submit_msg,
       LeaveSession,
-      is_img,
-      m_toggle,
-      OnMusic,
+      clickSound,
     };
   },
 };

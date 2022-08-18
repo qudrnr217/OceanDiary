@@ -11,7 +11,7 @@
           class="icon-create"
           alt="방생성"
           v-if="isMember"
-          @click="createRoom()"
+          @click="createRoom(), clickSound()"
         />
       </div>
       <div class="box-list">
@@ -33,7 +33,9 @@
                 ● {{ item.curNum }} / {{ item.maxNum }}
               </div>
               <div ref="button" class="room-card-button">
-                <div class="button-next" @click="enterRoom(item)">입장</div>
+                <div class="button-next" @click="enterRoom(item), clickSound()">
+                  입장
+                </div>
               </div>
             </div>
           </div>
@@ -49,12 +51,15 @@ import { onMounted, ref, reactive } from "vue";
 import { names, icons, indexes } from "@/const/const.js";
 import { useStore } from "vuex";
 import { getRoomList, joinRoom, getImageFile } from "@/api/webrtc.js";
-
+import useSound from "vue-use-sound";
+import clickSfx from "@/assets/Click.wav";
 export default {
   setup() {
+    const [clickSound] = useSound(clickSfx);
     const router = useRouter();
     const store = useStore();
 
+    console.log(store.state.userStore);
     const urlParams = new URL(location.href).searchParams;
     const dest = urlParams.get("dest");
     const index = indexes[dest];
@@ -82,7 +87,6 @@ export default {
       }
 
       joinRoom(
-        getToken(),
         item.roomId,
         inputPassword,
         (response) => {
@@ -126,14 +130,12 @@ export default {
     const button = ref(null);
     const imageFiles = reactive({});
     getRoomList(
-      getToken(),
       dest.toUpperCase(),
       0,
       (response) => {
         items.value = response.data.content;
         for (var con of response.data.content) {
           getImageFile(
-            getToken(),
             con.imageId,
             (response) => {
               imageFiles[response.data.id] = response.data.base64Str;
@@ -162,6 +164,7 @@ export default {
       enterRoom,
       imageFiles,
       isMember,
+      clickSound,
     };
   },
 };

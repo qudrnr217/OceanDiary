@@ -21,6 +21,8 @@
 <script>
 import { naverState } from "@/api/login.js";
 import { REDIRECT_URL } from "@/const/url.js";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 export default {
   data() {
     return {
@@ -28,6 +30,15 @@ export default {
     };
   },
   beforeCreate() {
+    const store = useStore();
+    const router = useRouter();
+    if (store.state.userStore.isLogin) {
+      router.push({
+        name: "station-chat",
+        params: { nextLink: "map", speech: "어디로 가시나요?" },
+      });
+      return;
+    }
     naverState(
       (response) => {
         console.log("네이버 상태코드 발급완료 : " + response.data.state);

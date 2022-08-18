@@ -50,6 +50,7 @@
           },
         }"
         class="button-metro"
+        @click="selectSound"
         >발 급</router-link
       >
     </div>
@@ -57,13 +58,17 @@
 </template>
 
 <script>
+import useSound from "vue-use-sound";
+import selectSfx from "@/assets/Select.wav";
+
 export default {
   setup() {
+    const [selectSound] = useSound(selectSfx);
     const day = new Date();
     const year = day.getFullYear();
     const month = day.getMonth() + 1;
     const date = day.getDate();
-    return { year, month, date };
+    return { year, month, date, selectSound };
   },
 };
 </script>
