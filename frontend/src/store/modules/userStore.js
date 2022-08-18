@@ -32,6 +32,14 @@ const userStore = {
     SET_NAME: (state, name) => {
       state.name = name;
     },
+    SET_INIT: (state) => {
+      state.isLogin = false;
+      state.social = "";
+      state.token = "";
+      state.oauthId = "";
+      state.name = "";
+      state.userId = Number;
+    },
   },
   // actions: {
   //   async userConfirm({ commit }, user) {

@@ -8,14 +8,12 @@
         class="title"
       />
     </div>
-    <div class="button">
-      <router-link
-        :to="{ name: 'login-menu' }"
-        class="start-btn"
-        @click="startSound()"
-        >시 작</router-link
-      >
-    </div>
+    <router-link
+      :to="{ name: 'login-menu' }"
+      class="button start-btn"
+      @click="startSound()"
+      >시 작</router-link
+    >
   </div>
 </template>
 
