@@ -83,7 +83,7 @@ export default {
   border-radius: 20px;
 }
 .ticket-icon {
-  height: 120px;
+  height: 50px;
   padding-top: 40px;
 }
 #ticket-top {
@@ -97,7 +97,7 @@ export default {
   text-align: center;
 }
 #ticket-left {
-  width: 60%;
+  width: 70%;
   height: 100%;
   display: flex;
   margin: auto;
@@ -105,7 +105,7 @@ export default {
   justify-content: center;
 }
 #ticket-right {
-  width: 40%;
+  width: 20%;
   height: 100%;
   display: flex;
   justify-content: left;

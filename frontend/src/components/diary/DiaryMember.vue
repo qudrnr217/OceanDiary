@@ -48,6 +48,11 @@
           </div>
           <div class="btn">
             <img
+              src="@/assets/아이콘/[아이콘]탈퇴버튼.png"
+              class="button-delete"
+              alt="탈퇴버튼"
+            />
+            <img
               src="@/assets/아이콘/[아이콘]수정버튼.png"
               class="button-modify"
               alt="수정버튼"
@@ -57,7 +62,7 @@
         <div class="right">
           <div class="top">
             <div class="first">
-              <div class="stamp">
+              <div class="stamp" v-if="stampsDOM[0].stampPath != ``">
                 <img :src="stampsDOM[0].stampPath" />
                 <div class="stamp-detail">
                   <div class="stamp-date">
@@ -71,11 +76,8 @@
               </div>
             </div>
             <div class="second">
-              <div class="stamp">
-                <img
-                  :src="stampsDOM[1].stampPath"
-                  v-if="stampsDOM[1].stampPath != ``"
-                />
+              <div class="stamp" v-if="stampsDOM[1].stampPath != ``">
+                <img :src="stampsDOM[1].stampPath" />
                 <div class="stamp-detail">
                   <div class="stamp-date">
                     {{ stampsDOM[1].date }}
@@ -162,50 +164,51 @@ import { onMounted } from "vue";
 import { useStore } from "vuex";
 export default {
   setup() {
-    const fakeData = [
-      {
-        id: 1,
-        category: "CAFE",
-        exitTime: "2022-08-17 11:11:11",
-        totalTime: "11:31:19",
-      },
-      {
-        id: 2,
-        category: "OCEAN",
-        exitTime: "2022-08-17 11:11:11",
-        totalTime: "06:31:19",
-      },
-      {
-        id: 3,
-        category: "FESTIVAL",
-        exitTime: "2022-08-17 11:11:11",
-        totalTime: "02:31:19",
-      },
-      {
-        id: 4,
-        category: "FESTIVAL",
-        exitTime: "2022-08-17 11:11:11",
-        totalTime: "11:31:19",
-      },
-      {
-        id: 5,
-        category: "HOUSE",
-        exitTime: "2022-08-17 11:11:11",
-        totalTime: "11:31:19",
-      },
-      {
-        id: 6,
-        category: "HOUSE",
-        exitTime: "2022-08-17 11:11:11",
-        totalTime: "02:31:19",
-      },
-      {
-        id: 7,
-        category: "CAFE",
-        exitTime: "2022-08-17 11:11:11",
-        totalTime: "11:31:19",
-      },
-    ];
+    const stamps = [];
+    // const fakeData = [
+    //   {
+    //     id: 1,
+    //     category: "CAFE",
+    //     exitTime: "2022-08-17 11:11:11",
+    //     totalTime: "11:31:19",
+    //   },
+    //   {
+    //     id: 2,
+    //     category: "OCEAN",
+    //     exitTime: "2022-08-17 11:11:11",
+    //     totalTime: "06:31:19",
+    //   },
+    //   {
+    //     id: 3,
+    //     category: "FESTIVAL",
+    //     exitTime: "2022-08-17 11:11:11",
+    //     totalTime: "02:31:19",
+    //   },
+    //   {
+    //     id: 4,
+    //     category: "FESTIVAL",
+    //     exitTime: "2022-08-17 11:11:11",
+    //     totalTime: "11:31:19",
+    //   },
+    //   {
+    //     id: 5,
+    //     category: "HOUSE",
+    //     exitTime: "2022-08-17 11:11:11",
+    //     totalTime: "11:31:19",
+    //   },
+    //   {
+    //     id: 6,
+    //     category: "HOUSE",
+    //     exitTime: "2022-08-17 11:11:11",
+    //     totalTime: "11:31:19",
+    //   },
+    //   {
+    //     id: 7,
+    //     category: "CAFE",
+    //     exitTime: "2022-08-17 11:11:11",
+    //     totalTime: "02:31:19",
+    //   },
+    // ];
     const store = useStore();
     const userInfo = reactive({
       name: "",
@@ -300,8 +303,9 @@ export default {
         userInfo.email = response.data.userInfo.email;
         userInfo.birth = response.data.userInfo.birth;
         userInfo.visitedAt = response.data.userInfo.visitedAt;
+        // stamps = response.data.stamps;
         // 03. 데이터를 파싱하여, 스탬프의 등급을 포함한 데이터를 저장한다.
-        for (var item of fakeData) {
+        for (var item of stamps) {
           // 03-00. 데이터 값을 가져온다.
           const id = item.id;
           const totalTime = item.totalTime;
@@ -410,9 +414,14 @@ export default {
 .user-info {
   height: 35%;
 }
+.button-delete {
+  float: right;
+  width: 20%;
+}
 .button-modify {
   float: right;
   width: 20%;
+  margin: auto 20px;
 }
 .btn {
   height: 15%;
