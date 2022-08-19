@@ -1,0 +1,65 @@
+= 다이어리 API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+== Diary API
+
+== *스탬프 생성*
+
+`POST /api/diary/stamp`
+
+요청 HTTP Request
+
+- form (JSON Data)
+
+include::{snippets}/create-stamp/http-request.adoc[]
+
+응답 HTTP Response
+
+include::{snippets}/create-stamp/http-response.adoc[]
+include::{snippets}/create-stamp/response-fields.adoc[]
+
+== *다이어리 조회*
+
+`GET /api/diary/user/{userId}`
+
+요청 HTTP Reqeust
+
+include::{snippets}/diary-contents/http-request.adoc[]
+include::{snippets}/diary-contents/path-parameters.adoc[]
+
+성공 응답 HTTP Response
+
+include::{snippets}/diary-contents/http-response.adoc[]
+include::{snippets}/diary-contents/response-fields.adoc[]
+
+== *유저 정보 수정*
+
+`PATCH /api/diary/user/{userId}/info`
+
+요청 HTTP Request
+
+include::{snippets}/update-user-info/http-request.adoc[]
+include::{snippets}/update-user-info/path-parameters.adoc[]
+
+성공 응답 HTTP Response
+
+include::{snippets}/update-user-info/http-response.adoc[]
+include::{snippets}/update-user-info/response-fields.adoc[]
+
+== *유저 탈퇴*
+`PATCH /api/diary/user/{userId}`
+
+요청 HTTP Request
+
+include::{snippets}/delete-user-info/http-request.adoc[]
+include::{snippets}/delete-user-info/path-parameters.adoc[]
+
+성공 응답 HTTP Response
+
+include::{snippets}/delete-user-info/http-response.adoc[]
+include::{snippets}/delete-user-info/response-fields.adoc[]
