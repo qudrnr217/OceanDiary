@@ -1,0 +1,160 @@
+= 방 API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+== WebRTC - Room API
+
+== *방 생성*
+
+`POST /api/rooms`
+
+요청 HTTP Request
+
+- form (JSON Data)
+----
+
+[source]
+ {
+      "categoryId": "LIBRARY",
+      "title": "테스트 방입니다",
+      "rule": "규칙 입니다.",
+      "maxNum": 4,
+      "isOpen": false,
+      "pw": "1234"
+ }
+
+----
+include::{snippets}/session-create-room/request-parts.adoc[]
+
+응답 HTTP Response
+
+include::{snippets}/session-create-room/http-response.adoc[]
+include::{snippets}/session-create-room/response-fields.adoc[]
+
+== *방 입장*
+
+`POST /api/rooms/{roomId}`
+
+요청 HTTP Request
+
+include::{snippets}/session-enter-room/http-request.adoc[]
+include::{snippets}/session-enter-room/request-fields.adoc[]
+
+
+응답 HTTP Response
+
+include::{snippets}/session-enter-room/http-response.adoc[]
+include::{snippets}/session-enter-room/response-fields.adoc[]
+
+== *방 퇴장*
+
+`DELETE /api/rooms/{roomId}/participants/{participantId}`
+
+요청 HTTP Request
+
+include::{snippets}/session-exit-room/http-request.adoc[]
+include::{snippets}/session-exit-room/path-parameters.adoc[]
+응답 HTTP Response
+
+include::{snippets}/session-exit-room/http-response.adoc[]
+include::{snippets}/session-exit-room/response-fields.adoc[]
+
+== *방 목록 - 검색 필터*
+
+`GET /api/rooms`
+
+요청 HTTP Request
+
+include::{snippets}/search-rooms/http-request.adoc[]
+
+성공 응답 HTTP Response
+
+include::{snippets}/search-rooms/http-response.adoc[]
+include::{snippets}/search-rooms/response-fields.adoc[]
+
+== *방 정보 - 조회*
+
+`GET /api/rooms/{roomId}/info`
+
+요청 HTTP Request
+
+include::{snippets}/room-info/http-request.adoc[]
+include::{snippets}/room-info/path-parameters.adoc[]
+
+성공 응답 HTTP Response
+
+include::{snippets}/room-info/http-response.adoc[]
+include::{snippets}/room-info/response-fields.adoc[]
+
+== *방 내부 상세정보 - 조회*
+
+`GET /api/rooms/{roomId}/detail`
+
+요청 HTTP Request
+
+include::{snippets}/room-detail/http-request.adoc[]
+include::{snippets}/room-detail/path-parameters.adoc[]
+
+성공 응답 HTTP Response
+
+include::{snippets}/room-detail/http-response.adoc[]
+include::{snippets}/room-detail/response-fields.adoc[]
+
+
+== *방 정보 수정*
+
+`PATCH /api/rooms/{roomId}/info`
+
+요청 HTTP Request
+
+include::{snippets}/update-room-info/http-request.adoc[]
+include::{snippets}/update-room-info/path-parameters.adoc[]
+include::{snippets}/update-room-info/request-fields.adoc[]
+
+성공 응답 HTTP Response
+
+include::{snippets}/update-room-info/http-response.adoc[]
+include::{snippets}/update-room-info/response-fields.adoc[]
+
+== *방 이미지 수정*
+
+`POST /api/rooms/{roomId}/image`
+
+요청 HTTP Request
+----
+[source]
+POST /api/rooms/1/image HTTP/1.1
+Content-Type: multipart/form-data;charset=UTF-8; boundary=6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Host: localhost:8080
+
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=file; filename=image.png
+Content-Type: image/png
+
+~BASE64 (생략)~
+----
+include::{snippets}/update-room-image/request-parts.adoc[]
+
+성공 응답 HTTP Response
+
+include::{snippets}/update-room-image/http-response.adoc[]
+
+include::{snippets}/update-room-image/response-fields.adoc[]
+
+== *방 강퇴*
+
+`POST /api/rooms/{roomId}/participants/{participantId}`
+
+요청 HTTP Request
+
+include::{snippets}/dropout-participant/http-request.adoc[]
+include::{snippets}/dropout-participant/path-parameters.adoc[]
+
+성공 응답 HTTP Response
+
+include::{snippets}/dropout-participant/http-response.adoc[]
+include::{snippets}/dropout-participant/response-fields.adoc[]

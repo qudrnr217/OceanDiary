@@ -1,0 +1,33 @@
+### 네이버 로그인을 위한 CSRF 방지 상태 코드 생성
+GET {{apiUrl}}/naver/state
+Authorization: {{authorizationToken}}
+Accept: application/json
+
+> {%  client.global.set("state", response.body.state) %}
+
+
+### 네이버 로그인 인증 토큰 생성 (URL 리다이렉트라 테스트 불가합니다.)
+GET https://nid.naver.com/oauth2.0/authorize?client_id={{naverApiClientId}}&response_type=code&redirect_uri={{domain}}&state={{state}}
+
+
+### 네이버 아이디로 로그인 (상기 API에서 가져온 code값을 사용하기에 테스트 불가합니다.)
+POST {{apiUrl}}/naver/login
+Authorization: {{authorizationToken}}
+Content-Type: application/json
+
+{
+  "code": "네이버에서 발급한 일회용 접근 코드 발급 코드"
+}
+
+
+### 네이버 아이디로 로그인 회원가입
+POST {{apiUrl}}/naver/signup
+Authorization: {{authorizationToken}}
+Content-Type: application/json
+
+{
+   "email": "jaewan9074@naver.com",
+   "name": "황재완",
+   "birth": "1998-09-02",
+   "oauthId": {{ouathId}}
+}
